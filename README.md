@@ -40,11 +40,11 @@ Build a machine learning pipeline that classifies Arabic customer complaints int
 | Member | Role |
 |---|---|
 | Feras | Leader + Data Collection + Evaluation |
-| Rima | Model Training |
 | Lana | Data Processing — Text Cleaning |
 | Khowla | Data Processing — Labeling & Splitting |
-| Meshal | API Integration |
+| Rima | Model Training |
 | Mohammed | Model Training |
+| Meshal | API Integration |
 
 ## Timeline (Phases)
 
