@@ -22,18 +22,6 @@ Build a machine learning pipeline that classifies Arabic customer complaints int
 | pandas / numpy | Data handling |
 | Gradio | Demo web interface |
 
-## Complaint Categories
-
-| ID | Arabic Label | Description |
-|---|---|---|
-| 0 | خدمة العملاء | Customer Service |
-| 1 | التوصيل والشحن | Delivery & Shipping |
-| 2 | جودة المنتج | Product Quality |
-| 3 | الفواتير والدفع | Billing & Payment |
-| 4 | المرتجعات والاسترداد | Returns & Refunds |
-| 5 | الموقع والتطبيق | Website & App |
-| 6 | العروض والخصومات | Offers & Discounts |
-| 7 | التوصيل المتأخر | Late Delivery |
 
 ## Team Roles
 
