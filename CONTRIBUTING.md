@@ -1,5 +1,62 @@
 # Contributing Guide
 
+## Getting Started
+
+Follow these steps **once** to set up your environment before doing anything else.
+
+### 1. Clone the repository
+
+Open a terminal (or Git Bash on Windows) and run:
+
+```bash
+git clone https://github.com/FerasMad/NLP-complaints-system.git
+cd NLP-complaints-system
+```
+
+If you have already cloned it before, just pull the latest changes instead:
+
+```bash
+git pull origin main
+```
+
+### 2. Open the setup notebook in Google Colab
+
+All work is done in **Google Colab** — no local Python installation is needed.
+
+1. Go to [colab.research.google.com](https://colab.research.google.com)
+2. Click **File → Open notebook → GitHub**
+3. Paste the repo URL: `https://github.com/FerasMad/NLP-complaints-system`
+4. Open `notebooks/00_setup.ipynb`
+5. Run all cells top-to-bottom — this mounts your Drive, installs dependencies, and pulls the repo
+
+> Run `00_setup.ipynb` **once at the start of every Colab session**.
+
+### 3. Create your branch
+
+After cloning, create your personal branch (replace with your own branch name from the table below):
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b lana/data-processing
+```
+
+Push your branch to GitHub so others can see it:
+
+```bash
+git push -u origin lana/data-processing
+```
+
+### 4. Open your assigned notebook
+
+Each member has a dedicated notebook in the `notebooks/` folder. Open it in Colab the same way as step 2.
+
+### 5. Submit your work
+
+When your task is complete, open a **Pull Request** on GitHub from your branch into `main`. Tag the team lead for review.
+
+---
+
 ## Branch Naming
 
 Each member works on their own branch:
