@@ -81,11 +81,12 @@ pipeline_svm = Pipeline([
 1. Load `data/processed/train.csv` and `val.csv`
 2. Train both pipelines on training set
 3. Evaluate both on validation set using weighted F1
-4. Save best model: `import joblib; joblib.dump(best_model, 'models/classifier.pkl')`
+4. Document: which model won and by how much (val F1 difference)
+5. Save best model: `import joblib; joblib.dump(best_model, 'models/classifier.pkl')`
 
 ---
 
-### Lana + Khowla — Data Processing
+### Lana + Khowla — Data Processing (Text Cleaning + Labeling & Splitting)
 
 **Branch:** Each creates their own (`lana/data-processing`, `khowla/data-processing`)
 
@@ -102,9 +103,11 @@ pipeline_svm = Pipeline([
    ```
 3. Remove punctuation, extra whitespace, non-Arabic characters
 
-**Khowla — Splitting:**
+**Khowla — Labeling & Splitting:**
 
-**Goal:** Encode labels and create stratified train/val/test splits.
+**Goal:** Verify category assignments and encode labels, then create stratified train/val/test splits.
+
+> **Labeling ownership note:** The data team (Lana + Khowla) owns ALL labeling decisions — both category assignment and integer encoding. The raw CSV from Feras includes `category_id` set by convention; Khowla verifies each row's category is correct before encoding.
 
 **Steps:**
 1. Encode `category_id` as integer labels (0–7)
