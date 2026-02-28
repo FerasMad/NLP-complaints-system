@@ -5,18 +5,19 @@
 Each member works on their own branch:
 
 ```
-member1/data-collection
-member2/preprocessing
-member3/model-training
-member4/evaluation
-member5/demo
+feras/data-collection
+rima/model-training
+lana/data-processing
+khowla/data-processing
+meshal/api-integration
+mohammed/model-training
 ```
 
 Create your branch from `main`:
 ```bash
 git checkout main
 git pull origin main
-git checkout -b member2/preprocessing
+git checkout -b lana/data-processing
 ```
 
 Open a Pull Request to `main` when your phase is complete.
@@ -25,41 +26,36 @@ Open a Pull Request to `main` when your phase is complete.
 
 ## Member Tasks
 
-### Member 1 — Data Collection
+### Feras — Leader + Data Collection + Evaluation
 
-**Goal:** Collect 150+ labeled Arabic complaint texts per category (1,200 total minimum).
+**Data Collection Goal:** Collect 150+ labeled Arabic complaint texts per category (1,200 total minimum).
 
-**Steps:**
+**Data Collection Steps:**
 1. Read `sample_complaints.csv` (shared on Drive) to understand the format and tone
 2. Collect real or realistic Arabic complaints for each of the 8 categories
 3. Save as `data/raw/complaints_raw.csv` with columns: `category_id`, `category_ar`, `text`
-4. Upload the file to the shared Google Drive folder
-5. Do NOT commit raw data to GitHub
+4. Upload the file to the shared Google Drive folder — do NOT commit raw data to GitHub
 
 **Target per category:** 150+ rows
 **Total target:** 1,200+ rows
 
----
+**Evaluation Goal (after model is trained):** Report model performance on the held-out test set.
 
-### Member 2 — Preprocessing
-
-**Goal:** Clean Arabic text and prepare train/val/test splits.
-
-**Steps:**
-1. Load `data/raw/complaints_raw.csv`
-2. Use CAMeL Tools to normalize and tokenize Arabic text:
-   ```python
-   from camel_tools.utils.normalize import normalize_unicode
-   from camel_tools.tokenizers.word import simple_word_tokenize
-   ```
-3. Remove punctuation, extra whitespace, non-Arabic characters
-4. Encode `category_id` as integer labels (0–7)
-5. Split: 70% train / 15% val / 15% test (stratified)
-6. Save to `data/processed/`: `train.csv`, `val.csv`, `test.csv`
+**Evaluation Steps:**
+1. Load `data/processed/test.csv` and `models/classifier.pkl`
+2. Generate predictions
+3. Compute and report:
+   - Overall accuracy
+   - Weighted F1-score
+   - Per-class precision, recall, F1 (`classification_report`)
+   - Confusion matrix (plot with seaborn heatmap)
+4. Identify the 2–3 weakest categories and document why
 
 ---
 
-### Member 3 — Model Training
+### Rima + Mohammed — Model Training
+
+**Branch:** Each creates their own (`rima/model-training`, `mohammed/model-training`)
 
 **Goal:** Train TF-IDF + classifier and save the best model.
 
@@ -89,47 +85,76 @@ pipeline_svm = Pipeline([
 
 ---
 
-### Member 4 — Evaluation
+### Lana + Khowla — Data Processing
 
-**Goal:** Report model performance on the held-out test set.
+**Branch:** Each creates their own (`lana/data-processing`, `khowla/data-processing`)
+
+**Lana — Text Cleaning:**
+
+**Goal:** Clean and normalize raw Arabic complaint text.
 
 **Steps:**
-1. Load `data/processed/test.csv` and `models/classifier.pkl`
-2. Generate predictions
-3. Compute and report:
-   - Overall accuracy
-   - Weighted F1-score
-   - Per-class precision, recall, F1 (`classification_report`)
-   - Confusion matrix (plot with seaborn heatmap)
-4. Identify the 2–3 weakest categories and document why
+1. Load `data/raw/complaints_raw.csv`
+2. Use CAMeL Tools to normalize and tokenize Arabic text:
+   ```python
+   from camel_tools.utils.normalize import normalize_unicode
+   from camel_tools.tokenizers.word import simple_word_tokenize
+   ```
+3. Remove punctuation, extra whitespace, non-Arabic characters
+
+**Khowla — Splitting:**
+
+**Goal:** Encode labels and create stratified train/val/test splits.
+
+**Steps:**
+1. Encode `category_id` as integer labels (0–7)
+2. Split: 70% train / 15% val / 15% test (stratified)
+3. Save to `data/processed/`: `train.csv`, `val.csv`, `test.csv`
 
 ---
 
-### Member 5 — Demo (Gradio)
+### Meshal — API Integration
 
-**Goal:** Build a simple Arabic text → predicted category web demo.
+**Branch:** `meshal/api-integration`
+
+**Goal:** Build a REST API to serve the trained model.
 
 **Steps:**
 1. Load `models/classifier.pkl`
-2. Build Gradio interface:
-   ```python
-   import gradio as gr
-   import joblib
+2. Build a REST API endpoint (Flask or FastAPI):
+   - `POST /predict` — accepts `{ "text": "..." }`, returns `{ "category": "..." }`
+3. Save as `app/api.py`
 
-   model = joblib.load('models/classifier.pkl')
-   categories = ['خدمة العملاء', 'التوصيل والشحن', 'جودة المنتج',
-                 'الفواتير والدفع', 'المرتجعات والاسترداد',
-                 'الموقع والتطبيق', 'العروض والخصومات', 'التوصيل المتأخر']
+---
 
-   def predict(text):
-       pred = model.predict([text])[0]
-       return categories[pred]
+### All Members — Demo
 
-   demo = gr.Interface(fn=predict, inputs='text', outputs='text',
-                       title='Arabic Complaint Classifier')
-   demo.launch()
-   ```
-3. Save as `app/app.py`
+**Collective task** (no dedicated branch — done on `main` after merge)
+
+**Goal:** Run the Gradio interface together for the final presentation.
+
+**Steps:**
+1. Each member tests their own category predictions using the Gradio interface
+2. Present results collectively
+
+**Gradio interface (already implemented in `app/app.py`):**
+```python
+import gradio as gr
+import joblib
+
+model = joblib.load('models/classifier.pkl')
+categories = ['خدمة العملاء', 'التوصيل والشحن', 'جودة المنتج',
+              'الفواتير والدفع', 'المرتجعات والاسترداد',
+              'الموقع والتطبيق', 'العروض والخصومات', 'التوصيل المتأخر']
+
+def predict(text):
+    pred = model.predict([text])[0]
+    return categories[pred]
+
+demo = gr.Interface(fn=predict, inputs='text', outputs='text',
+                    title='Arabic Complaint Classifier')
+demo.launch()
+```
 
 ---
 
