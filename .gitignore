@@ -1,0 +1,29 @@
+# Data files (not committed — share via Google Drive)
+data/raw/
+data/processed/
+*.csv
+
+# Trained models
+models/
+*.pkl
+*.joblib
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
