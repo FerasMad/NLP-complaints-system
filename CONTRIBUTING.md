@@ -30,6 +30,33 @@ The project is in Phase 0 (setup and onboarding). Data collection and all downst
 
 ---
 
+## Phase 6 — Deployment (Meshal + Feras)
+
+**Goal:** Put the trained system on a public website.
+
+**Architecture:**
+- `app/api.py` — FastAPI service (`POST /predict`), deployed as a Render Web Service
+- `app/app.py` — Gradio interface that calls the live FastAPI endpoint, deployed as a second Render Web Service
+
+**Meshal's Steps:**
+1. Complete `app/api.py`:
+   - Load `models/classifier.pkl` at startup
+   - Expose `POST /predict` — accepts `{"text": "..."}`, returns `{"category": "..."}`
+   - Add CORS middleware so the Gradio frontend can call it
+2. Complete `app/app.py`:
+   - Gradio `Interface` that posts to the live API URL (not local)
+   - RTL layout hint for Arabic input text
+3. Create `render.yaml` (Render blueprint) defining both services
+4. Upload `models/classifier.pkl` as a Render persistent disk or GitHub release asset
+5. Deploy both services on Render.com free tier
+6. Verify end-to-end: enter an Arabic complaint → API returns correct category label
+
+**What "done" means:**
+- A public URL exists where anyone can type an Arabic complaint and receive a category
+- Both services stay running after the team's Colab session ends
+
+---
+
 ## What NOT to Commit
 
 - Raw or processed data files (`data/`)
