@@ -21,8 +21,6 @@ Build a machine learning pipeline that classifies Arabic customer complaints int
 | CAMeL Tools | Arabic text normalization and tokenization |
 | pandas / numpy | Data handling |
 | Gradio | Demo web interface |
-| FastAPI + uvicorn | REST API serving the trained model (`POST /predict`) |
-| Render.com | Cloud hosting for API and Gradio frontend |
 
 
 ## Team Roles
@@ -36,11 +34,14 @@ Build a machine learning pipeline that classifies Arabic customer complaints int
 | Mohammed | Model Training |
 | Meshal | API Integration |
 
-## Status
+## Timeline (Phases)
 
-**Phase 0** (current): Project setup, team onboarding, environment verification, and synthetic data reference. Data collection and downstream phases will follow.
-
-**Phase 6**: Deployment — host FastAPI on Render.com, connect Gradio frontend to live API endpoint
+- **Phase 0** (current): Project setup, team onboarding, data reference
+- **Phase 1**: Data collection — 150+ complaints per category (1,200 total)
+- **Phase 2**: Preprocessing — cleaning, normalization, train/val/test split **(next — Lana & Khowla)**
+- **Phase 3**: Model training — TF-IDF + LR/SVM, save best model
+- **Phase 4**: Evaluation — metrics, confusion matrix, weak category report
+- **Phase 5**: Demo — Gradio interface
 
 ## Folder Structure (will be populated in later phases)
 

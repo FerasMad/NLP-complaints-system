@@ -30,30 +30,120 @@ The project is in Phase 0 (setup and onboarding). Data collection and all downst
 
 ---
 
-## Phase 6 — Deployment (Meshal + Feras)
+## Phase 2 — Data Processing
 
-**Goal:** Put the trained system on a public website.
+### Lana — Text Cleaning
 
-**Architecture:**
-- `app/api.py` — FastAPI service (`POST /predict`), deployed as a Render Web Service
-- `app/app.py` — Gradio interface that calls the live FastAPI endpoint, deployed as a second Render Web Service
+**Notebook:** `notebooks/02_text_cleaning.ipynb`
+**Branch:** `lana/data-processing`
 
-**Meshal's Steps:**
-1. Complete `app/api.py`:
-   - Load `models/classifier.pkl` at startup
-   - Expose `POST /predict` — accepts `{"text": "..."}`, returns `{"category": "..."}`
-   - Add CORS middleware so the Gradio frontend can call it
-2. Complete `app/app.py`:
-   - Gradio `Interface` that posts to the live API URL (not local)
-   - RTL layout hint for Arabic input text
-3. Create `render.yaml` (Render blueprint) defining both services
-4. Upload `models/classifier.pkl` as a Render persistent disk or GitHub release asset
-5. Deploy both services on Render.com free tier
-6. Verify end-to-end: enter an Arabic complaint → API returns correct category label
+**Steps:**
+1. Run `00_setup.ipynb` first (once per session) to mount Drive and pull the repo
+2. Open `02_text_cleaning.ipynb` and run all cells top-to-bottom
+3. The notebook loads `data/text/complaints_labeled.csv` and `data/text/complaints_unlabeled.csv` from the repo
+4. It applies Arabic normalization (tashkeel removal, alef/ya/ta-marbuta normalisation, punctuation removal)
+5. Saves two cleaned CSVs to your Drive: `data/processed/complaints_labeled_clean.csv` and `data/processed/complaints_unlabeled_clean.csv`
+6. Commit and push **only the notebook** on your branch (`lana/data-processing`) — never commit the CSV files
 
-**What "done" means:**
-- A public URL exists where anyone can type an Arabic complaint and receive a category
-- Both services stay running after the team's Colab session ends
+**Done when:** `complaints_labeled_clean.csv` and `complaints_unlabeled_clean.csv` exist in the shared Drive folder.
+
+---
+
+### Khowla — Labeling & Splitting
+
+**Notebook:** `notebooks/03_labeling_splitting.ipynb`
+**Branch:** `khowla/data-processing`
+**Requires:** Lana's output in `data/processed/` (coordinate with Lana first)
+
+**Steps:**
+1. Run `00_setup.ipynb` first (once per session)
+2. Open `03_labeling_splitting.ipynb` and run all cells top-to-bottom
+3. The notebook loads `complaints_labeled_clean.csv` from the shared Drive
+4. Displays label distribution — confirm all 8 categories are present and roughly balanced
+5. Encodes category names → integers (0–7), saves `label_map.json`
+6. Performs a stratified 70/15/15 train/val/test split
+7. Saves `train.csv`, `val.csv`, `test.csv` to `data/processed/` on Drive
+8. Commit and push **only the notebook** on your branch (`khowla/data-processing`)
+
+**Done when:** `train.csv`, `val.csv`, `test.csv`, and `label_map.json` exist in the shared Drive folder.
+
+---
+
+### Rima + Mohammed — Model Training
+
+**Branch:** Each creates their own (`rima/model-training`, `mohammed/model-training`)
+
+**Goal:** Train TF-IDF + classifier and save the best model.
+
+**Pipeline (no pre-trained LLMs — TF-IDF only):**
+```python
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import LinearSVC
+from sklearn.pipeline import Pipeline
+
+pipeline_lr = Pipeline([
+    ('tfidf', TfidfVectorizer(max_features=10000, ngram_range=(1, 2))),
+    ('clf', LogisticRegression(max_iter=1000))
+])
+
+pipeline_svm = Pipeline([
+    ('tfidf', TfidfVectorizer(max_features=10000, ngram_range=(1, 2))),
+    ('clf', LinearSVC())
+])
+```
+
+**Steps:**
+1. Load `data/processed/train.csv` and `val.csv`
+2. Train both pipelines on training set
+3. Evaluate both on validation set using weighted F1
+4. Document: which model won and by how much (val F1 difference)
+5. Save best model: `import joblib; joblib.dump(best_model, 'models/classifier.pkl')`
+
+---
+
+### Meshal — API Integration
+
+**Branch:** `meshal/api-integration`
+
+**Goal:** Build a REST API to serve the trained model.
+
+**Steps:**
+1. Load `models/classifier.pkl`
+2. Build a REST API endpoint (Flask or FastAPI):
+   - `POST /predict` — accepts `{ "text": "..." }`, returns `{ "category": "..." }`
+3. Save as `app/api.py`
+
+---
+
+### All Members — Demo
+
+**Collective task** (no dedicated branch — done on `main` after merge)
+
+**Goal:** Run the Gradio interface together for the final presentation.
+
+**Steps:**
+1. Each member tests their own category predictions using the Gradio interface
+2. Present results collectively
+
+**Gradio interface (already implemented in `app/app.py`):**
+```python
+import gradio as gr
+import joblib
+
+model = joblib.load('models/classifier.pkl')
+categories = ['خدمة العملاء', 'التوصيل والشحن', 'جودة المنتج',
+              'الفواتير والدفع', 'المرتجعات والاسترداد',
+              'الموقع والتطبيق', 'العروض والخصومات', 'التوصيل المتأخر']
+
+def predict(text):
+    pred = model.predict([text])[0]
+    return categories[pred]
+
+demo = gr.Interface(fn=predict, inputs='text', outputs='text',
+                    title='Arabic Complaint Classifier')
+demo.launch()
+```
 
 ---
 
