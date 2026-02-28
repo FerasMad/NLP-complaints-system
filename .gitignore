@@ -1,7 +1,8 @@
-# Data files (not committed — share via Google Drive)
+# Data files — raw and processed CSVs excluded; data/text/ is tracked
 data/raw/
 data/processed/
-*.csv
+data/raw/*.csv
+data/processed/*.csv
 
 # Trained models
 models/
