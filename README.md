@@ -34,14 +34,9 @@ Build a machine learning pipeline that classifies Arabic customer complaints int
 | Mohammed | Model Training |
 | Meshal | API Integration |
 
-## Timeline (Phases)
+## Status
 
-- **Phase 0** (current): Project setup, team onboarding, data reference
-- **Phase 1**: Data collection — 150+ complaints per category (1,200 total)
-- **Phase 2**: Preprocessing — cleaning, normalization, train/val/test split
-- **Phase 3**: Model training — TF-IDF + LR/SVM, save best model
-- **Phase 4**: Evaluation — metrics, confusion matrix, weak category report
-- **Phase 5**: Demo — Gradio interface
+**Phase 0** (current): Project setup, team onboarding, environment verification, and synthetic data reference. Data collection and downstream phases will follow.
 
 ## Folder Structure (will be populated in later phases)
 
