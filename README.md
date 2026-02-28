@@ -2,7 +2,7 @@
 
 ## Goal
 
-Build a machine learning pipeline that classifies Arabic customer complaints into one of 8 predefined categories. The system is trained entirely on data collected by the team — no pre-trained language models are used.
+Build a machine learning pipeline that classifies Arabic customer complaints into a ist predefined categories. The system is trained entirely on data collected by the team — no pre-trained language models are used.
 
 ## Model Approach
 
