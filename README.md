@@ -38,7 +38,7 @@ Build a machine learning pipeline that classifies Arabic customer complaints int
 
 - **Phase 0** (current): Project setup, team onboarding, data reference
 - **Phase 1**: Data collection 
-- **Phase 2**: Preprocessing — cleaning, normalization, train/val/test split **(next — Lana & Khowla)**
+- **Phase 2**: Preprocessing — cleaning, normalization, train/val/test split 
 - **Phase 3**: Model training — TF-IDF + LR/SVM, save best model
 - **Phase 4**: Evaluation — metrics, confusion matrix, weak category report
 - **Phase 5**: Demo — Gradio interface
