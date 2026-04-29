@@ -8,3 +8,5 @@ uvicorn>=0.29
 gradio>=4.0
 seaborn>=0.13
 matplotlib>=3.8
+google-play-scraper>=1.2
+requests>=2.31
