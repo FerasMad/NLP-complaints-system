@@ -1,0 +1,32 @@
+services:
+  # FastAPI service serving POST /predict
+  - type: web
+    name: complaints-api
+    runtime: python
+    plan: free
+    buildCommand: |
+      pip install -r requirements.txt
+      curl -L $MODEL_URL -o models/classifier.pkl
+    startCommand: uvicorn app.api:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: MODEL_PATH
+        value: models/classifier.pkl
+      - key: MODEL_URL
+        sync: false  # set in Render dashboard — GitHub release URL or HF Hub URL
+      - key: CONFIDENCE_THRESHOLD
+        value: "0.30"
+      - key: PYTHON_VERSION
+        value: "3.10"
+
+  # Gradio frontend that calls the API
+  - type: web
+    name: complaints-ui
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app/app.py
+    envVars:
+      - key: API_URL
+        sync: false  # set after API service deploys, e.g. https://complaints-api.onrender.com/predict
+      - key: PYTHON_VERSION
+        value: "3.10"
