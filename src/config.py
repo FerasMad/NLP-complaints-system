@@ -65,4 +65,4 @@ REGRESSION_MACRO_F1_FLOOR = 0.85
 REGRESSION_MIN_CLASS_FLOOR = 0.65
 
 # --- HF Hub (single-model deploy) ---
-DEFAULT_HF_REPO_ID_SINGLE = "FerasMad/arabic-complaints-camelbert-mix"
+DEFAULT_HF_REPO_ID_SINGLE = "FerasMad/arabic-complaints-classifier"

@@ -4,7 +4,7 @@ Loads the single best CAMeLBERT-mix model from HuggingFace Hub at startup
 and serves a polished Gradio UI styled with the Thmanyah typeface.
 
 Set HF_REPO_ID env var in your Space settings to your HF model repo ID,
-e.g. "FerasMad/arabic-complaints-camelbert-mix".
+e.g. "FerasMad/arabic-complaints-classifier".
 """
 import base64
 import os
@@ -19,7 +19,7 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 # ---- Config ----
 HF_REPO_ID = os.environ.get(
     "HF_REPO_ID",
-    "FerasMad/arabic-complaints-camelbert-mix",  # replace with your HF model repo
+    "FerasMad/arabic-complaints-classifier",  # replace with your HF model repo
 )
 HF_REVISION = os.environ.get("HF_REVISION", None)
 MAX_LENGTH = 192

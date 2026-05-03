@@ -5,12 +5,12 @@
 #
 # Usage:
 #   bash scripts/upload_to_hf.sh <hf-username> [repo-name]
-#   bash scripts/upload_to_hf.sh FerasMad arabic-complaints-camelbert-mix
+#   bash scripts/upload_to_hf.sh FerasMad arabic-complaints-classifier
 
 set -euo pipefail
 
 USER="${1:-}"
-REPO_NAME="${2:-arabic-complaints-camelbert-mix}"
+REPO_NAME="${2:-arabic-complaints-classifier}"
 
 if [ -z "$USER" ]; then
     echo "Usage: $0 <hf-username> [repo-name]"
