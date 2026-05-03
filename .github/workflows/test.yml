@@ -1,0 +1,72 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  data-pipeline-tests:
+    name: Data pipeline tests (no model loading)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install lightweight deps
+        run: |
+          python -m pip install --upgrade pip
+          # Just what's needed for data pipeline tests; skip torch/transformers
+          pip install pytest pandas numpy
+
+      - name: Verify processed data exists
+        run: |
+          if [ ! -f "data/processed/label_map.json" ]; then
+            echo "label_map.json not present in CI checkout — generating..."
+            # CI doesn't have data committed; this job is a stub for now.
+            # In a fuller setup, fetch from HF datasets or run src/split_dataset.py.
+            echo "::warning::data/processed missing in CI; skipping data tests"
+            exit 0
+          fi
+
+      - name: Run data tests
+        run: |
+          if [ -f "data/processed/label_map.json" ]; then
+            pytest tests/test_data_pipeline.py -v -m "not gpu"
+          fi
+
+  inference-smoke-test:
+    name: Inference smoke (CPU; loads model from HF Hub)
+    runs-on: ubuntu-latest
+    # Disabled by default — model hosting on HF Hub is required.
+    # Enable by setting `if: ${{ vars.ENABLE_INFERENCE_TESTS == 'true' }}` once HF_REPO secret is set.
+    if: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install full deps
+        run: |
+          python -m pip install --upgrade pip
+          # Install CPU-only torch for CI
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements.txt
+
+      - name: Download model from HF Hub
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_REPO: ${{ vars.HF_REPO }}
+        run: |
+          python -c "from huggingface_hub import snapshot_download; snapshot_download('$HF_REPO', local_dir='models/ensemble_artifacts', token='$HF_TOKEN')"
+
+      - name: Run inference tests
+        run: pytest tests/test_inference.py tests/test_api.py -v -m "integration"

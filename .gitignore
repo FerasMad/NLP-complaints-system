@@ -4,10 +4,19 @@ data/processed/
 data/raw/*.csv
 data/processed/*.csv
 
-# Trained models
-models/
-*.pkl
-*.joblib
+# Trained models — too large for git, fetched from HF Hub at deploy time
+models/bakeoff/
+models/ensemble/
+models/error_analysis/
+models/*.pkl
+models/*.joblib
+models/*.bin
+models/*.safetensors
+models/*.txt
+models/*.png
+# But DO track the ensemble manifest (it's small + critical for deploy)
+!models/ensemble_final/
+!models/ensemble_final/*.json
 
 # Python
 __pycache__/
@@ -31,3 +40,14 @@ Thumbs.db
 
 # Tooling
 .claude/
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# CI artifacts
+*.log
+
+# Gradio cache
+.gradio/
