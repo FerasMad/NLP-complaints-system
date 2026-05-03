@@ -354,12 +354,11 @@ with gr.Blocks(title="تصنيف شكاوى المطاعم العربية", anal
 | وقت الانتظار | In-restaurant wait time |
 
 **Limitations:**
-- Specialized for Saudi/Gulf dialect (intentional). Egyptian / Levantine / pure MSA performance is lower (see REPORT.md §cross-dialect).
+- Specialized for Saudi/Gulf dialect (intentional). Egyptian / Levantine / pure MSA performance is lower.
 - Single-label only — for multi-aspect complaints, the top-3 list shows alternatives.
 - Not for safety-critical decisions.
 
 **Source code:** [github.com/FerasMad/NLP-complaints-system](https://github.com/FerasMad/NLP-complaints-system)
-**Typography:** [Thmanyah Typeface](https://thmanyah.com/)
 """
         )
 

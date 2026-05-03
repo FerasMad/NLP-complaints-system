@@ -9,7 +9,7 @@ import pytest
 
 
 def test_label_map_is_8_classes(label_map_path):
-    """Schema is 8 categories (ambiance was dropped — see REPORT.md)."""
+    """Schema is 8 categories (ambiance was dropped — see README)."""
     with open(label_map_path, encoding="utf-8") as f:
         m = json.load(f)
     assert len(m) == 8, f"expected 8 classes (post-ambiance-drop), got {len(m)}"

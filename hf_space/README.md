@@ -52,6 +52,4 @@ Classify Arabic restaurant complaints into 8 actionable categories. Saudi-Gulf d
 
 ## Source
 
-- Code: https://github.com/FerasMad/NLP-complaints-system
-- Full report: [REPORT.md](https://github.com/FerasMad/NLP-complaints-system/blob/main/REPORT.md)
-- Model card: [MODEL_CARD.md](https://github.com/FerasMad/NLP-complaints-system/blob/main/MODEL_CARD.md)
+https://github.com/FerasMad/NLP-complaints-system

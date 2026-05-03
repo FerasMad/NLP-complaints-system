@@ -40,6 +40,4 @@ assignees: ''
 <!-- Drag in any relevant files -->
 
 ## Have you checked
-- [ ] [REPORT.md](../../REPORT.md) — known limitations
-- [ ] [models/error_analysis/error_analysis_report.md](../../models/error_analysis/error_analysis_report.md) — known failure modes
 - [ ] Existing issues for duplicates

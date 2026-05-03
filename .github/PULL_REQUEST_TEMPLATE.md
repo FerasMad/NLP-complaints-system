@@ -17,8 +17,7 @@
 - [ ] If deps changed: `pip install -e .` works in a fresh venv
 
 ## Checklist
-- [ ] CHANGELOG.md updated
-- [ ] If schema/contract changed: MODEL_CARD.md, DATA_CARD.md, REPORT.md updated as needed
+- [ ] If schema/contract changed: README.md updated
 - [ ] No model weight files committed (use HF Hub instead)
 - [ ] No secrets / tokens committed (HF_TOKEN, OPENAI_API_KEY, etc.)
 - [ ] Type hints + docstrings added on public functions

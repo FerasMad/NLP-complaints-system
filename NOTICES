@@ -46,7 +46,7 @@ This project loads and fine-tunes the following pretrained models. Their origina
 ## Datasets
 
 ### Production complaints dataset
-- Internal pre-existing labeled Arabic restaurant complaints. Provenance documented in DATA_CARD.md.
+- Internal pre-existing labeled Arabic restaurant complaints.
 - Used for training and as primary source of test/val data.
 
 ### Google Play scraped reviews

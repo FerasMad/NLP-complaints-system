@@ -106,7 +106,7 @@ print(probs.argmax().item())  # 3 (جودة الطعام)
 - EDA augmentation on minority classes (دقة الطلب, عامة)
 - Seed: 2024
 
-Training data: ~98K labeled Arabic complaints from production data + scraped Saudi food delivery app reviews. Full provenance in [DATA_CARD.md](https://github.com/FerasMad/NLP-complaints-system/blob/main/DATA_CARD.md).
+Training data: ~98K labeled Arabic complaints from production data + scraped Saudi food delivery app reviews.
 
 ## Limitations
 
