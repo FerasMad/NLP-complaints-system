@@ -36,7 +36,6 @@ Classify Arabic restaurant complaints into 8 actionable categories. Saudi-Gulf d
 | Test weighted F1 | 95.08% |
 | Test macro F1 | 92.03% |
 | Min class F1 (عامة) | 84.84% |
-| Calibration ECE (T=1.523) | 0.014 |
 
 ## Categories
 

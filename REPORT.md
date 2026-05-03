@@ -12,11 +12,8 @@
 | Test weighted F1 | 95.08% | [94.72%, 95.43%] |
 | Test macro F1 | 92.03% | [91.20%, 92.87%] |
 | Min class F1 (عامة) | 84.84% | [81.0%, 88.3%] |
-| Calibration ECE (untuned) | 0.034 | — |
-| Calibration ECE (T=1.523) | 0.014 | — |
-| Mean robustness (6 perturbations) | 95.6% | — |
-| Inference (ensemble GPU p50) | 18 ms | — |
-| Inference (single-model CPU p50) | 16 ms | — |
+
+Calibration ECE 0.014 after T=1.523. Mean robustness 95.6% across 6 perturbations. Inference: 18 ms (ensemble GPU p50), 16 ms (single CPU p50).
 
 All 8 categories pass ≥80% F1. Spread is 11.3 points (worst عامة 84.9%, best food 96.2%).
 
@@ -78,46 +75,18 @@ Diagram of the same flow is in [README.md §Approach](README.md#approach).
 
 ## Calibration
 
-ECE (Expected Calibration Error, 10 bins): 0.0192 → well calibrated (threshold for "well": ECE < 0.03).
-
-| Confidence threshold | Coverage | Accuracy at threshold |
-|---:|---:|---:|
-| ≥ 0.50 | 99.8% | 95.1% |
-| ≥ 0.70 | 96.4% | 96.4% |
-| ≥ 0.80 | 92.4% | 97.3% |
-| ≥ 0.90 | 89.9% | 97.9% |
-| ≥ 0.95 | 87.8% | 98.3% |
-| ≥ 0.99 | 83.0% | 98.9% |
-
-When the model returns confidence ≥ 0.90, it is right ~98% of the time. For confidence-gated workflows, 0.90 is a safe threshold. Below 0.50 (only 0.2% of inputs), fall back to "عامة" or human review.
-
-Plot: [models/calibration_plot.png](models/calibration_plot.png).
+Test ECE 0.014 after temperature scaling (T=1.523, fitted on val NLL). Untuned ECE was 0.034. At confidence ≥ 0.90, the model is right ~98% of the time — safe threshold for confidence-gated workflows. Plot: [models/calibration_plot.png](models/calibration_plot.png).
 
 ---
 
-## Inference benchmarks (RTX 4070 / Intel CPU)
+## Inference (RTX 4070 / Intel CPU, p50)
 
-### Single-request latency
+| Config | GPU | CPU |
+|---|---:|---:|
+| single best (capALL_s2024_v2) | 4 ms | 16 ms |
+| ensemble (4 models) | 18 ms | 77 ms |
 
-| Config | Device | p50 (ms) | p95 (ms) | p99 (ms) | mean (ms) |
-|---|---|---:|---:|---:|---:|
-| single best (capALL_s2024_v2) | cuda | 4.4 | 4.5 | 4.5 | 4.4 |
-| single best | cpu | 16.2 | 18.5 | 19.0 | 16.4 |
-| ensemble (4 models) | cuda | 17.7 | 20.1 | 21.1 | 18.0 |
-| ensemble (4 models) | cpu | 76.3 | 89.5 | 92.8 | 77.0 |
-
-### Throughput (req/s)
-
-| Config | Device | batch=1 | batch=8 | batch=32 |
-|---|---|---:|---:|---:|
-| single | cuda | 220 | 1,232 | 4,256 |
-| single | cpu | 61 | 130 | 246 |
-| ensemble | cuda | 55 | 310 | 851 |
-| ensemble | cpu | 13 | 35 | 64 |
-
-Free-tier HuggingFace Spaces (CPU) handles ~13 req/s with the full ensemble (~77 ms / request). For higher throughput, use the single-model variant (61 req/s) at the cost of ~0.3% accuracy.
-
-Full benchmarks: [models/benchmarks.txt](models/benchmarks.txt).
+Free-tier HF Spaces CPU handles ~13 req/s with the full ensemble. Single-model variant gets ~61 req/s for ~0.3% accuracy cost. Full numbers: [models/benchmarks.txt](models/benchmarks.txt).
 
 ---
 

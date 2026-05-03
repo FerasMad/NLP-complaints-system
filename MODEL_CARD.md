@@ -42,8 +42,6 @@
 | Weighted F1 | 95.08% | [94.72%, 95.43%] |
 | Macro F1 | 92.03% | [91.20%, 92.87%] |
 | Min class F1 (عامة) | 84.84% | [81.0%, 88.3%] |
-| Calibration ECE (T=1.523) | 0.014 | — |
-| Mean robustness (6 perturbations) | 95.6% | — |
 
 Per-class F1 in [REPORT.md](REPORT.md). Confusion matrix and error analysis at [models/error_analysis/](models/error_analysis/).
 

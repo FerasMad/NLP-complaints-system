@@ -25,9 +25,6 @@ Held-out test set, 13,986 real reviews:
 | Weighted F1 | 95.08% | [94.72%, 95.43%] |
 | Macro F1 | 92.03% | [91.20%, 92.87%] |
 | Min class F1 | 84.84% | [81.0%, 88.3%] |
-| Calibration ECE | 0.014 | — |
-| Inference latency (single GPU, p50) | 4.4 ms | — |
-| Inference latency (ensemble CPU, p50) | 77 ms | — |
 
 Per-class F1 (test):
 
