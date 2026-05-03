@@ -33,6 +33,34 @@ Inference: uniform average of softmax probabilities. Wired in [app/ensemble_infe
 
 ---
 
+## Methodology
+
+How we got from start to finish.
+
+1. **Linear baseline.** TF-IDF char n-grams + LinearSVC, 9 categories. Test acc 89.8%, but per-class F1 was ugly: ambiance 24%, order accuracy 22%. Linear models miss dialect markers.
+
+2. **Switched to fine-tuned BERT.** CAMeLBERT-mix on the same data → 93.2% acc, 76.7% macro F1. Big jump on minority classes.
+
+3. **Scaled the data.** Real-data starvation was the bottleneck. Scraped 4 Saudi delivery apps (HungerStation, Jahez, Mrsool, Talabat) across 3 star-bands with pagination → 14,789 unique reviews. Keyword-filtered into التوصيل + دقة الطلب. دقة الطلب went 137 → 714 real samples.
+
+4. **Multi-source data pipeline.** Production corpus + scrape + dialectal synthetic templates + ChatGPT-generated + back-translation + multi-model pseudo-labels (top-2 ensemble agree at ≥0.90 confidence). Hard rule: anything synthetic/augmented is train-only, never in val/test. Caught and patched a leakage bug where pseudo-labels were sneaking into eval.
+
+5. **Bake-off across 5 architectures.** CAMeLBERT-mix (×2 seeds), CAMeLBERT-da, MARBERT, AraBERTv02, XLM-R. Picked the top 4 by val macro F1. Lost: CAMeLBERT-da (cleaning strips its dialect advantage) and XLM-R (multilingual loses to Arabic-specific).
+
+6. **Dropped the ambiance category.** Could not get F1 above 35% no matter what. Audit of the 171 val+test gold labels: only 2 were truly clean ambiance, 47% probably mislabeled, 40% multi-aspect. Removed the category. Test acc 94.07 → 94.86, macro F1 82.8 → 90.5, min class F1 35 → 79.
+
+7. **EDA boost on the bottom 2 classes.** Random word swap/delete/insert on دقة الطلب + عامة only. Both crossed 85% F1.
+
+8. **Eval rigor.** Bootstrap CI on test (n=1000): 95.05% [94.70%, 95.41%]. Temperature scaling (T=1.523) cut ECE 0.034 → 0.014. Perturbation robustness 95.6% mean stability across 6 perturbations. Cross-dialect canary documenting Saudi specialization as intentional. Per-category label-noise audit. Per-source eval (production vs Play Store).
+
+9. **Tried back-translation on عامة (didn't work).** 1,410 MarianMT Ar→En→Ar paraphrases. Single-model val improved +2.2%. Ensemble test regressed −1.2%. BT drift is amplified by the ensemble. Reverted. Documented in §Discarded approaches.
+
+10. **Production hardening.** Real Python package (`pip install -e .`), FastAPI with `/healthz` `/readyz` `/metrics` `/predict_batch`, PII scrubbing, OOD abstain, restricted CORS, rate limiting. Gradio UI for HF Spaces. Test suite: data integrity + Hypothesis property tests + determinism + 200-row regression gate.
+
+Diagram of the same flow is in [README.md §Approach](README.md#approach).
+
+---
+
 ## Per-class F1 on test set
 
 | Category | Train rows | Test rows | F1 |

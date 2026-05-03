@@ -41,6 +41,68 @@ Per-class F1 (test):
 
 Full results, methodology, ablations: [REPORT.md](REPORT.md).
 
+## Approach
+
+TF-IDF baseline → fine-tuned BERT → multi-source data scaling → 4-model ensemble → drop a broken category → boost the floor → harden eval → deploy.
+
+```
+              ┌─────────────────────────────────────────┐
+              │            DATA  (~98K rows)            │
+              │  production · Play Store scrape         │
+              │  synthetic templates · pseudo-labels    │
+              │  EDA on دقة الطلب + عامة                │
+              └────────────────┬────────────────────────┘
+                               │
+                        clean() pipeline
+                  tashkeel · alef · ya · ta-marbuta
+                               │
+                  stratified 70/15/15 on REAL ONLY
+                  synthetic + augmented → train only
+                               │
+                               ▼
+              ┌─────────────────────────────────────────┐
+              │                BAKE-OFF                 │
+              │  CAMeLBERT-mix×2  CAMeLBERT-da  ✗       │
+              │  MARBERT  AraBERTv02  XLM-R  ✗          │
+              │             ↓ top 4 by val mF1          │
+              └────────────────┬────────────────────────┘
+                               │
+                  ┌────────────┴────────────┐
+                  │  drop ambiance          │
+                  │  (audit: 2/171 clean)   │
+                  └────────────┬────────────┘
+                               │
+                  ┌────────────┴────────────┐
+                  │  EDA boost              │
+                  │  دقة الطلب · عامة ≥ 85% │
+                  └────────────┬────────────┘
+                               │
+                               ▼
+              ┌─────────────────────────────────────────┐
+              │             4-MODEL ENSEMBLE            │
+              │   uniform softmax average               │
+              │   + temperature scaling (T = 1.523)     │
+              └────────────────┬────────────────────────┘
+                               │
+                               ▼
+              ┌─────────────────────────────────────────┐
+              │                  EVAL                   │
+              │  bootstrap CI · calibration · robustness│
+              │  cross-dialect · per-source · per-class │
+              ├─────────────────────────────────────────┤
+              │  95.05% acc · 92.03% macro F1           │
+              │  every class ≥ 80% F1 · ECE 0.014       │
+              └────────────────┬────────────────────────┘
+                               │
+                               ▼
+              ┌─────────────────────────────────────────┐
+              │                 DEPLOY                  │
+              │  FastAPI · Gradio · HF Hub · HF Space   │
+              └─────────────────────────────────────────┘
+```
+
+Step-by-step in [REPORT.md §Methodology](REPORT.md#methodology).
+
 ## Quick start
 
 ```bash
