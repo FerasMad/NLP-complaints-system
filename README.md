@@ -1,92 +1,114 @@
-# Arabic NLP Complaints Classification System
+# Arabic Restaurant Complaints Classifier
 
-## Goal
-
-Build a machine learning pipeline that classifies Arabic customer complaints into 9 actionable categories. The system is trained entirely on data collected and processed by the team — no pre-trained language models are used.
-
-## Model Approach
-
-**TF-IDF + Classical ML Classifier (no LLMs, no AraBERT)**
-
-- Text vectorization: TF-IDF with Arabic-aware tokenization (CAMeL Tools)
-- Classifiers: Logistic Regression and SVM — best model selected by validation weighted F1
-- Class imbalance handled via `class_weight='balanced'`
-- Evaluation: Accuracy, Weighted F1, per-class report, Confusion Matrix
+Classify Arabic restaurant complaints into 8 actionable categories. Saudi-Gulf dialect specialization, 95% test accuracy, every category ≥80% F1.
 
 ## Categories
 
-| ID | Arabic | Description |
-|----|--------|-------------|
-| 0 | التوصيل | Delivery: late, missing, wrong address, driver issues |
-| 1 | الجو والمكان | Ambiance: noise, seating, decor, parking |
-| 2 | السعر والقيمة | Price/value complaints |
-| 3 | النظافة | Cleanliness, hygiene |
-| 4 | جودة الطعام | Food quality: taste, freshness, portion |
-| 5 | خدمة الموظفين | Staff behavior, attitude |
-| 6 | دقة الطلب | Order accuracy: wrong/missing items |
-| 7 | عامة | General fallback |
-| 8 | وقت الانتظار | In-restaurant wait time |
+| ID | Arabic | English |
+|----|--------|---------|
+| 0 | التوصيل | Delivery |
+| 1 | السعر والقيمة | Price / value |
+| 2 | النظافة | Cleanliness |
+| 3 | جودة الطعام | Food quality |
+| 4 | خدمة الموظفين | Staff service |
+| 5 | دقة الطلب | Order accuracy |
+| 6 | عامة | General |
+| 7 | وقت الانتظار | Wait time |
 
-## Tech Stack
+## Performance
 
-| Tool | Purpose |
-|------|---------|
-| Python 3.10+ | Core language |
-| scikit-learn | TF-IDF, classifiers, evaluation |
-| CAMeL Tools | Arabic text normalization and tokenization |
-| pandas / numpy | Data handling |
-| google-play-scraper | Arabic review scraping (Saudi food delivery apps) |
-| Gradio | Demo web interface |
-| FastAPI + uvicorn | REST API serving the trained model |
-| Render.com | Cloud hosting |
+Held-out test set, 13,986 real reviews:
 
-## Team Roles
+| Metric | Value | 95% CI |
+|---|---:|---|
+| Accuracy | **95.05%** | [94.70%, 95.41%] |
+| Weighted F1 | 95.08% | [94.72%, 95.43%] |
+| Macro F1 | 92.03% | [91.20%, 92.87%] |
+| Min class F1 | 84.84% | [81.0%, 88.3%] |
+| Calibration ECE | 0.014 | — |
+| Inference latency (single GPU, p50) | 4.4 ms | — |
+| Inference latency (ensemble CPU, p50) | 77 ms | — |
 
-| Member | Role |
-|--------|------|
-| Feras | Leader + Evaluation |
-| Lana | Text Cleaning |
-| Khowla | Labeling & Splitting |
-| Rima | Model Training |
-| Mohammed | Model Training |
-| Meshal | API Integration + Deployment |
+Per-class F1 (test):
 
-## Dataset
+| Category | F1 | | Category | F1 |
+|---|---:|---|---|---:|
+| جودة الطعام | 96.2% | | التوصيل | 90.1% |
+| خدمة الموظفين | 95.8% | | دقة الطلب | 86.7% |
+| النظافة | 95.3% | | عامة | 84.9% |
+| السعر والقيمة | 94.7% | | | |
+| وقت الانتظار | 91.9% | | | |
 
-**95,340 labeled Arabic complaint texts** across 9 categories.
+Full results, methodology, ablations: [REPORT.md](REPORT.md).
 
-Sources:
-- 88,415 rows from a production Arabic restaurant complaint dataset
-- 1,008 scraped from Saudi food delivery apps (HungerStation, Jahez, Mrsool, Talabat) for التوصيل
-- 565 from large-arabic-sentiment RES1 negative reviews for الجو والمكان
-- 6,925 synthetic template-generated rows to balance the small categories
+## Quick start
 
-Splits (stratified 70/15/15):
-- `data/processed/train.csv` — 66,735 rows
-- `data/processed/val.csv` — 14,298 rows
-- `data/processed/test.csv` — 14,307 rows
-
-## Folder Structure
-
-```
-NLP-complaint-system/
-├── data/
-│   ├── text/              # Source CSVs (labeled, unlabeled, synthetic)
-│   ├── raw/               # Scraped Play Store reviews
-│   └── processed/         # Cleaned + split train/val/test + label_map.json
-├── models/                # classifier.pkl after training
-├── notebooks/             # Per-phase Colab notebooks
-├── src/                   # Data preparation scripts
-│   ├── scrape_reviews.py
-│   ├── build_dataset.py
-│   ├── generate_synthetic.py
-│   └── split_dataset.py
-├── app/                   # Gradio demo + FastAPI service
-├── README.md
-├── CONTRIBUTING.md
-└── requirements.txt
+```bash
+py -m venv .venv
+.venv/Scripts/python -m pip install -e .
+# GPU users:
+# .venv/Scripts/python -m pip install torch --index-url https://download.pytorch.org/whl/cu124
 ```
 
-## Status
+```python
+from app.ensemble_inference import EnsembleClassifier
 
-**Phases 0–2 complete.** Phase 3 (model training) is current.
+clf = EnsembleClassifier("models/ensemble_final/config.json")
+result = clf.predict("الاكل بايخ ومالح")
+print(result.category, result.confidence)
+# جودة الطعام 0.99
+```
+
+REST API:
+
+```bash
+.venv/Scripts/python -m uvicorn app.api:app --port 8000
+curl -X POST http://localhost:8000/predict \
+    -H 'Content-Type: application/json' \
+    -d '{"text": "الاكل بايخ"}'
+```
+
+Gradio (local + public *.gradio.live URL, 72h, no account):
+
+```bash
+SHARE=true .venv/Scripts/python -m app.space_app
+```
+
+UI is styled with the [Thmanyah typeface](https://thmanyah.com/).
+
+## Model
+
+4 fine-tuned Arabic BERTs averaged at inference:
+
+- CAMeLBERT-mix (CAMeL-Lab) — 2 seeds for diversity
+- MARBERT (UBC-NLP) — Twitter-trained, dialect-friendly
+- AraBERTv02 (aubmindlab)
+
+Ensemble manifest: [`models/ensemble_final/config.json`](models/ensemble_final/config.json).
+Lighter single-model variant: [`models/single_final/config.json`](models/single_final/config.json) — ~440 MB, ~94.86% test acc.
+
+## Layout
+
+```
+.
+├── app/                  # API + Gradio + EnsembleClassifier
+├── src/                  # data + training + eval scripts
+├── tests/                # pytest suite
+├── models/ensemble_final # ensemble manifest
+├── data/                 # labeled CSVs + canary sets
+├── hf_space/             # turnkey HuggingFace Spaces deploy directory
+├── scripts/              # launch + upload helpers
+└── docs (README, REPORT, MODEL_CARD, DATA_CARD, DEPLOYMENT, CHANGELOG)
+```
+
+## Team
+
+Feras (lead, evaluation), Lana (text cleaning), Khowla (labeling/splitting), Rima + Mohammed (model training), Meshal (deployment).
+
+## License
+
+[MIT](LICENSE). Upstream model licenses in [NOTICES](NOTICES).
+
+## Live demo
+
+https://huggingface.co/spaces/<your-username>/arabic-complaints-classifier *(deploy steps in [hf_space/HOW_TO_DEPLOY.md](hf_space/HOW_TO_DEPLOY.md); link goes here once live)*
