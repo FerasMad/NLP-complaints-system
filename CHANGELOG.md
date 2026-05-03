@@ -16,7 +16,7 @@ Notable changes to the model + repo.
 - ensemble_inference rewrite: graceful degradation, OOD abstain, model SHA pinning, structured PredictionResult.
 - API rewrite: /healthz + /readyz, POST /predict_batch, optional Prometheus + slowapi, PII scrubbing, structured logging, restricted CORS.
 - Test suite: data pipeline, pure-logic unit tests (no model loading), Hypothesis property tests, determinism, 200-row regression gate.
-- Visual identity: Thmanyah typeface (3 families × 5 weights) embedded as data URIs.
+- Gradio UI: dark theme, RTL Arabic, top-3 with confidence bars, example chips.
 - Turnkey HF Spaces deploy directory ([hf_space/](hf_space/)).
 - Single-model deploy variant ([models/single_final/config.json](models/single_final/config.json)).
 - LICENSE (MIT), SECURITY.md, NOTICES, Dockerfile, .editorconfig, .pre-commit-config.yaml.

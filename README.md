@@ -137,8 +137,6 @@ Gradio (local + public *.gradio.live URL, 72h, no account):
 SHARE=true .venv/Scripts/python -m app.space_app
 ```
 
-UI is styled with the [Thmanyah typeface](https://thmanyah.com/).
-
 ## Model
 
 4 fine-tuned Arabic BERTs averaged at inference:
