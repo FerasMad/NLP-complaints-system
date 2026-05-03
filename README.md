@@ -111,4 +111,4 @@ Feras (lead, evaluation), Lana (text cleaning), Khowla (labeling/splitting), Rim
 
 ## Live demo
 
-https://huggingface.co/spaces/<your-username>/arabic-complaints-classifier *(deploy steps in [hf_space/HOW_TO_DEPLOY.md](hf_space/HOW_TO_DEPLOY.md); link goes here once live)*
+https://huggingface.co/spaces/<your-username>/arabic-complaints-classifier

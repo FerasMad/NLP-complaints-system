@@ -26,7 +26,7 @@
     "عامة": 0.0,
     "وقت الانتظار": 0.0
   },
-  "label_map_path": "data/processed/label_map.json",
+  "label_map_path": "models/label_map.json",
   "max_length": 192,
   "metrics": {
     "test_accuracy": 0.9486,

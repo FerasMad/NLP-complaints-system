@@ -29,7 +29,9 @@ MIN_ARABIC_RATIO = float(os.environ.get("MIN_ARABIC_RATIO", "0.30"))
 SHARE = os.environ.get("SHARE", "").lower() in {"1", "true", "yes", "y"}
 
 ROOT = Path(__file__).resolve().parent.parent
-FONTS_DIR = ROOT / "assets" / "fonts"
+# Optional Thmanyah typeface — drop the .woff2 files into FONTS_DIR locally to use them.
+# Not shipped in the source repo (commercial license).
+FONTS_DIR = Path(os.environ.get("FONTS_DIR", str(ROOT / "assets" / "fonts")))
 
 
 # ---- Load model ----
@@ -374,7 +376,7 @@ if __name__ == "__main__":
         share=SHARE,
         server_name="0.0.0.0" if SHARE else "127.0.0.1",
         server_port=int(os.environ.get("PORT", 7860)),
-        allowed_paths=[str(FONTS_DIR)],
+        allowed_paths=[str(FONTS_DIR)] if FONTS_DIR.exists() else [],
         theme=gr.themes.Base(),
         css=CSS,
     )

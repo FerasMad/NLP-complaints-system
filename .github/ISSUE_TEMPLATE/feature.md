@@ -18,7 +18,7 @@ assignees: ''
 ## Impact
 - [ ] Affects model accuracy (needs eval)
 - [ ] Affects API contract (needs version bump)
-- [ ] Affects deployment story (needs DEPLOYMENT.md update)
+- [ ] Affects deployment story
 - [ ] Adds dependencies
 - [ ] Pure dev-experience improvement
 

@@ -1,8 +1,7 @@
-# Data files — raw and processed CSVs excluded; data/text/ is tracked
-data/raw/
-data/processed/
-data/raw/*.csv
-data/processed/*.csv
+# Data — training-only artifacts not shipped; canary set is the exception
+data/
+!data/canary/
+!data/canary/*
 
 # Trained models — too large for git, fetched from HF Hub at deploy time
 models/bakeoff/
@@ -14,9 +13,15 @@ models/*.bin
 models/*.safetensors
 models/*.txt
 models/*.png
-# But DO track the ensemble manifest (it's small + critical for deploy)
+# But DO track the ensemble manifest + label map (small, critical for runtime)
 !models/ensemble_final/
 !models/ensemble_final/*.json
+!models/single_final/
+!models/single_final/*.json
+!models/label_map.json
+
+# Local-only docs
+PROJECT_HANDOFF.md
 
 # Python
 __pycache__/

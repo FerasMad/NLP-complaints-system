@@ -230,7 +230,7 @@ Saudi-Gulf specialization is intentional. The model is designed for the training
 - Inference module: [app/ensemble_inference.py](app/ensemble_inference.py)
 - FastAPI service: [app/api.py](app/api.py)
 - Gradio UI (HF Spaces): [app/space_app.py](app/space_app.py)
-- HF Spaces turnkey directory: [hf_space/](hf_space/), step-by-step in [hf_space/HOW_TO_DEPLOY.md](hf_space/HOW_TO_DEPLOY.md)
+- HF Spaces turnkey directory: [hf_space/](hf_space/) — drop into a fresh Gradio Space, set `HF_REPO_ID` to your model repo, push.
 - Single-model lighter variant: [models/single_final/config.json](models/single_final/config.json)
 
 Local smoke test:
@@ -250,18 +250,13 @@ SHARE=true .venv/Scripts/python -m app.space_app
 End-to-end rerun (~7 hours on RTX 4070):
 
 ```bash
+# Build the dataset
 py src/scrape_reviews.py
 py src/rebuild_dataset.py
 py src/generate_synthetic.py
-py src/load_chatgpt_ambiance.py    # only if data/raw/chatgpt_ambiance.txt exists
 py src/split_dataset.py
-py src/run_bakeoff.py              # bake-off all 5 architectures
+py src/run_bakeoff.py
 py src/pseudo_label.py
-py src/split_dataset.py            # re-split with pseudo-labels train-only
-
-# Drop ambiance
-py src/audit_ambiance_eval.py
-py src/drop_ambiance.py
 py src/split_dataset.py
 
 # EDA boost the bottom 2 classes

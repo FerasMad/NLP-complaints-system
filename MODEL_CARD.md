@@ -92,4 +92,4 @@ Per-class F1 in [REPORT.md](REPORT.md). Confusion matrix and error analysis at [
 
 - **Recommended:** the 4-model ensemble at [models/ensemble_final/config.json](models/ensemble_final/config.json) (~1.8 GB total disk).
 - **Lighter option:** single best model `models/bakeoff/camelbert-mix_8c_capALL_s2024_v2_final` (~440 MB, val acc 94.90%, test acc 94.86%). Manifest at [models/single_final/config.json](models/single_final/config.json).
-- See [DEPLOYMENT.md](DEPLOYMENT.md) and [hf_space/HOW_TO_DEPLOY.md](hf_space/HOW_TO_DEPLOY.md) for HF Spaces deployment steps.
+- HF Spaces turnkey bundle in [`hf_space/`](hf_space/) — drop into a Gradio Space, set `HF_REPO_ID`, push.

@@ -20,7 +20,7 @@ def ensemble_config_path():
 
 @pytest.fixture(scope="session")
 def label_map_path():
-    return ROOT / "data" / "processed" / "label_map.json"
+    return ROOT / "models" / "label_map.json"
 
 
 @pytest.fixture(scope="session")

@@ -25,7 +25,9 @@ HF_REVISION = os.environ.get("HF_REVISION", None)
 MAX_LENGTH = 192
 MIN_ARABIC_RATIO = 0.30
 NUM_LABELS = 8
-FONTS_DIR = Path(__file__).parent / "fonts"
+# Optional Thmanyah typeface — not bundled in source (commercial license).
+# Drop .woff2 files into FONTS_DIR locally or in the Space repo to enable them.
+FONTS_DIR = Path(os.environ.get("FONTS_DIR", str(Path(__file__).parent / "fonts")))
 
 CATEGORIES = [
     "التوصيل", "السعر والقيمة", "النظافة", "جودة الطعام",
