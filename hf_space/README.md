@@ -8,7 +8,7 @@ sdk_version: 4.44.0
 app_file: app.py
 pinned: true
 license: mit
-short_description: 8-class Arabic restaurant complaint classifier — 95% test accuracy
+short_description: Classify Arabic restaurant complaints into 8 categories
 tags:
   - arabic
   - nlp
