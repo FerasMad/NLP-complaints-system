@@ -1,0 +1,5 @@
+torch>=2.6
+transformers>=5.7
+sentencepiece>=0.2
+gradio>=4.44
+numpy>=1.24

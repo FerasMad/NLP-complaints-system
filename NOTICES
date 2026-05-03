@@ -1,0 +1,72 @@
+## Third-party model licenses
+
+This project loads and fine-tunes the following pretrained models. Their original licenses apply to those weights; our fine-tuned weights inherit and combine accordingly.
+
+### CAMeLBERT-Mix
+- Repository: https://huggingface.co/CAMeL-Lab/bert-base-arabic-camelbert-mix
+- Authors: CAMeL Lab, NYU Abu Dhabi
+- License: MIT
+- Usage in this project: fine-tuned for 8-class classification (two seeds, both used in the production ensemble)
+
+### MARBERT
+- Repository: https://huggingface.co/UBC-NLP/MARBERT
+- Authors: UBC-NLP (Abdul-Mageed et al.)
+- License: Apache 2.0
+- Citation:
+  ```
+  @inproceedings{abdul-mageed-etal-2021-arbert,
+    title = "{ARBERT} {\&} {MARBERT}: Deep Bidirectional Transformers for {A}rabic",
+    author = "Abdul-Mageed, Muhammad and Elmadany, AbdelRahim and Nagoudi, El Moatez Billah",
+    booktitle = "ACL/IJCNLP 2021",
+  }
+  ```
+- Usage: fine-tuned for 8-class classification (used in the production ensemble)
+
+### AraBERTv02
+- Repository: https://huggingface.co/aubmindlab/bert-base-arabertv02
+- Authors: aubmindlab (Antoun et al.)
+- License: MIT-like (research use; see model card)
+- Citation:
+  ```
+  @inproceedings{antoun2020arabert,
+    title="AraBERT: Transformer-based Model for Arabic Language Understanding",
+    author="Antoun, Wissam and Baly, Fady and Hajj, Hazem",
+    booktitle="LREC 2020 Workshop on Arabic NLP",
+  }
+  ```
+- Usage: fine-tuned for 8-class classification (used in the production ensemble)
+
+### Helsinki-NLP MarianMT (used during data augmentation only)
+- Repositories:
+  - https://huggingface.co/Helsinki-NLP/opus-mt-ar-en
+  - https://huggingface.co/Helsinki-NLP/opus-mt-en-ar
+- License: CC-BY-4.0
+- Usage: back-translation augmentation for the (later-dropped) ambiance category. NOT used at inference time. Not part of the deployed ensemble.
+
+## Datasets
+
+### Production complaints dataset
+- Internal pre-existing labeled Arabic restaurant complaints. Provenance documented in DATA_CARD.md.
+- Used for training and as primary source of test/val data.
+
+### Google Play scraped reviews
+- Public reviews of Saudi food delivery apps (HungerStation, Jahez, Mrsool, Talabat).
+- Scraped via google-play-scraper Python package. All reviews were already publicly visible at the time of scraping.
+
+### RES1 negative reviews
+- Subset of large-arabic-sentiment dataset, negative-polarity subset, keyword-filtered for ambiance content.
+- Used during 9-class training; rows were removed when the ambiance category was dropped.
+
+### ChatGPT-generated synthetic
+- ~2,000 dialectal Saudi-Gulf ambiance complaints generated externally via OpenAI GPT-4o.
+- Used during 9-class training; rows were removed when the ambiance category was dropped.
+
+## Project code
+
+This project's code (under `src/`, `app/`, `tests/`, and config files) is licensed under MIT.
+
+## Acknowledgments
+
+- AI Club (host institution) for the project context.
+- Arabic NLP research community for the pretrained model checkpoints.
+- The original creators of the production complaints dataset and the large-arabic-sentiment corpus.
