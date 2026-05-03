@@ -1,0 +1,50 @@
+{
+  "name": "Arabic Complaints Classifier — 4-model ensemble (8-class)",
+  "description": "Uniform softmax average of 4 Arabic BERT variants on the 8-category schema. EDA augmentation boosted دقة الطلب and عامة specifically. 95.05% test accuracy, 92.03% test macro F1, min class F1 84.84%. Untuned biases. Optional T=1.523 temperature scaling at inference (see temperature.json).",
+  "schema_version": "8class",
+  "categories": [
+    "التوصيل",
+    "السعر والقيمة",
+    "النظافة",
+    "جودة الطعام",
+    "خدمة الموظفين",
+    "دقة الطلب",
+    "عامة",
+    "وقت الانتظار"
+  ],
+  "models": [
+    "models/bakeoff/camelbert-mix_8c_capALL_s42_final",
+    "models/bakeoff/camelbert-mix_8c_capALL_s2024_v2_final",
+    "models/bakeoff/marbert_8c_capALL_v2_final",
+    "models/bakeoff/arabertv02_8c_v3_final"
+  ],
+  "weighting": "uniform",
+  "tuned_biases": {
+    "التوصيل": 0.0,
+    "السعر والقيمة": 0.0,
+    "النظافة": 0.0,
+    "جودة الطعام": 0.0,
+    "خدمة الموظفين": 0.0,
+    "دقة الطلب": 0.0,
+    "عامة": 0.0,
+    "وقت الانتظار": 0.0
+  },
+  "label_map_path": "data/processed/label_map.json",
+  "max_length": 192,
+  "metrics": {
+    "test_accuracy": 0.9505,
+    "test_weighted_f1": 0.9508,
+    "test_macro_f1": 0.9203,
+    "test_min_class_f1": 0.8484
+  },
+  "per_class_test_f1": {
+    "جودة الطعام": 0.962,
+    "خدمة الموظفين": 0.958,
+    "النظافة": 0.953,
+    "السعر والقيمة": 0.947,
+    "وقت الانتظار": 0.919,
+    "التوصيل": 0.901,
+    "دقة الطلب": 0.867,
+    "عامة": 0.849
+  }
+}

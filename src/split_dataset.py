@@ -12,7 +12,11 @@ import csv
 import json
 import os
 import random
+import sys
 from collections import defaultdict, Counter
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 random.seed(42)
 
@@ -26,10 +30,11 @@ def main():
         rows = list(csv.DictReader(f))
     print(f"Loaded {len(rows)} rows from {IN}")
 
-    real = [r for r in rows if r.get("source") != "synthetic"]
-    synth = [r for r in rows if r.get("source") == "synthetic"]
-    print(f"  real: {len(real)}")
-    print(f"  synthetic: {len(synth)}")
+    train_only_sources = {"synthetic", "augmented_bt", "chatgpt_synthetic", "pseudo_labeled", "eda_augmented"}
+    real = [r for r in rows if r.get("source") not in train_only_sources]
+    synth = [r for r in rows if r.get("source") in train_only_sources]
+    print(f"  real (split into train/val/test): {len(real)}")
+    print(f"  train-only (synthetic + augmented): {len(synth)}")
 
     # build label map from ALL categories
     categories = sorted({r["category"] for r in rows})
