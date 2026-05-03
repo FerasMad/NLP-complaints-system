@@ -237,7 +237,7 @@ DESCRIPTION_MD = """
 """
 
 
-with gr.Blocks(title="تصنيف شكاوى المطاعم العربية", analytics_enabled=False) as demo:
+with gr.Blocks(title="تصنيف شكاوى المطاعم العربية", analytics_enabled=False, theme=gr.themes.Base(), css=CSS) as demo:
     gr.Markdown(
         """# تصنيف شكاوى المطاعم العربية
 ## Arabic Restaurant Complaints Classifier"""
@@ -284,4 +284,7 @@ with gr.Blocks(title="تصنيف شكاوى المطاعم العربية", anal
 
 
 if __name__ == "__main__":
-    demo.launch(theme=gr.themes.Base(), css=CSS)
+    demo.launch()
+
+# HF Spaces auto-launches the `demo` variable; no manual launch needed there.
+demo.queue()
