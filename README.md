@@ -102,6 +102,10 @@ Step-by-step in [REPORT.md §Methodology](REPORT.md#methodology).
 
 ## Quick start
 
+No GPU? Open the [Colab notebook](notebooks/colab_demo.ipynb) — [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/FerasMad/NLP-complaints-system/blob/main/notebooks/colab_demo.ipynb) — runs on the free tier.
+
+Local install:
+
 ```bash
 py -m venv .venv
 .venv/Scripts/python -m pip install -e .
