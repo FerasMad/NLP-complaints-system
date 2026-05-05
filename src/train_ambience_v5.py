@@ -286,6 +286,25 @@ def train(args, T) -> dict:
             "ambience_f1": float(amb_f1),
         }
 
+    # Detect whether val has any ambience rows. If not, ambience_f1 is
+    # always 0 and using it for best-model selection would pick a random
+    # checkpoint. Codex's first run hit this exact failure mode: trained
+    # 4 epochs with ambience F1 = 0 on val (synthetic-only ambience is
+    # train-only by leakage gate), and "best" model was worse than the
+    # final checkpoint. Fall back to weighted_f1 in that case.
+    val_has_ambience = (val_df["category"] == "الجو والمكان").any()
+    best_metric = args.best_metric
+    if best_metric == "ambience_f1" and not val_has_ambience:
+        print(
+            "[train] WARNING: val split has zero ambience rows "
+            "(synthetic-only training). Switching metric_for_best_model "
+            "from 'ambience_f1' to 'weighted_f1' to avoid noise-driven "
+            "checkpoint selection. Pass --best-metric weighted_f1 to "
+            "silence this warning, or add real ambience rows to val.",
+            file=sys.stderr,
+        )
+        best_metric = "weighted_f1"
+
     args.output_dir.mkdir(parents=True, exist_ok=True)
     training_args = T["TrainingArguments"](
         output_dir=str(args.output_dir / "_checkpoints"),
@@ -297,8 +316,9 @@ def train(args, T) -> dict:
         weight_decay=0.01,
         eval_strategy="epoch",
         save_strategy="epoch",
-        load_best_model_at_end=True,
-        metric_for_best_model="ambience_f1",
+        save_total_limit=2,  # keep last 2 checkpoints; full 4 ate ~2GB
+        load_best_model_at_end=not args.promote_final_checkpoint,
+        metric_for_best_model=best_metric,
         greater_is_better=True,
         logging_steps=50,
         report_to=[],
@@ -311,7 +331,7 @@ def train(args, T) -> dict:
         args=training_args,
         train_dataset=train_ds,
         eval_dataset=val_ds,
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
         data_collator=T["DataCollatorWithPadding"](tokenizer),
         compute_metrics=compute_metrics,
     )
@@ -333,14 +353,22 @@ def train(args, T) -> dict:
     trainer.save_model(str(args.output_dir))
     tokenizer.save_pretrained(str(args.output_dir))
 
-    # The HF config.json will already exist; add our schema_version + metrics
+    # The HF config.json will already exist; add our schema_version + metrics.
+    # Strip the "eval_" prefix that Trainer.evaluate() adds, but KEEP the
+    # underlying metrics. Earlier version filtered them out by mistake,
+    # leaving v5_metrics with only "epoch".
+    def _strip_eval_prefix(d):
+        return {(k[len("eval_"):] if k.startswith("eval_") else k): v for k, v in d.items()}
+
     config_path = args.output_dir / "config.json"
     with open(config_path, encoding="utf-8") as f:
         cfg = json.load(f)
     cfg["schema_version"] = "9class_ambience"
     cfg["v5_metrics"] = {
-        "val": {k: v for k, v in val_metrics.items() if not k.startswith("eval_")},
-        "test": {k: v for k, v in test_metrics.items() if not k.startswith("eval_")},
+        "val": _strip_eval_prefix(val_metrics),
+        "test": _strip_eval_prefix(test_metrics),
+        "best_metric_used": best_metric,
+        "promoted_final_checkpoint": args.promote_final_checkpoint,
     }
     with open(config_path, "w", encoding="utf-8") as f:
         json.dump(cfg, f, ensure_ascii=False, indent=2)
@@ -382,6 +410,26 @@ def main() -> int:
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--skip-split", action="store_true",
                    help="Skip the data-loading/splitting step and reuse existing data-dir CSVs")
+    p.add_argument(
+        "--best-metric",
+        default="ambience_f1",
+        choices=["ambience_f1", "weighted_f1", "macro_f1", "accuracy"],
+        help=(
+            "Metric for load_best_model_at_end. Default 'ambience_f1' is "
+            "right when val has real ambience rows; auto-falls-back to "
+            "'weighted_f1' if val ambience is empty (synthetic-only run)."
+        ),
+    )
+    p.add_argument(
+        "--promote-final-checkpoint",
+        action="store_true",
+        help=(
+            "Skip best-model-at-end and keep the final epoch's weights. "
+            "Use when val metrics are unreliable (e.g. zero-ambience val). "
+            "Codex's first run found the final checkpoint substantially "
+            "outperformed the 'best' on the adversarial fixture."
+        ),
+    )
     args = p.parse_args()
 
     if not args.skip_split:

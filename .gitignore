@@ -32,6 +32,13 @@ CLAUDE_AMBIENCE_DATA_PIPELINE_HANDOFF.md
 smoke_*/
 tests_tmp*/
 
+# v5 training artifacts — large checkpoints + logs + per-run eval reports.
+# Keep the senior review and run results docs in docs/ instead.
+models/single_ambience_v1/
+models/ensemble_ambience_v1/
+logs/
+reports/
+
 # Python
 __pycache__/
 *.py[cod]
