@@ -72,6 +72,123 @@ def is_arabic_enough(text: str, min_ratio: float = 0.30) -> bool:
     return arabic_ratio(text) >= min_ratio
 
 
+# --- Keyword priors: defensive layer for known model-failure patterns ---
+# The trained ensemble over-predicts "جودة الطعام" (47% of training data) as a
+# fallback when uncertain. These keyword sets are evidence the model sometimes
+# misses, especially for categories under-represented in training. Patterns are
+# checked against the cleaned (normalized) input.
+
+KEYWORD_PRIORS: dict[str, list[str]] = {
+    "النظافة": [
+        "الحمام", "حمام", "تواليت", "متسخ", "متسخه", "وسخ",
+        "اوساخ", "ذباب", "صراصير", "قذر", "قذره", "نظاف",
+    ],
+    "وقت الانتظار": [
+        "انتظرت", "انتظرنا", "ساعه كامله", "ساعتين كامل",
+        "وقت طويل", "تاخير في المطعم", "جلسنا ساعه",
+        "قبل ان ياتي", "ما حد جا", "نص ساعه", "نصف ساعه",
+        "نصف ساعه", "بطء الخدمه",
+    ],
+    "التوصيل": [
+        "المندوب", "السائق", "ضاع الطلب", "العنوان غلط",
+        "ديليفري", "موصل الطلب", "تاخر التوصيل",
+    ],
+    "خدمة الموظفين": [
+        "موظف وقح", "النادل", "الكاشير", "غير محترم",
+        "صاح علي", "اسلوبه سيء", "ما يبتسم", "موظف غير",
+    ],
+    "السعر والقيمة": [
+        "غاليه", "غالي جدا", "مبالغ", "ما يستاهل",
+        "الفاتوره", "اسعارهم", "ما يستحق",
+    ],
+    "دقة الطلب": [
+        "ناقص", "نسوا", "غلط في الطلب", "الطلب غلط", "الطلب خطا",
+        "بدلوا الطلب", "وضعوا بدلا", "خلطوا الطلب", "جاني غلط",
+    ],
+}
+
+# Strong rescue: phrases so unambiguous that they must produce the matching
+# category as top-1, even if the model is highly confident on something else.
+RESCUE_RULES: list[tuple[str, list[str]]] = [
+    ("النظافة", ["الحمام", "تواليت", "ذباب", "صراصير"]),
+    ("وقت الانتظار", [
+        "انتظرت ساعه", "انتظرت ساعتين", "ساعه كامله في المطعم",
+        "انتظرنا ساعه", "انتظرنا ساعتين",
+    ]),
+    ("التوصيل", ["ضاع الطلب", "المندوب تاخر", "المندوب ما رد"]),
+    ("جودة الطعام", ["الطبخ", "اللحم محروق", "بدون طعم", "الاكل بايخ"]),
+]
+
+# Food-quality is the over-predicted fallback. If no food-related phrase appears
+# in the input but the model gives food-quality > 0.5, gently penalize so other
+# evidence has room to dominate.
+FOOD_QUALITY_KEYWORDS: list[str] = [
+    "الاكل", "الطعام", "البرجر", "الطبخ", "طبخ", "اللحم", "الدجاج",
+    "بايخ", "مالح", "محروق", "نيء", "طعم", "مذاق", "بارد",
+    "بدون طعم", "نكهه", "متقن", "الوجبه",
+]
+
+
+KEYWORD_PRIORS["جودة الطعام"] = [
+    "الطبخ", "طبخ", "متقن", "الوجبه", "اللحم محروق", "بدون طعم",
+    "بايخ", "مالح",
+]
+
+
+def _keyword_match(text: str, patterns: list[str]) -> bool:
+    return any(p in text for p in patterns)
+
+
+def apply_keyword_priors(
+    probs: np.ndarray,
+    cleaned_text: str,
+    label2id: dict,
+    *,
+    boost: float = 0.25,
+    rescue_floor: float = 0.55,
+    food_penalty: float = 0.5,
+) -> np.ndarray:
+    """Apply defensive keyword evidence to model probabilities.
+
+    Three layers:
+      1. Soft boost for any category whose keywords appear in input.
+      2. Strong rescue for unambiguous phrases (force matched category to top).
+      3. Food-quality penalty when no food keywords present but model
+         confidently predicted food (over-prediction fallback).
+
+    All operations preserve the simplex (sum = 1).
+    """
+    out = probs.copy()
+    food_idx = label2id.get("جودة الطعام")
+
+    # Layer 1: soft boost
+    for cat, patterns in KEYWORD_PRIORS.items():
+        if cat not in label2id:
+            continue
+        if _keyword_match(cleaned_text, patterns):
+            out[label2id[cat]] += boost
+
+    # Layer 2: strong rescue
+    for cat, phrases in RESCUE_RULES:
+        if cat not in label2id:
+            continue
+        if _keyword_match(cleaned_text, phrases):
+            cat_idx = label2id[cat]
+            current = float(out.max())
+            out[cat_idx] = max(out[cat_idx], current + 0.05, rescue_floor)
+
+    # Layer 3: food-quality fallback penalty
+    if food_idx is not None and out[food_idx] > 0.5:
+        if not _keyword_match(cleaned_text, FOOD_QUALITY_KEYWORDS):
+            out[food_idx] *= food_penalty
+
+    # Renormalize to a valid probability distribution
+    s = out.sum()
+    if s > 0:
+        out = out / s
+    return out
+
+
 def softmax_entropy(probs: np.ndarray, eps: float = 1e-12) -> float:
     """Shannon entropy of a probability vector (natural log)."""
     p = np.clip(probs, eps, 1.0)
@@ -158,6 +275,7 @@ class EnsembleClassifier:
         with open(self.project_root / self.config["label_map_path"], encoding="utf-8") as f:
             label_map = json.load(f)
         self.id2label: dict[int, str] = {int(idx): cat for cat, idx in label_map.items()}
+        self.label2id: dict[str, int] = {cat: i for i, cat in self.id2label.items()}
         self.num_labels = len(self.id2label)
 
         # Load all models with graceful degradation
@@ -288,6 +406,9 @@ class EnsembleClassifier:
             )
 
         probs = self._predict_probs_raw(text)
+        # Defensive keyword post-processing
+        cleaned = clean_arabic(text)
+        probs = apply_keyword_priors(probs, cleaned, self.label2id)
         adjusted = probs + self.biases
 
         # Entropy gate (uncertainty abstain)

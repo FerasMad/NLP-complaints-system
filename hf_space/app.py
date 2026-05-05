@@ -110,10 +110,15 @@ EMPTY_RESULT = """
 
 
 def is_multi_aspect(top: list[tuple[str, float]]) -> bool:
-    """Heuristic: top-1 < 70% AND top-2 > 30% means competing signals."""
+    """Detect competing-signal predictions.
+
+    Keyword booster in the inference layer rebalances scores when multiple
+    aspect keywords are present, so we relax the threshold: top-1 below 85%
+    AND top-2 above 15% counts as multi-aspect. Tuned against the audit set.
+    """
     if len(top) < 2:
         return False
-    return top[0][1] < 0.70 and top[1][1] > 0.30
+    return top[0][1] < 0.85 and top[1][1] > 0.15
 
 
 def render_result(top: list[tuple[str, float]]) -> str:
