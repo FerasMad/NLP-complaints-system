@@ -121,9 +121,56 @@ def is_multi_aspect(top: list[tuple[str, float]]) -> bool:
     return top[0][1] < 0.85 and top[1][1] > 0.15
 
 
+def render_general_fallback(top: list[tuple[str, float]]) -> str:
+    """Special render for when 'general' is the top-1 prediction.
+
+    'general' is a fallback that doesn't help users route or act on the
+    complaint. We reframe it as 'no specific aspect detected' and surface
+    the next 2 specific categories so the user has SOMETHING actionable.
+    """
+    # Filter out general; show the next 2 specific categories with their (low) confidence
+    specific = [(c, s) for c, s in top if c != "عامة"][:2]
+    rows = []
+    for cat, score in specific:
+        en = CATEGORIES_EN.get(cat, "")
+        pct = f"{score * 100:.0f}%"
+        rows.append(
+            f'<div class="result-row result-rank-fallback">'
+            f'  <div class="result-meta">'
+            f'    <span class="result-rank">·</span>'
+            f'    <span class="result-en">{en}</span>'
+            f'  </div>'
+            f'  <div class="result-cat">{cat}</div>'
+            f'  <div class="result-pct">{pct}</div>'
+            f'</div>'
+        )
+
+    return (
+        '<div class="general-fallback">'
+        '  <div class="general-headline">'
+        '    <strong>لم يُحدَّد جانب معيّن</strong>'
+        '    <span>no specific aspect detected — input may be too vague</span>'
+        '  </div>'
+        '  <div class="general-hint">'
+        '    اذكر جانباً محدداً في شكواك '
+        '    <em>(الطعام · الخدمة · التوصيل · النظافة · السعر · وقت الانتظار · دقة الطلب)</em>'
+        '    للحصول على تصنيف أدقّ.'
+        '  </div>'
+        f'  <div class="general-rail">'
+        f'    <span class="general-rail-label">قد تكون عن:</span>'
+        f'    <div class="result-stack">{"".join(rows)}</div>'
+        f'  </div>'
+        '</div>'
+    )
+
+
 def render_result(top: list[tuple[str, float]]) -> str:
     if not top:
         return EMPTY_RESULT
+
+    # Special handling: when general is top-1, reframe as "no aspect detected"
+    if top[0][0] == "عامة":
+        return render_general_fallback(top)
 
     multi = is_multi_aspect(top)
 
@@ -759,6 +806,87 @@ body.dark .result-rank-2 { border-color: rgba(138, 148, 104, 0.30); }
 .result-rank-3 .result-cat { color: var(--ink-muted); font-weight: 700; }
 .result-rank-3 .result-pct { color: var(--ink-muted); }
 .result-rank-3 .result-rank { color: var(--ink-muted); }
+
+/* General fallback: when model can't identify a specific aspect */
+.general-fallback {
+    direction: rtl;
+    padding: 28px 26px;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.general-headline {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.general-headline strong {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--ink);
+}
+.general-headline span {
+    font-size: 0.88rem;
+    color: var(--ink-muted);
+    direction: ltr;
+    text-align: right;
+}
+
+.general-hint {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--ink);
+    padding: 14px 18px;
+    background: var(--surface);
+    border-right: 3px solid var(--terracotta);
+    border-radius: 8px;
+}
+.general-hint em {
+    color: var(--terracotta-deep);
+    font-style: normal;
+    font-weight: 700;
+}
+body.dark .general-hint em { color: var(--terracotta); }
+
+.general-rail {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+}
+.general-rail-label {
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    direction: ltr;
+    text-align: right;
+    padding-right: 4px;
+}
+
+.result-rank-fallback {
+    background: transparent;
+    border: 1px solid var(--border);
+}
+.result-rank-fallback .result-rank {
+    color: var(--terracotta-deep);
+    font-size: 1rem;
+}
+body.dark .result-rank-fallback .result-rank { color: var(--terracotta); }
+.result-rank-fallback .result-cat {
+    color: var(--ink);
+    font-weight: 700;
+}
+.result-rank-fallback .result-pct {
+    color: var(--ink-muted);
+    font-size: 1.1rem;
+}
 
 /* Multi-aspect: rank 1 and 2 share equal visual weight */
 .result-rank-co1 { background: var(--terracotta); color: #F5EFE6; }
