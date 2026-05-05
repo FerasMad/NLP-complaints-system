@@ -4,6 +4,7 @@ Visual identity is warm, hospitable, Saudi-rooted. Multi-section page with a
 golden-hour SVG hero, overlapping stats strip, classify, performance charts,
 inline about, and footer. Light + dark themes (toggle top-right). Almarai font.
 """
+import base64
 import os
 import re
 from pathlib import Path
@@ -81,11 +82,19 @@ def _load_svg(path: Path) -> str:
     return text
 
 
+def _svg_data_uri(path: Path) -> str:
+    """Encode an SVG file as a base64 data URI for use in <img src="...">.
+    Robust against inline-HTML/SVG interaction issues that can hide charts."""
+    raw = path.read_bytes()
+    b64 = base64.b64encode(raw).decode("ascii")
+    return f"data:image/svg+xml;base64,{b64}"
+
+
 HERO_SVG = _load_svg(HERE / "hero.svg")
-CHART_F1_LIGHT = _load_svg(HERE / "charts" / "per_class_f1.svg")
-CHART_F1_DARK = _load_svg(HERE / "charts" / "per_class_f1.dark.svg")
-CHART_BL_LIGHT = _load_svg(HERE / "charts" / "vs_baselines.svg")
-CHART_BL_DARK = _load_svg(HERE / "charts" / "vs_baselines.dark.svg")
+CHART_F1_LIGHT_URI = _svg_data_uri(HERE / "charts" / "per_class_f1.svg")
+CHART_F1_DARK_URI = _svg_data_uri(HERE / "charts" / "per_class_f1.dark.svg")
+CHART_BL_LIGHT_URI = _svg_data_uri(HERE / "charts" / "vs_baselines.svg")
+CHART_BL_DARK_URI = _svg_data_uri(HERE / "charts" / "vs_baselines.dark.svg")
 
 
 # ---- Prediction ------------------------------------------------------------
@@ -843,10 +852,14 @@ body.dark .multi-aspect-badge { border-color: rgba(138, 148, 104, 0.40); }
     direction: ltr;
 }
 
-.perf-card-chart svg {
+.perf-card-chart {
     width: 100%;
     height: auto;
     display: block;
+}
+
+img.perf-card-chart {
+    max-width: 100%;
 }
 
 /* Light/dark chart swap */
@@ -1008,7 +1021,7 @@ ABOUT_BLOCKS = [
         "الأداء",
         "<strong>٩٥٫٠٥٪ دقّة</strong> على مجموعة اختبار من ١٣٬٩٨٦ مراجعة حقيقية محتجزة. "
         "بفاصل ثقة ٩٥٪ بين [٩٤٫٧٠٪، ٩٥٫٤١٪]. جميع الفئات فوق ٨٠٪ F1. "
-        "خطأ المعايرة (ECE) بعد التنعيم الحراري: ٠٫٠١٤.",
+        "خطأ المعايرة (ECE) بعد <em>temperature scaling</em>: ٠٫٠١٤.",
     ),
     (
         "بيانات التدريب",
@@ -1179,8 +1192,8 @@ with gr.Blocks(
                   <div class="perf-card-title">F1 لكل فئة</div>
                   <div class="perf-card-sub">test set, 13,986 reviews</div>
                 </div>
-                <div class="perf-card-chart chart-light">{CHART_F1_LIGHT}</div>
-                <div class="perf-card-chart chart-dark">{CHART_F1_DARK}</div>
+                <img class="perf-card-chart chart-light" src="{CHART_F1_LIGHT_URI}" alt="Per-class F1 bar chart" loading="lazy">
+                <img class="perf-card-chart chart-dark" src="{CHART_F1_DARK_URI}" alt="Per-class F1 bar chart" loading="lazy">
                 <p class="perf-card-caption">
                   أعلى فئة (جودة الطعام) ٩٦٫٢٪، أدنى فئة (عامة) ٨٤٫٩٪. الفارق ١١٫٣ نقطة فقط.
                 </p>
@@ -1191,8 +1204,8 @@ with gr.Blocks(
                   <div class="perf-card-title">رحلة النموذج</div>
                   <div class="perf-card-sub">accuracy across iterations</div>
                 </div>
-                <div class="perf-card-chart chart-light">{CHART_BL_LIGHT}</div>
-                <div class="perf-card-chart chart-dark">{CHART_BL_DARK}</div>
+                <img class="perf-card-chart chart-light" src="{CHART_BL_LIGHT_URI}" alt="Accuracy progression across iterations" loading="lazy">
+                <img class="perf-card-chart chart-dark" src="{CHART_BL_DARK_URI}" alt="Accuracy progression across iterations" loading="lazy">
                 <p class="perf-card-caption">
                   بدأنا بنموذج TF-IDF كأساس، ثم انتقلنا إلى BERT، ثم إلى المجموعة، ثم حذفنا فئة "الجو والمكان"
                   بعد تدقيق كشف أن ٩٩٪ من بياناتها كانت غير دقيقة.
