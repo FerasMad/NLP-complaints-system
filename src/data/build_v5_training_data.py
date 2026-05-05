@@ -61,6 +61,23 @@ def main() -> int:
         default=ROOT / "data" / "processed" / "ambience" / "huggingface" / "ambience_candidates.csv",
     )
     p.add_argument(
+        "--hard-candidates-csv",
+        type=Path,
+        default=ROOT / "data" / "processed" / "ambience" / "huggingface_hard" / "ambience_candidates.csv",
+        help="HARD (hotel reviews) ambience candidates. Filtered to drop hotel-only terms before adding.",
+    )
+    p.add_argument(
+        "--include-hard",
+        action="store_true",
+        help="Include filtered HARD ambience candidates as weak labels (target for run 5+).",
+    )
+    p.add_argument(
+        "--hard-max-rows",
+        type=int,
+        default=5000,
+        help="Cap on HARD rows added (after hotel-term filter). Default 5000.",
+    )
+    p.add_argument(
         "--output",
         type=Path,
         default=ROOT / "data" / "text" / "complaints_labeled_v5_real.csv",
@@ -111,6 +128,44 @@ def main() -> int:
     else:
         print(f"[load] WARNING: no qaym ambience candidates at {args.qaym_candidates_csv}")
 
+    # Optionally load HARD ambience candidates, filtered to drop hotel-only terms.
+    # The keyword vocab in src/config/ambience_keywords.py is restaurant-focused
+    # so HARD candidates that triggered the filter mostly use cross-domain
+    # ambience vocabulary (parking, AC, smell, decor). But hotel-specific
+    # terms (room, check-in, hotel staff procedures) leak through. Drop those.
+    hard_amb = pd.DataFrame()
+    if args.include_hard and args.hard_candidates_csv.exists():
+        raw_hard = pd.read_csv(args.hard_candidates_csv, encoding="utf-8-sig")
+        before = len(raw_hard)
+        # Hotel-only stop terms — drop any row containing any of these
+        hotel_only = [
+            "غرفة", "غرفه", "الغرفه", "الغرفة", "غرف", "الغرف",
+            "الفندق", "فندق", "الفنادق", "فنادق",
+            "الإقامة", "الاقامة", "الاقامه", "إقامة", "اقامة", "اقامه",
+            "تسجيل الدخول", "تسجيل الخروج", "check in", "check-in", "checkin",
+            "السرير", "سرير", "الأسرة", "الاسره", "اسره",
+            "الاستقبال", "استقبال", "موظف الاستقبال", "موظفة الاستقبال",
+            "ليله", "ليلة", "ليالي", "الليلة", "الليله",
+            "الحجز", "حجز الغرفه", "حجز الفندق",
+        ]
+        text_lower = raw_hard["text"].astype(str).str.lower()
+        mask = ~text_lower.str.contains("|".join(hotel_only), regex=True, na=False)
+        hard_amb = raw_hard[mask].copy()
+        # Cap to max-rows after filter
+        if len(hard_amb) > args.hard_max_rows:
+            hard_amb = hard_amb.sample(n=args.hard_max_rows, random_state=42).reset_index(drop=True)
+        print(f"[load] HARD ambience candidates: "
+              f"{before} raw -> {(~mask).sum()} dropped as hotel-only "
+              f"-> {len(hard_amb)} kept (cap={args.hard_max_rows})")
+        # Force category, set weak source
+        hard_amb["category"] = AMBIENCE_LABEL
+        hard_amb["source"] = "weak_hard_ambience"
+        if "priority" not in hard_amb.columns:
+            hard_amb["priority"] = 1
+        hard_amb = hard_amb[["text", "category", "priority", "source"]]
+    elif args.include_hard:
+        print(f"[load] WARNING: --include-hard set but no file at {args.hard_candidates_csv}")
+
     # Concatenate everything
     parts = [baseline]
     if not synthetic.empty:
@@ -124,6 +179,8 @@ def main() -> int:
         parts.append(synth_keep)
     if not qaym_amb.empty:
         parts.append(qaym_amb)
+    if not hard_amb.empty:
+        parts.append(hard_amb)
 
     combined = pd.concat(parts, ignore_index=True)
     # Drop empty texts
