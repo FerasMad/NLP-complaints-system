@@ -93,6 +93,53 @@ def predict_batch(texts: list[str], tokenizer, model, device, torch_mod, batch_s
     return top_cat, top_conf, all_probs, label_map
 
 
+def predict_batch_ensemble(
+    texts: list[str],
+    model_dirs: list[Path],
+    batch_size: int = 32,
+):
+    """Run inference across multiple models and average their softmax outputs.
+
+    Each model is loaded, predicts the full softmax distribution, and the
+    per-row probabilities are averaged across models. Then argmax + threshold
+    + abstain pipelines work the same as single-model inference.
+
+    Assumes all models share the same label_map (verified by string equality
+    on the id2label dict). Errors loudly if not.
+
+    Returns (top_categories, top_confidences, full_avg_probs, label_map).
+    """
+    assert len(model_dirs) >= 1, "ensemble requires at least 1 model"
+    print(f"[ensemble] loading {len(model_dirs)} models...")
+    per_model_probs = []
+    label_map = None
+    for i, mdir in enumerate(model_dirs):
+        print(f"[ensemble]   [{i+1}/{len(model_dirs)}] {mdir}")
+        tokenizer, model, device, torch_mod = load_model(mdir)
+        _, _, probs, this_label_map = predict_batch(texts, tokenizer, model, device, torch_mod, batch_size)
+        if label_map is None:
+            label_map = this_label_map
+        else:
+            if label_map != this_label_map:
+                raise ValueError(
+                    f"label_map mismatch between {model_dirs[0]} and {mdir}. "
+                    f"Ensemble requires identical label maps."
+                )
+        per_model_probs.append(probs)
+        # Free GPU memory between models
+        del model, tokenizer
+        if torch_mod.cuda.is_available():
+            torch_mod.cuda.empty_cache()
+
+    # Average softmax across models — uniform weighting
+    avg_probs = np.mean(np.stack(per_model_probs, axis=0), axis=0).astype(np.float32)
+    top_idx = avg_probs.argmax(axis=-1)
+    top_conf = avg_probs[np.arange(len(texts)), top_idx]
+    top_cat = [label_map[int(i)] for i in top_idx]
+    print(f"[ensemble] averaged softmax over {len(per_model_probs)} models")
+    return top_cat, top_conf, avg_probs, label_map
+
+
 def apply_abstain_logic(
     texts: list[str],
     predicted: list[str],
@@ -329,8 +376,18 @@ def generate_report(df: pd.DataFrame, output_dir: Path) -> dict:
 
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__.strip().splitlines()[0])
-    p.add_argument("--model-dir", type=Path, required=True,
-                   help="Path to the trained model directory (output of train_ambience_v5.py)")
+    p.add_argument("--model-dir", type=Path, required=False, default=None,
+                   help="Path to the trained model directory (output of train_ambience_v5.py). "
+                        "Required unless --ensemble-dirs is set.")
+    p.add_argument(
+        "--ensemble-dirs",
+        nargs="+",
+        type=Path,
+        default=None,
+        metavar="DIR",
+        help="Two or more model directories to ensemble (uniform softmax averaging). "
+             "When set, --model-dir is ignored. Models must share the same label_map.",
+    )
     p.add_argument("--adversarial-fixture", type=Path,
                    default=ROOT / "tests" / "fixtures" / "ambience_adversarial.csv",
                    help="Adversarial test CSV (default: tests/fixtures/ambience_adversarial.csv)")
@@ -373,7 +430,16 @@ def main() -> int:
                    help="Exit 1 if any quality gate fails (use in CI)")
     args = p.parse_args()
 
-    if not args.model_dir.exists():
+    # Validate model arg(s)
+    if not args.ensemble_dirs and not args.model_dir:
+        print("Either --model-dir or --ensemble-dirs is required.", file=sys.stderr)
+        return 2
+    if args.ensemble_dirs:
+        for mdir in args.ensemble_dirs:
+            if not mdir.exists():
+                print(f"Model directory not found: {mdir}", file=sys.stderr)
+                return 2
+    elif not args.model_dir.exists():
         print(f"Model directory not found: {args.model_dir}", file=sys.stderr)
         print("Run src/train_ambience_v5.py first.", file=sys.stderr)
         return 2
@@ -381,16 +447,19 @@ def main() -> int:
         print(f"Adversarial fixture not found: {args.adversarial_fixture}", file=sys.stderr)
         return 2
 
-    print(f"[load] loading model from {args.model_dir}")
-    tokenizer, model, device, torch_mod = load_model(args.model_dir)
-    print(f"[load] model loaded on {device}")
-
     df = pd.read_csv(args.adversarial_fixture, encoding="utf-8")
     print(f"[load] loaded {len(df)} adversarial cases")
-
-    print("[predict] running inference...")
     texts = df["text"].astype(str).tolist()
-    top_cat, top_conf, all_probs, label_map = predict_batch(texts, tokenizer, model, device, torch_mod)
+
+    if args.ensemble_dirs:
+        print(f"[load] ensemble of {len(args.ensemble_dirs)} models")
+        top_cat, top_conf, all_probs, label_map = predict_batch_ensemble(texts, args.ensemble_dirs)
+    else:
+        print(f"[load] loading single model from {args.model_dir}")
+        tokenizer, model, device, torch_mod = load_model(args.model_dir)
+        print(f"[load] model loaded on {device}")
+        print("[predict] running inference...")
+        top_cat, top_conf, all_probs, label_map = predict_batch(texts, tokenizer, model, device, torch_mod)
 
     # Threshold sweep mode — run evaluation at each threshold and write a
     # summary CSV. Skip the per-row reports (caller will pick a threshold
