@@ -419,60 +419,59 @@ body.dark #theme-toggle .icon-moon { display: none; }
     text-shadow: 0 1px 12px rgba(45, 17, 8, 0.4);
 }
 
-/* ---- Stats strip overlapping hero ---- */
+/* ---- Headline figure (replaces 4-cell stats strip) ---- */
 
-#stats-wrap { width: 100%; background: transparent; }
+#headline-wrap { width: 100%; background: transparent; }
 
-#stats {
+#headline {
     max-width: 1080px;
-    margin: -56px auto 0;
+    margin: clamp(48px, 6vw, 72px) auto 0;
     padding: 0 clamp(24px, 5vw, 56px);
     position: relative;
     z-index: 3;
-}
-
-#stats .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    transition: background-color 240ms ease, border-color 240ms ease;
-}
-
-#stats .stat {
-    padding: 22px 24px;
-    border-right: 1px solid var(--border);
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: clamp(20px, 4vw, 56px);
     direction: ltr;
 }
 
-#stats .stat:last-child { border-right: none; }
+.headline-stat {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-shrink: 0;
+}
 
-#stats .stat-key {
-    font-size: 0.66rem;
+.headline-figure {
+    font-size: clamp(3.6rem, 8vw, 5.4rem);
+    font-weight: 800;
+    color: var(--terracotta-deep);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+}
+
+body.dark .headline-figure { color: var(--terracotta); }
+
+.headline-unit {
+    font-size: clamp(0.85rem, 1.1vw, 0.95rem);
     font-weight: 700;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--ink-muted);
+    transform: translateY(-6px);
 }
 
-#stats .stat-val {
-    font-size: clamp(1.4rem, 2.8vw, 1.8rem);
-    font-weight: 800;
-    color: var(--ink);
-    font-variant-numeric: tabular-nums;
-    line-height: 1.1;
-}
-
-#stats .stat-sub {
-    font-size: 0.78rem;
+.headline-note {
+    font-size: clamp(0.92rem, 1.2vw, 1rem);
     color: var(--ink-muted);
-    margin-top: 2px;
+    line-height: 1.6;
+    margin: 0;
+    max-width: 42ch;
+    flex: 1;
+    min-width: 240px;
+    direction: ltr;
 }
 
 /* ---- Section scaffolding ---- */
@@ -876,65 +875,79 @@ body.dark .chart-dark { display: block; }
     text-align: right;
 }
 
-/* ---- Inline About section (no accordion) ---- */
+/* ---- Inline About section ---- */
 
-.about-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: clamp(32px, 4vw, 48px);
-}
-
-.about-block {
+.about-prose {
     direction: rtl;
+    margin: 0 0 56px auto;
+    max-width: 60ch;
 }
 
-.about-block h3 {
-    font-size: 1.05rem;
-    font-weight: 800;
+.about-prose p {
+    font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+    font-weight: 400;
     color: var(--ink);
-    margin: 0 0 10px;
-    direction: rtl;
-    text-align: right;
-}
-
-.about-block p {
-    font-size: 0.98rem;
-    color: var(--ink);
-    line-height: 1.8;
+    line-height: 1.85;
     margin: 0;
-    max-width: 64ch;
     direction: rtl;
     text-align: right;
 }
 
-.about-block p strong { color: var(--ink); font-weight: 700; }
+.about-prose p strong {
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.categories-rail {
+    direction: rtl;
+    border-top: 1px solid var(--border);
+    padding-top: 28px;
+}
+
+.categories-rail .rail-label {
+    display: block;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin: 0 0 18px;
+    direction: ltr;
+    text-align: right;
+}
 
 .categories-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 12px;
-    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    direction: rtl;
 }
 
 .category-cell {
-    background: var(--surface);
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    background: transparent;
     border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 16px;
+    border-radius: 999px;
+    padding: 8px 16px;
     direction: rtl;
-    transition: background-color 240ms ease, border-color 240ms ease;
+    transition: border-color 240ms ease, background-color 240ms ease;
+}
+
+.category-cell:hover {
+    border-color: var(--ink-muted);
+    background: var(--surface);
 }
 
 .category-cell .cat-ar {
-    font-size: 1rem;
-    font-weight: 800;
+    font-size: 0.95rem;
+    font-weight: 700;
     color: var(--ink);
-    display: block;
-    margin-bottom: 2px;
 }
 
 .category-cell .cat-en {
-    font-size: 0.82rem;
+    font-size: 0.75rem;
     color: var(--ink-muted);
     direction: ltr;
 }
@@ -1011,41 +1024,16 @@ footer { display: none !important; }
 
 # ---- Build the about section as raw HTML (no accordion) --------------------
 
-ABOUT_BLOCKS = [
-    (
-        "ما هو هذا النموذج؟",
-        "نموذج <strong>CAMeLBERT-mix</strong> مدرّب على ٨ فئات من شكاوى المطاعم العربية. "
-        "بُني من البداية إلى النهاية بواسطة فريق NLP في AI Club.",
-    ),
-    (
-        "الأداء",
-        "<strong>٩٥٫٠٥٪ دقّة</strong> على مجموعة اختبار من ١٣٬٩٨٦ مراجعة حقيقية محتجزة. "
-        "بفاصل ثقة ٩٥٪ بين [٩٤٫٧٠٪، ٩٥٫٤١٪]. جميع الفئات فوق ٨٠٪ F1. "
-        "خطأ المعايرة (ECE) بعد <em>temperature scaling</em>: ٠٫٠١٤.",
-    ),
-    (
-        "بيانات التدريب",
-        "<strong>~٩٨ ألف</strong> شكوى عربية مُصنّفة. المصادر: مجموعة شكاوى إنتاجية، "
-        "ومراجعات مستخرجة من تطبيقات التوصيل السعودية (HungerStation, Jahez, Mrsool, Talabat). "
-        "البيانات الاصطناعية والمعزّزة تُستخدم في التدريب فقط، ولا تظهر أبداً في التحقق أو الاختبار.",
-    ),
-    (
-        "التخصص",
-        "النموذج <strong>مخصّص للهجة السعودية والخليجية</strong>.",
-    ),
-]
-
-
-def render_about_blocks() -> str:
-    parts = []
-    for title, body in ABOUT_BLOCKS:
-        parts.append(
-            f'<div class="about-block">'
-            f'  <h3>{title}</h3>'
-            f'  <p>{body}</p>'
-            f'</div>'
-        )
-    return f'<div class="about-grid">{"".join(parts)}</div>'
+ABOUT_HTML = """
+<div class="about-prose">
+  <p>
+    نموذج <strong>CAMeLBERT-mix</strong> دقّق على ٩٨ ألف شكوى عربية حقيقية، معظمها من تطبيقات
+    التوصيل السعودية. مخصّص للهجة السعودية والخليجية. الدقّة على مجموعة اختبار محتجزة
+    من ١٣٬٩٨٦ مراجعة: <strong>٩٥٫٠٥٪</strong>، بفاصل ثقة ٩٥٪ بين ٩٤٫٧٠٪ و ٩٥٫٤١٪.
+    جميع الفئات الثمان فوق ٨٠٪ F1.
+  </p>
+</div>
+"""
 
 
 CATEGORIES_GRID_HTML = '<div class="categories-grid">' + "".join(
@@ -1099,30 +1087,16 @@ with gr.Blocks(
           </div>
         </section>
 
-        <div id="stats-wrap">
-          <div id="stats">
-            <div class="stats-grid">
-              <div class="stat">
-                <span class="stat-key">Test accuracy</span>
-                <span class="stat-val">95.05%</span>
-                <span class="stat-sub">on 13,986 real reviews</span>
-              </div>
-              <div class="stat">
-                <span class="stat-key">Categories</span>
-                <span class="stat-val">8</span>
-                <span class="stat-sub">all ≥ 80% F1</span>
-              </div>
-              <div class="stat">
-                <span class="stat-key">Architecture</span>
-                <span class="stat-val">CAMeLBERT-mix</span>
-                <span class="stat-sub">single best of a 4-model ensemble</span>
-              </div>
-              <div class="stat">
-                <span class="stat-key">Dialect</span>
-                <span class="stat-val">Saudi / Gulf</span>
-                <span class="stat-sub">specialized by design</span>
-              </div>
+        <div id="headline-wrap">
+          <div id="headline">
+            <div class="headline-stat">
+              <span class="headline-figure">95.05%</span>
+              <span class="headline-unit">test accuracy</span>
             </div>
+            <p class="headline-note">
+              13,986 held-out real reviews. 8 categories, all above 80% F1.
+              Single best CAMeLBERT-mix from a 4-model ensemble.
+            </p>
           </div>
         </div>
         """
@@ -1151,8 +1125,8 @@ with gr.Blocks(
                 container=False,
             )
             with gr.Row(elem_id="actions"):
-                submit_btn = gr.Button("صنّف الشكوى  ·  Classify", variant="primary", scale=2)
-                clear_btn = gr.Button("مسح  ·  Clear", variant="secondary", scale=1)
+                submit_btn = gr.Button("صنّف الشكوى", variant="primary", scale=2)
+                clear_btn = gr.Button("مسح", variant="secondary", scale=1)
 
         with gr.Column(elem_id="result_panel"):
             output_html = gr.HTML(value=EMPTY_RESULT)
@@ -1210,28 +1184,17 @@ with gr.Blocks(
         """
     )
 
-    # About section (inline, no accordion)
+    # About + Categories — combined into one quiet section, no template rhythm
     gr.HTML(
         f"""
-        <section class="section section--surface">
+        <section class="section section--surface" id="about-section">
           <div class="section-inner">
-            <div class="section-eyebrow">About</div>
             <h2 class="section-title">عن النموذج</h2>
-            <p class="section-lede">
-              ما الذي يفعله النموذج، كيف بُني، وعلى أي بيانات تدرّب.
-            </p>
-            {render_about_blocks()}
-          </div>
-        </section>
-
-        <section class="section section--paper">
-          <div class="section-inner">
-            <div class="section-eyebrow">Categories</div>
-            <h2 class="section-title">الفئات الثمانية</h2>
-            <p class="section-lede">
-              تم اختيار هذه الفئات بحيث تكون قابلة للتصرّف عملياً (تذهب لفريق العمليات المناسب).
-            </p>
-            {CATEGORIES_GRID_HTML}
+            {ABOUT_HTML}
+            <div class="categories-rail">
+              <span class="rail-label">الفئات</span>
+              {CATEGORIES_GRID_HTML}
+            </div>
           </div>
         </section>
         """
