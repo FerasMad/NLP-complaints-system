@@ -1027,10 +1027,10 @@ footer { display: none !important; }
 ABOUT_HTML = """
 <div class="about-prose">
   <p>
-    نموذج <strong>CAMeLBERT-mix</strong> دقّق على ٩٨ ألف شكوى عربية حقيقية، معظمها من تطبيقات
-    التوصيل السعودية. مخصّص للهجة السعودية والخليجية. الدقّة على مجموعة اختبار محتجزة
-    من ١٣٬٩٨٦ مراجعة: <strong>٩٥٫٠٥٪</strong>، بفاصل ثقة ٩٥٪ بين ٩٤٫٧٠٪ و ٩٥٫٤١٪.
-    جميع الفئات الثمان فوق ٨٠٪ F1.
+    نموذج <strong>CAMeLBERT-mix</strong> تدرّب على ٩٨ ألف شكوى عربية حقيقية،
+    معظمها من تطبيقات التوصيل السعودية. مخصّص للّهجة السعودية والخليجية.
+    على مجموعة اختبار مستقلّة من ١٣٬٩٨٦ مراجعة، الدقّة <strong>٩٥٫٠٥٪</strong>
+    بفاصل ثقة ٩٥٪ بين ٩٤٫٧٠٪ و ٩٥٫٤١٪. كل الفئات الثماني فوق ٨٠٪ F1.
   </p>
 </div>
 """
@@ -1081,7 +1081,7 @@ with gr.Blocks(
             <div class="eyebrow">Arabic Restaurant Complaints Classifier</div>
             <h1>تصنيف شكاوى المطاعم العربية</h1>
             <p class="lede">
-              نموذج عربي مدرّب على ٩٨٬٠٠٠ شكوى حقيقية من تطبيقات التوصيل السعودية،
+              نموذج عربي تدرّب على ٩٨٬٠٠٠ شكوى حقيقية من تطبيقات التوصيل السعودية،
               يصنّف أي شكوى إلى واحدة من ٨ فئات بدقّة ٩٥٪.
             </p>
           </div>
@@ -1149,8 +1149,8 @@ with gr.Blocks(
             <div class="section-eyebrow">Performance</div>
             <h2 class="section-title">كل الفئات فوق ٨٠٪</h2>
             <p class="section-lede">
-              النموذج يتعامل مع الفئات الكبيرة والصغيرة بنفس الجودة. هذه القياسات على
-              مجموعة اختبار محتجزة تماماً، لم تُستخدم أثناء التدريب.
+              النموذج يتعامل مع الفئات الكبيرة والصغيرة بنفس الجودة.
+              هذه القياسات على مجموعة اختبار مستقلّة، لم تُستخدم أثناء التدريب.
             </p>
 
             <div class="perf-grid">
@@ -1174,8 +1174,8 @@ with gr.Blocks(
                 <img class="perf-card-chart chart-light" src="{CHART_BL_LIGHT_URI}" alt="Accuracy progression across iterations" loading="lazy">
                 <img class="perf-card-chart chart-dark" src="{CHART_BL_DARK_URI}" alt="Accuracy progression across iterations" loading="lazy">
                 <p class="perf-card-caption">
-                  بدأنا بنموذج TF-IDF كأساس، ثم انتقلنا إلى BERT، ثم إلى المجموعة، ثم حذفنا فئة "الجو والمكان"
-                  بعد تدقيق كشف أن ٩٩٪ من بياناتها كانت غير دقيقة.
+                  رحلتنا من TF-IDF إلى BERT، ثم إلى <em>ensemble</em> من ٤ نماذج.
+                  وحذفنا فئة "الجو والمكان" بعد تدقيق كشف أن ٩٩٪ من تصنيفاتها كانت خاطئة.
                 </p>
               </div>
             </div>
