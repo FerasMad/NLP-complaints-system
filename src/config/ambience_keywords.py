@@ -36,6 +36,14 @@ AMBIENCE_BY_SUBTYPE: dict[str, list[str]] = {
         "الجو", "الأجواء", "اجواء", "الفايب",
         "رايق", "كئيب", "يكتم", "يفتح النفس", "ما يفتح النفس",
         "شرح", "منفس", "مقفل", "قديم", "متهالك", "مكروف", "مهلوك",
+        # Place + condition multi-word phrases — high-precision ambience cues
+        # that combine an otherwise-risky place token with a condition.
+        # Without these, sentences like "المكان بارد والمكيف قوي" demote to
+        # review because both individual words are risky-ambiguous.
+        "المكان بارد", "المكان حار", "المكان قديم", "المكان كئيب",
+        "المطعم بارد", "المطعم حار", "المطعم قديم",
+        "الفرع بارد", "الفرع حار", "الفرع قديم",
+        "المحل بارد", "المحل حار", "المحل قديم",
     ],
     "seating_comfort": [
         "الجلسه", "الجلسات", "قعدة", "القعده", "القعدات",
@@ -51,7 +59,9 @@ AMBIENCE_BY_SUBTYPE: dict[str, list[str]] = {
         "زحمه", "زحمة", "زحام", "زحمة موت", "زحمة مره",
         "مزدحم", "كتمه", "كتمة", "ضيق", "ضيقه", "مخنوق", "مكتوم",
         "مافي مساحه", "ما فيه مساحة",
-        "واسع", "وسع", "رحب", "فاضي", "هادي", "هادي مره", "رايق",
+        "واسع", "وسع", "رحب", "فاضي", "هادي", "هادي مره",
+        # NB: 'رايق' (calm) was here originally — moved to general_place_vibe
+        # exclusively, since duplicates make subtype tagging non-deterministic.
     ],
     "temperature_ac": [
         "المكيف", "المكيفات", "التكييف", "التهويه", "التهوية",
@@ -60,6 +70,8 @@ AMBIENCE_BY_SUBTYPE: dict[str, list[str]] = {
         "مكيف خربان", "المكيف خربان", "المكيف ما يبرد",
         "التكييف سيء", "التكييف ما يبرد",
         "رطوبه", "رطوبة", "خانق", "مافي هوا", "ما فيه هوا",
+        # AC condition multi-word phrases
+        "المكيف قوي", "المكيف بارد", "المكيف ضعيف",
     ],
     "noise_music": [
         "ازعاج", "إزعاج", "مزعج", "صجه", "صجة", "لجه", "لجة",

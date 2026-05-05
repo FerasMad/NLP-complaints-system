@@ -40,6 +40,34 @@ jobs:
             pytest tests/test_data_pipeline.py -v -m "not gpu"
           fi
 
+  ambience-data-tests:
+    name: Ambience v5 data tests (no model loading)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install lightweight deps
+        run: |
+          python -m pip install --upgrade pip
+          # Same lightweight footprint as data-pipeline-tests; no torch/transformers
+          pip install pytest pandas numpy
+
+      - name: Run ambience tests
+        # These three files cover: keyword integrity, boundary triage on the
+        # 90-row fixture, and splitter integrity (synthetic-leakage gate +
+        # 9-class schema). They use only fixtures shipped in the repo —
+        # no need for data/processed/ to exist.
+        run: |
+          pytest tests/test_ambience_keywords.py \
+                 tests/test_ambience_boundaries.py \
+                 tests/test_ambience_split_integrity.py \
+                 -v
+
   inference-smoke-test:
     name: Inference smoke (CPU; loads model from HF Hub)
     runs-on: ubuntu-latest
