@@ -8,17 +8,41 @@ import pandas as pd
 import pytest
 
 
-def test_label_map_is_8_classes(label_map_path):
-    """Schema is 8 categories (ambiance was dropped — see README)."""
+def test_label_map_class_count(label_map_path, schema_version):
+    """Class count must match the declared schema_version.
+
+    8class:           8 categories, no ambience
+    9class_ambience:  9 categories, ambience included (v5 experiment)
+    """
     with open(label_map_path, encoding="utf-8") as f:
         m = json.load(f)
-    assert len(m) == 8, f"expected 8 classes (post-ambiance-drop), got {len(m)}"
+    expected = {"8class": 8, "9class_ambience": 9}.get(schema_version)
+    assert expected is not None, f"unknown schema_version: {schema_version!r}"
+    assert len(m) == expected, (
+        f"schema_version={schema_version!r} expects {expected} classes, got {len(m)}"
+    )
 
 
-def test_label_map_no_ambiance(label_map_path):
+def test_label_map_ambience_presence(label_map_path, schema_version):
+    """Ambience must be absent in 8class and present in 9class_ambience.
+
+    This replaces the old `test_label_map_no_ambiance` which permanently
+    blocked ambience. The v3 → v4 ambience drop was correct for the
+    production schema but should not block the v5 experiment.
+    """
     with open(label_map_path, encoding="utf-8") as f:
         m = json.load(f)
-    assert "الجو والمكان" not in m, "ambiance category should not be present"
+    if schema_version == "8class":
+        assert "الجو والمكان" not in m, (
+            "ambience must NOT be present in the 8-class production schema "
+            "(was dropped in v4 due to label noise)"
+        )
+    elif schema_version == "9class_ambience":
+        assert "الجو والمكان" in m, (
+            "ambience MUST be present in the 9-class experimental schema"
+        )
+    else:
+        pytest.fail(f"unknown schema_version: {schema_version!r}")
 
 
 def test_label_map_indices_contiguous(label_map_path):
@@ -35,8 +59,16 @@ def test_train_val_test_files_exist(project_root):
 
 
 def test_train_only_sources_not_in_val_test(project_root):
-    """The crucial leakage test: synthetic/augmented sources must not appear in val or test."""
-    train_only = {"synthetic", "augmented_bt", "chatgpt_synthetic", "pseudo_labeled", "eda_augmented"}
+    """The crucial leakage test: synthetic/augmented sources must not appear in val or test.
+
+    `ambience_synthetic` is the v5 source name — added here so that when the
+    experimental data lands, the existing leakage gate covers it without
+    requiring a second test file.
+    """
+    train_only = {
+        "synthetic", "augmented_bt", "chatgpt_synthetic",
+        "pseudo_labeled", "eda_augmented", "ambience_synthetic",
+    }
     for split in ["val", "test"]:
         path = project_root / "data" / "processed" / f"{split}.csv"
         df = pd.read_csv(path)

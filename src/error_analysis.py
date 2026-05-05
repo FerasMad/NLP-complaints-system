@@ -45,7 +45,7 @@ BATCH_SIZE = 64
 
 # Reuse the audit script's keyword sets
 sys.path.insert(0, str(ROOT / "src"))
-from audit_ambiance_eval import KW, count_hits
+from audit_ambience_eval import KW, count_hits
 
 
 def predict_probs(model_dir, texts, device, max_length):

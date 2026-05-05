@@ -22,9 +22,9 @@ if hasattr(sys.stdout, "reconfigure"):
 
 import pandas as pd
 
-# Reuse keyword sets + classification heuristic from the ambiance audit
+# Reuse keyword sets + classification heuristic from the ambience audit
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from audit_ambiance_eval import KW, classify, count_hits
+from audit_ambience_eval import KW, classify, count_hits
 
 ROOT = Path(__file__).resolve().parent.parent
 VAL_CSV = ROOT / "data" / "processed" / "val.csv"

@@ -12,7 +12,7 @@ that aren't on this machine. This rebuilder:
 Run order for a full rebuild:
   py src/rebuild_dataset.py        # this script — scraped real data only
   py src/generate_synthetic.py     # appends synthetic
-  py src/augment_ambiance.py       # appends back-translated ambiance
+  py src/augment_ambience.py       # appends back-translated ambience
   py src/split_dataset.py          # produces train/val/test
 """
 import csv
@@ -157,7 +157,7 @@ def main():
     print()
     print("Next steps:")
     print("  py src/generate_synthetic.py     # appends new synthetic")
-    print("  py src/augment_ambiance.py       # appends back-translated ambiance")
+    print("  py src/augment_ambience.py       # appends back-translated ambience")
     print("  py src/split_dataset.py          # produces train/val/test")
 
 
