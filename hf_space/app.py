@@ -13,6 +13,15 @@ import gradio as gr
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
+# Optional Arabic morphology engine (Gulf-dialect aware) for stem-based aspect
+# matching. Falls back to surface-form matching if not installed.
+try:
+    from pysarf import PySarf
+    _SARF = PySarf(dialect="gulf")
+except Exception as _sarf_err:  # noqa: BLE001
+    print(f"PySarf unavailable, falling back to surface matching: {_sarf_err}")
+    _SARF = None
+
 HF_REPO_ID = os.environ.get("HF_REPO_ID", "FerasMad/arabic-complaints-classifier")
 GITHUB_URL = "https://github.com/FerasMad/NLP-complaints-system"
 MAX_LENGTH = 192
@@ -50,7 +59,14 @@ def clean(text: str) -> str:
     if not text:
         return ""
     t = TASHKEEL.sub("", text)
-    t = t.translate(str.maketrans({"أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا", "ى": "ي", "ة": "ه"}))
+    # Standard MSA normalization + Gulf/Persian-influenced char fold-in.
+    # The Gulf chars (پ, چ, گ, ک, ی) appear in Saudi/Gulf social-media writing.
+    t = t.translate(str.maketrans({
+        "أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا",
+        "ى": "ي",
+        "ة": "ه",
+        "پ": "ب", "چ": "ج", "گ": "ك", "ک": "ك", "ی": "ي",
+    }))
     t = NON_ARABIC.sub(" ", t)
     return WHITESPACE.sub(" ", t).strip().lower()
 
@@ -151,6 +167,37 @@ ASPECT_CSS_ID = {
 }
 
 
+def _build_vocab_indices():
+    """Pre-compute two indices for aspect matching:
+      - phrases per aspect (multi-word, exact-match w/ prefix tolerance)
+      - stem-to-aspect map (single-word, morphology-aware via PySarf)
+
+    The stem index is what makes 'والمندوبين' match the 'المندوب' vocab entry,
+    or 'بطعم' match 'طعم', without listing every surface form.
+    """
+    phrases_by_aspect: dict[str, list[str]] = {}
+    stem_to_aspect: dict[str, str] = {}
+    for aspect, items in ASPECT_VOCAB.items():
+        for item in items:
+            words = item.split()
+            if len(words) > 1:
+                phrases_by_aspect.setdefault(aspect, []).append(item)
+                continue
+            # Single word: register the surface form AND its stem (if PySarf available)
+            phrases_by_aspect.setdefault(aspect, []).append(item)
+            if _SARF is not None:
+                try:
+                    stem = _SARF.analyze(words[0]).stem
+                except Exception:
+                    stem = None
+                if stem and stem not in stem_to_aspect:
+                    stem_to_aspect[stem] = aspect
+    return phrases_by_aspect, stem_to_aspect
+
+
+_PHRASES_BY_ASPECT, _STEM_TO_ASPECT = _build_vocab_indices()
+
+
 # Single-char prefixes that attach to words in Arabic (و, ف, ب, ل, ك, س).
 # When checking a word boundary at the START of a phrase, allow these prefixes
 # so 'المندوب' matches inside 'والمندوب' (and-the-delivery-person).
@@ -180,15 +227,22 @@ def _is_word_boundary_end(text: str, idx: int) -> bool:
 def extract_aspects(cleaned_text: str) -> tuple[list[tuple[int, int, str, str]], dict[str, list[str]]]:
     """Find aspect-specific phrases in the cleaned text.
 
-    Word-boundary aware: 'طعم' in 'المطعم' (restaurant) does NOT match.
+    Two-pass matching:
+      1. Multi-word phrases match exactly (with one-char Arabic prefix tolerance)
+      2. Single-word matching uses PySarf stems so 'والمندوبين' matches the
+         'المندوب' vocab entry without listing every surface form
+
+    Word-boundary aware: 'طعم' in 'المطعم' (restaurant) does NOT match the
+    food keyword, because their stems are 'مطعم' vs 'طعم'.
 
     Returns:
-        matches: list of (start, end, aspect, matched_phrase) sorted by start.
-                 Non-overlapping (longer matches preferred over shorter).
-        by_aspect: {aspect_name: [matched_phrases]} for the summary list.
+        matches: list of (start, end, aspect, matched_phrase) sorted by start
+        by_aspect: {aspect_name: [matched_phrases]}
     """
-    raw_matches = []
-    for aspect, phrases in ASPECT_VOCAB.items():
+    raw_matches: list[tuple[int, int, str, str]] = []
+
+    # Pass 1: phrase matching (exact substring with prefix-tolerant boundary)
+    for aspect, phrases in _PHRASES_BY_ASPECT.items():
         for phrase in sorted(phrases, key=len, reverse=True):
             start = 0
             while True:
@@ -198,16 +252,36 @@ def extract_aspects(cleaned_text: str) -> tuple[list[tuple[int, int, str, str]],
                 end = idx + len(phrase)
                 if _is_word_boundary_start(cleaned_text, idx) and _is_word_boundary_end(cleaned_text, end):
                     raw_matches.append((idx, end, aspect, phrase))
-                start = idx + 1  # advance one char so we don't miss adjacent matches
+                start = idx + 1
 
-    raw_matches.sort(key=lambda m: (m[0], -(m[1] - m[0])))
+    # Pass 2: stem matching for any single word in the input (PySarf only)
+    if _SARF is not None and _STEM_TO_ASPECT:
+        char_pos = 0
+        for word in cleaned_text.split():
+            word_start = cleaned_text.find(word, char_pos)
+            if word_start < 0:
+                char_pos += len(word) + 1
+                continue
+            char_pos = word_start + len(word)
+            try:
+                stem = _SARF.analyze(word).stem
+            except Exception:
+                continue
+            if stem and stem in _STEM_TO_ASPECT:
+                raw_matches.append((word_start, word_start + len(word), _STEM_TO_ASPECT[stem], word))
 
-    final = []
-    last_end = -1
+    # Greedy longest-match-first dedup so multi-word phrase matches beat
+    # overlapping single-word stem matches
+    raw_matches.sort(key=lambda m: -(m[1] - m[0]))
+    final: list[tuple[int, int, str, str]] = []
+    covered: set[int] = set()
     for m in raw_matches:
-        if m[0] >= last_end:
-            final.append(m)
-            last_end = m[1]
+        s, e = m[0], m[1]
+        if any(i in covered for i in range(s, e)):
+            continue
+        final.append(m)
+        covered.update(range(s, e))
+    final.sort(key=lambda m: m[0])
 
     by_aspect: dict[str, list[str]] = {}
     for s, e, asp, phrase in final:
