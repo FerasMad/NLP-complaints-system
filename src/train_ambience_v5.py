@@ -326,21 +326,33 @@ def train(args, T) -> dict:
             "ambience_f1": float(amb_f1),
         }
 
-    # Detect whether val has any ambience rows. If not, ambience_f1 is
-    # always 0 and using it for best-model selection would pick a random
-    # checkpoint. Codex's first run hit this exact failure mode: trained
-    # 4 epochs with ambience F1 = 0 on val (synthetic-only ambience is
-    # train-only by leakage gate), and "best" model was worse than the
-    # final checkpoint. Fall back to weighted_f1 in that case.
-    val_has_ambience = (val_df["category"] == "الجو والمكان").any()
+    # Pick best-checkpoint metric defensively. Two failure modes both seen
+    # in real runs:
+    #
+    #   (a) Val split has zero ambience rows (e.g. synthetic-only training,
+    #       all ambience is train-only by leakage gate). ambience_f1 is
+    #       always 0 → "best" picks a random checkpoint. Codex's first run
+    #       hit this; the final epoch was 8 F1 points better than the
+    #       promoted "best".
+    #
+    #   (b) Val HAS ambience rows but the model never predicts ambience
+    #       there (precision = 0 / recall = 0 / F1 = 0 across all epochs).
+    #       Same outcome: "best" by tie-break is epoch 1 (under-trained).
+    #       This requires a quick "did the model ever score above 0 for
+    #       ambience F1?" probe — we can't do that before training, so we
+    #       require AT LEAST 100 ambience rows in val to trust ambience_f1
+    #       as the selection metric.
+    val_amb_count = int((val_df["category"] == "الجو والمكان").sum())
     best_metric = args.best_metric
-    if best_metric == "ambience_f1" and not val_has_ambience:
+    if best_metric == "ambience_f1" and val_amb_count < 100:
         print(
-            "[train] WARNING: val split has zero ambience rows "
-            "(synthetic-only training). Switching metric_for_best_model "
-            "from 'ambience_f1' to 'weighted_f1' to avoid noise-driven "
-            "checkpoint selection. Pass --best-metric weighted_f1 to "
-            "silence this warning, or add real ambience rows to val.",
+            f"[train] WARNING: val has only {val_amb_count} ambience rows "
+            f"(< 100 threshold). Ambience F1 on val is unreliable as a "
+            f"checkpoint-selection signal — high risk of promoting a near-"
+            f"random checkpoint via tie-breaking. Switching "
+            f"metric_for_best_model from 'ambience_f1' to 'weighted_f1'. "
+            f"To force ambience_f1 anyway, pass --best-metric ambience_f1 "
+            f"AND collect more real ambience rows for val.",
             file=sys.stderr,
         )
         best_metric = "weighted_f1"
