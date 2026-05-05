@@ -510,6 +510,20 @@ RESCUE_RULES: list[tuple[str, list[str]]] = [
     ]),
     ("التوصيل", ["ضاع الطلب", "المندوب تاخر", "المندوب ما رد"]),
     ("جودة الطعام", ["الطبخ", "اللحم محروق", "بدون طعم", "الاكل بايخ"]),
+    # General-complaint rescue — added after live-Space audit found
+    # "تجربه سيئه عموما لن اعود" being misclassified as السعر والقيمة.
+    # These phrases are unambiguous "no specific aspect, overall bad"
+    # signals that the model under-fires on. Conservative phrase set —
+    # full sentences only, not bare words.
+    ("عامة", [
+        "تجربه سيئه عموما", "تجربة سيئة عموما",
+        "لن اعود", "لن أعود",
+        "اخر مره اطلب", "آخر مرة اطلب",
+        "اول مره واخر مره", "اول مرة واخر مرة",
+        "ما عجبني شي", "ما عجبني شيء",
+        "بشكل عام سيء", "بشكل عام سيئ",
+        "تجربه محبطه", "تجربة محبطة",
+    ]),
 ]
 
 
