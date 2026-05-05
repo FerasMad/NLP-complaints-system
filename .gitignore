@@ -25,6 +25,10 @@ PROJECT_HANDOFF.md
 team_message.pdf
 documentation.pdf
 
+# Ambience revival sandbox — smoke-test outputs and any local triage runs
+research/ambience_revival/_smoke_test_output/
+research/ambience_revival/_*/
+
 # Python
 __pycache__/
 *.py[cod]
