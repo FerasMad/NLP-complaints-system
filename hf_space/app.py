@@ -312,9 +312,18 @@ def annotate_text(text: str, matches: list[tuple[int, int, str, str]]) -> str:
     return "".join(out)
 
 
-def render_understanding(cleaned_text: str) -> str:
-    """Render the 'how I read this' interpretability panel."""
-    matches, by_aspect = extract_aspects(cleaned_text)
+def render_understanding(
+    cleaned_text: str,
+    matches: list[tuple[int, int, str, str]] | None = None,
+    by_aspect: dict[str, list[str]] | None = None,
+) -> str:
+    """Render the 'how I read this' interpretability panel.
+
+    Optionally accepts pre-computed matches/by_aspect so the caller can avoid
+    running extract_aspects twice (once for multi-aspect detection, once here).
+    """
+    if matches is None or by_aspect is None:
+        matches, by_aspect = extract_aspects(cleaned_text)
 
     if not by_aspect:
         return (
@@ -377,13 +386,22 @@ EMPTY_RESULT = """
 """
 
 
-def is_multi_aspect(top: list[tuple[str, float]]) -> bool:
+def is_multi_aspect(
+    top: list[tuple[str, float]],
+    by_aspect: dict[str, list[str]] | None = None,
+) -> bool:
     """Detect competing-signal predictions.
 
-    Keyword booster in the inference layer rebalances scores when multiple
-    aspect keywords are present, so we relax the threshold: top-1 below 85%
-    AND top-2 above 15% counts as multi-aspect. Tuned against the audit set.
+    Two paths trigger multi-aspect display:
+      1. Probability shape — top-1 < 85% AND top-2 > 15% (model is hedging)
+      2. Aspect-extraction shape — 2+ distinct aspect categories detected
+         in the text. This catches the over-confident failure mode where the
+         model returns 100% on one aspect but the text clearly mentions two
+         (e.g. "الاكل بارد والموظف غير مهذب" → 100% food, but staff phrase
+         is also unambiguously present).
     """
+    if by_aspect is not None and len(by_aspect) >= 2:
+        return True
     if len(top) < 2:
         return False
     return top[0][1] < 0.85 and top[1][1] > 0.15
@@ -432,7 +450,10 @@ def render_general_fallback(top: list[tuple[str, float]]) -> str:
     )
 
 
-def render_result(top: list[tuple[str, float]]) -> str:
+def render_result(
+    top: list[tuple[str, float]],
+    by_aspect: dict[str, list[str]] | None = None,
+) -> str:
     if not top:
         return EMPTY_RESULT
 
@@ -440,7 +461,7 @@ def render_result(top: list[tuple[str, float]]) -> str:
     if top[0][0] == "عامة":
         return render_general_fallback(top)
 
-    multi = is_multi_aspect(top)
+    multi = is_multi_aspect(top, by_aspect)
 
     rows = []
     for rank, (cat, score) in enumerate(top):
@@ -523,6 +544,41 @@ def apply_rescue(probs, cleaned_text: str, rescue_floor: float = 0.55):
     return out
 
 
+# Praise vs complaint screen — protects against the "ممتاز جدا شكرا" failure
+# where positive feedback gets dumped into 'عامة' with 100% confidence.
+# Word-set matching (not substring) so short particles like "لا" / "ما" don't
+# false-match inside common words like "الاكل" (which contains "لا").
+PRAISE_WORDS = frozenset({
+    "ممتاز", "ممتازه", "ممتازة", "رائع", "رائعه", "رائعة", "احسن", "أحسن",
+    "افضل", "أفضل", "جميل", "جميله", "جميلة", "حلو", "حلوه", "حلوة",
+    "لذيذ", "لذيذه", "لذيذة", "نظيف", "نظيفه", "نظيفة",
+    "مريح", "مريحه", "مريحة", "سريع", "سريعه", "سريعة",
+    "شكرا", "شكراً", "احب", "أحب", "نصحت", "انصح", "أنصح",
+})
+NEGATIVE_WORDS = frozenset({
+    "سيء", "سيئ", "سيئه", "سيئة", "سيئا", "بايخ", "بايخه", "بايخة",
+    "مالح", "مالحه", "مالحة", "بارد", "بارده", "باردة",
+    "تاخر", "تاخرت", "تأخر", "تأخرت", "متأخر", "متاخر",
+    "قذر", "قذره", "قذرة", "متسخ", "متسخه", "متسخة", "وسخ", "وسخه", "وسخة",
+    "غير", "ما", "لا", "مو", "مب",  # negation particles — only match as whole words
+    "مزعج", "مزعجه", "مزعجة", "غالي", "غاليه", "غالية",
+    "ضاع", "ضاعت", "محروق", "محروقه", "محروقة", "نسي", "نسوا",
+    "مشكله", "مشكلة", "مشاكل", "خربان", "خربانه", "خربانة",
+})
+
+
+def looks_like_praise(cleaned: str) -> bool:
+    """True when the input has positive sentiment words and no negatives.
+
+    Uses whole-word matching (not substring) so short negation particles like
+    'لا' / 'ما' don't false-match inside common words such as 'الاكل'.
+    """
+    words = set(cleaned.split())
+    has_praise = bool(words & PRAISE_WORDS)
+    has_negative = bool(words & NEGATIVE_WORDS)
+    return has_praise and not has_negative
+
+
 @torch.no_grad()
 def predict(text: str) -> str:
     if not text or len(text.strip()) < 3:
@@ -537,12 +593,34 @@ def predict(text: str) -> str:
         )
 
     cleaned = clean(text)
+
+    # Topic-only abstain: a single bare word like "الاكل" has no opinion.
+    # Require ≥2 words so the model only fires on actual complaint shapes.
+    if len(cleaned.split()) < 2:
+        return render_message(
+            "اكتب شكوى تحتوي على رأي محدد، وليس كلمة واحدة فقط",
+            "type a complaint with an opinion, not just a topic word",
+        )
+
+    # Praise screen: route obvious praise away from the classifier so it
+    # doesn't get dumped into 'عامة' at 100% confidence.
+    if looks_like_praise(cleaned):
+        return render_message(
+            "هذا يبدو ثناءً وليس شكوى",
+            "this looks like praise, not a complaint — try describing a problem",
+        )
+
     enc = tokenizer(cleaned, return_tensors="pt", truncation=True, max_length=MAX_LENGTH).to(device)
     probs = torch.softmax(model(**enc).logits[0], dim=-1).cpu().numpy()
     probs = apply_rescue(probs, cleaned)
     top_idx = probs.argsort()[::-1][:3]
     top = [(ID2LABEL[int(i)], float(probs[i])) for i in top_idx]
-    return render_result(top) + render_understanding(cleaned)
+
+    # Compute aspects once and reuse — also feeds the multi-aspect detector
+    # so 100%/0% predictions still trigger the multi-aspect badge when two
+    # distinct aspect categories are present in the text.
+    matches, by_aspect = extract_aspects(cleaned)
+    return render_result(top, by_aspect) + render_understanding(cleaned, matches, by_aspect)
 
 
 EXAMPLES = [
