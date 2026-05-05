@@ -1,0 +1,184 @@
+id,text,expected_label,difficulty,attack_type,notes
+EASY-POS-01,المكيف ما يشتغل والجو حار جدا,الجو والمكان,easy,clean,clear AC complaint
+EASY-POS-02,المكان مزدحم وما لقينا طاوله,الجو والمكان,easy,clean,clear crowding
+EASY-POS-03,الكراسي قاسيه على الظهر,الجو والمكان,easy,clean,clear seating
+EASY-POS-04,الموسيقى عاليه ما نقدر نتكلم,الجو والمكان,easy,clean,clear noise
+EASY-POS-05,الاضاءه مزعجه على العين,الجو والمكان,easy,clean,clear lighting
+EASY-POS-06,ريحه عفنه طالعه من الزاويه,الجو والمكان,easy,clean,clear smell
+EASY-POS-07,الديكور قديم والفرش مهلوك,الجو والمكان,easy,clean,clear decor
+EASY-POS-08,ما لقيت موقف للسياره,الجو والمكان,easy,clean,clear parking
+EASY-POS-09,السيفون خربان والمغسله معطله,الجو والمكان,easy,clean,clear bathroom facilities
+EASY-POS-10,التراس فيه شمس قويه ما نقدر نقعد,الجو والمكان,easy,clean,clear outdoor
+EASY-POS-11,ما فيه خصوصيه كل الناس تشوفك,الجو والمكان,easy,clean,clear privacy
+EASY-POS-12,الجو في المطعم كئيب ما يفتح النفس,الجو والمكان,easy,clean,clear vibe
+EASY-POS-13,التهويه سيئه والهوا ما يدور,الجو والمكان,easy,clean,ventilation
+EASY-POS-14,الكنب مهلوك والاسفنج طالع,الجو والمكان,easy,clean,furniture wear
+EASY-POS-15,زحمه موت يوم الويك اند ما تقدر تقعد,الجو والمكان,easy,clean,weekend crowd
+EASY-POS-16,الاطفال يصرخون والمكان مفتوح بدون حواجز,الجو والمكان,easy,clean,kids noise + privacy
+EASY-POS-17,الديكور كئيب مثل المستشفى مو مطعم,الجو والمكان,easy,clean,depressing decor
+EASY-POS-18,الجلسه الارضيه فيها رائحة تعب,الجو والمكان,easy,clean,floor seating smell
+EASY-POS-19,الطاوله تتمايل كل ما اوكل عليها,الجو والمكان,easy,clean,wobbly table
+EASY-POS-20,المواقف بعيده والممشى صعب على كبار السن,الجو والمكان,easy,clean,parking accessibility
+EASY-POS-21,الاضاءه قويه على عيون البيبي يصرخ,الجو والمكان,easy,clean,bright lights bothering baby
+EASY-POS-22,ريحة الزيت المحروق منتشره داخل المطعم,الجو والمكان,easy,clean,burnt-oil smell in place
+EASY-POS-23,الفرع متهالك والديكور من زمن,الجو والمكان,easy,clean,rundown branch
+EASY-POS-24,الكنب وسخ من زمن الاستخدام مش من القذاره,الجو والمكان,easy,clean,worn-not-dirty (boundary)
+EASY-POS-25,ما فيه باركنج للمعاقين لازم اوقف بعيد,الجو والمكان,easy,clean,accessibility
+EASY-NEG-01,الاكل بايخ ومالح بزياده,جودة الطعام,easy,clean,clear food
+EASY-NEG-02,الموظف ما رد علي ووقف معي ساعه,خدمة الموظفين,easy,clean,clear staff
+EASY-NEG-03,المندوب تاخر ساعتين ما رد على التلفون,التوصيل,easy,clean,clear delivery
+EASY-NEG-04,الفاتوره غاليه على وجبه بسيطه,السعر والقيمة,easy,clean,clear price
+EASY-NEG-05,نسوا نص الطلب في الكيس,دقة الطلب,easy,clean,clear order accuracy
+EASY-NEG-06,انتظرت ساعتين قبل ما يوصل الطلب,وقت الانتظار,easy,clean,clear wait
+EASY-NEG-07,الصحون وسخه فيها بقع طعام قديم,النظافة,easy,clean,clear hygiene
+EASY-NEG-08,تجربه سيئه عموما لن اعود ابدا,عامة,easy,clean,clear general
+EASY-NEG-09,اللحمه نيه من الداخل ومحروقه من برا,جودة الطعام,easy,clean,food cooking issue
+EASY-NEG-10,طلبت بدون بصل لكنهم وضعوا بصل,دقة الطلب,easy,clean,clear order mod
+EASY-NEG-11,شفت ذبابه فوق الطعام مباشره,النظافة,easy,clean,pest in food
+EASY-NEG-12,الكاشير حسبها غلط وما عدلها,خدمة الموظفين,easy,clean,calculation error
+EASY-NEG-13,الديليفري اخذ ساعه كامله بدون اعتذار,التوصيل,easy,clean,delivery time + apology
+EASY-NEG-14,البرجر فيه شعره طالعه من الجبن,النظافة,easy,clean,foreign object in food
+EASY-NEG-15,طلبت دجاج مشوي وجاء مقلي,دقة الطلب,easy,clean,wrong cooking method
+EASY-NEG-16,التطبيق علق وما قبل الطلب,التوصيل,easy,clean,app issue
+EASY-NEG-17,اول مره وآخر مره اطلب من هذا المكان,عامة,easy,clean,general dissatisfaction
+EASY-NEG-18,القهوه طلعت بارده ومالها طعم,جودة الطعام,easy,clean,cold drink
+EASY-NEG-19,الموظف اسلوبه متعالي وغير محترم,خدمة الموظفين,easy,clean,arrogant staff
+EASY-NEG-20,انتظرت نص ساعه عند الكاشير لطلب وحده,وقت الانتظار,easy,clean,checkout wait
+BOUNDARY-01,الاكل بارد,جودة الطعام,hard,boundary,classic food temp boundary
+BOUNDARY-02,المكان بارد والمكيف قوي,الجو والمكان,hard,boundary,classic place temp
+BOUNDARY-03,الشاورما حاره,جودة الطعام,hard,boundary,food spice
+BOUNDARY-04,المكان حار والمكيف ما يبرد,الجو والمكان,hard,boundary,AC failure
+BOUNDARY-05,البطاطس مليانه زيت,جودة الطعام,hard,boundary,greasy food
+BOUNDARY-06,ريحة الزيت ماسكه في المطعم,الجو والمكان,hard,boundary,oil smell in place
+BOUNDARY-07,الموظف كان بارد في التعامل,خدمة الموظفين,hard,boundary,cold staff
+BOUNDARY-08,الطاوله تهتز كل ما تحط شي,الجو والمكان,hard,boundary,wobbly table
+BOUNDARY-09,الطاوله وسخه فيها بقع طعام,النظافة,hard,boundary,dirty table
+BOUNDARY-10,الحمام وصخ ومقرف,النظافة,hard,boundary,dirty bathroom
+BOUNDARY-11,السيفون خربان وما فيه صابون,الجو والمكان,hard,boundary,broken bathroom facilities
+BOUNDARY-12,الاكل قديم محسوس عليه ومش طازه,جودة الطعام,hard,boundary,old food
+BOUNDARY-13,الديكور قديم والاجواء قديمه,الجو والمكان,hard,boundary,old decor (same word as old food)
+BOUNDARY-14,الكوكا باردة بزياده ما اقدر اشربها,جودة الطعام,hard,boundary,cold drink
+BOUNDARY-15,التكييف بارد بزياده يثلجنا,الجو والمكان,hard,boundary,AC over-cold
+BOUNDARY-16,اللحمه حاره من القلي مباشره,جودة الطعام,hard,boundary,hot food
+BOUNDARY-17,التراس حار جدا تحت الشمس,الجو والمكان,hard,boundary,hot outdoor
+BOUNDARY-18,الموظف ازعجني بكثرة الاسئله,خدمة الموظفين,hard,boundary,annoying staff (vs ambience-noise)
+BOUNDARY-19,الموسيقى ازعاج فظيع,الجو والمكان,hard,boundary,annoying music
+BOUNDARY-20,صوت الموظف عالي ومزعج وقت الطلب,خدمة الموظفين,hard,boundary,loud staff voice
+BOUNDARY-21,صوت الموسيقى عالي ما نقدر نسولف,الجو والمكان,hard,boundary,loud music
+BOUNDARY-22,ريحة الاكل غريبه شككتني فيه,جودة الطعام,hard,boundary,off-smelling food
+BOUNDARY-23,ريحة المعسل والشيشه في كل المكان,الجو والمكان,hard,boundary,shisha smell environment
+BOUNDARY-24,الكنب وسخ بقع طعام عليه,النظافة,hard,boundary,dirty sofa (cleanliness)
+BOUNDARY-25,الكنب مهلوك ومتشقق من الاستعمال,الجو والمكان,hard,boundary,worn sofa (condition)
+NEGATION-01,المكيف يشتغل بشكل ممتاز والجو حلو,no_complaint,medium,negation,explicit praise
+NEGATION-02,ما عندي مشكله مع المكان كله مرتب,no_complaint,medium,negation,no-issue declaration
+NEGATION-03,الجو ما هو حار المكيف يبرد كويس,no_complaint,medium,negation,negation of complaint
+NEGATION-04,المطعم ما فيه زحمه اليوم بصراحه,no_complaint,medium,negation,no crowd
+NEGATION-05,الديكور قديم بس بشكل جذاب وانيق,الجو والمكان,medium,negation,old decor positively-framed (still ambience)
+NEGATION-06,الكنب مرتاح مالحظت اي مشكله,no_complaint,medium,negation,praise of seating
+NEGATION-07,الحمام نظيف ومرتب ومافي شي يطلب,no_complaint,medium,negation,praise of bathroom
+NEGATION-08,ما فيه ريحه ابدا الجو منعش,no_complaint,medium,negation,no smell
+NEGATION-09,الاضاءه ممتازه وما تجهد العين,no_complaint,medium,negation,good lighting
+NEGATION-10,الموسيقى هادئه ومناسبه ما تزعج,no_complaint,medium,negation,good music
+NEGATION-11,المواقف كثيره ما تحتاج تمشي,no_complaint,medium,negation,plenty of parking
+NEGATION-12,الخصوصيه عاليه القسم العائلي مفصول,no_complaint,medium,negation,good privacy
+NEGATION-13,الجو رائق والمكان واسع جدا,no_complaint,medium,negation,good ambience
+NEGATION-14,ما يستاهل تنرفز كل شي عادي,no_complaint,medium,negation,nothing to complain about
+NEGATION-15,تجربه ممتازه شكرا للفريق,no_complaint,medium,negation,praise
+SARCASM-01,واو ما اروع الكنب اللي يهرس الظهر,الجو والمكان,hard,sarcasm,sarcastic seating complaint
+SARCASM-02,ما شاء الله مكيف يدفي بدل ما يبرد,الجو والمكان,hard,sarcasm,sarcastic AC
+SARCASM-03,ابدع المعماري في الديكور القديم المهلوك,الجو والمكان,hard,sarcasm,sarcastic decor
+SARCASM-04,تخيل تروح مطعم وتسمع نفسك تفكر،مستحيل,الجو والمكان,hard,sarcasm,implicit noise
+SARCASM-05,خصوصيه روعه كل الجيران يعرفون انك تاكل,الجو والمكان,hard,sarcasm,sarcastic privacy
+SARCASM-06,شكرا على الجلسه المريحه مثل البلاط,الجو والمكان,hard,sarcasm,sarcastic seating
+SARCASM-07,واخيرا مكيف يطلع ثلج بدل هوا منعش,الجو والمكان,hard,sarcasm,sarcastic AC
+SARCASM-08,تستاهل المغامره ريحة المجاري في الصاله,الجو والمكان,hard,sarcasm,sarcastic smell
+SARCASM-09,ما تنحسد على الاضاءه القويه على راسك,الجو والمكان,hard,sarcasm,sarcastic lighting
+SARCASM-10,ابدعتو في تصميم الموقف اللي في الجبل,الجو والمكان,hard,sarcasm,sarcastic parking
+MIXED-01,AC ما يشتغل والجو حر,الجو والمكان,medium,mixed_dialect,Arabic+English
+MIXED-02,no parking والمكان زحمه,الجو والمكان,medium,mixed_dialect,English transliteration
+MIXED-03,الجو dim والاضاءه ضعيفه,الجو والمكان,medium,mixed_dialect,English adjective
+MIXED-04,البلكونه view حلو بس الكراسي تعبانه,الجو والمكان,medium,mixed_dialect,view loanword
+MIXED-05,WiFi ما يشتغل والجو ممل,عامة,medium,mixed_dialect,wifi loanword (general gripe)
+MIXED-06,المكان كله messy وقذر,النظافة,medium,mixed_dialect,messy + clean
+MIXED-07,البارتشن broken ما يفصل بين الطاولات,الجو والمكان,medium,mixed_dialect,partition state
+MIXED-08,الديكور outdated من زمن,الجو والمكان,medium,mixed_dialect,outdated loanword
+MIXED-09,القعده cozy بس الموظفين بطيئين,خدمة الموظفين,medium,mixed_dialect,cozy seat + slow staff
+MIXED-10,Place جدا ضيق ما فيه space,الجو والمكان,medium,mixed_dialect,heavy English
+MIXED-11,الكنب comfortable بس الطاوله shaky,الجو والمكان,medium,mixed_dialect,comfortable + shaky
+MIXED-12,توقع noise كبير من الاطفال,الجو والمكان,medium,mixed_dialect,noise loanword
+MULTI-01,الاكل بارد والمكيف خربان,الجو والمكان,hard,multi_aspect,food cold + AC broken (ambience must surface)
+MULTI-02,الموظف بطيء والكنب وسخ,خدمة الموظفين,hard,multi_aspect,staff + cleanliness
+MULTI-03,الديكور قديم والسعر غالي,الجو والمكان,hard,multi_aspect,decor + price
+MULTI-04,الجو حار والاكل بايخ والمندوب تاخر,جودة الطعام,hard,multi_aspect,3-aspect (food dominant)
+MULTI-05,المكان زحمه والموظفين ما يلاحقون,الجو والمكان,hard,multi_aspect,crowding + staff (ambience root cause)
+MULTI-06,الفاتوره غاليه على كنب مهلوك,الجو والمكان,hard,multi_aspect,price + furniture (ambience focus)
+MULTI-07,الحمام خربان والصابون ناقص والمنشفه وسخه,الجو والمكان,hard,multi_aspect,facilities + supplies + cleanliness
+MULTI-08,انتظرنا ساعه وفي زحمه شديده,وقت الانتظار,hard,multi_aspect,wait dominates over crowding
+MULTI-09,الموسيقى عاليه والاكل بارد,جودة الطعام,hard,multi_aspect,noise + cold food (food primary cause of complaint)
+MULTI-10,ريحة المطبخ تخرج للصاله والاكل ما يستاهل,جودة الطعام,hard,multi_aspect,kitchen smell + bad food (food primary)
+MULTI-11,التكييف ضعيف والموظفين يتهاوشون فوق راسنا,خدمة الموظفين,hard,multi_aspect,AC weak + staff fighting
+MULTI-12,قعدت اربع ساعات بدون احد يخدمنا والكنب يهرس,خدمة الموظفين,hard,multi_aspect,no service + uncomfortable
+MULTI-13,الديكور رهيب والاكل اروع والاسعار معقوله,no_complaint,hard,multi_aspect,all praise (no complaint)
+MULTI-14,ضائع الطلب وضائعنا في الموقف من الزحمه,التوصيل,hard,multi_aspect,delivery loss + parking crowd
+MULTI-15,البارتشن مكسور والكاشير ما يحسب صح,خدمة الموظفين,hard,multi_aspect,partition + cashier error
+SHORT-01,حر,abstain,hard,very_short,too short
+SHORT-02,بارد,abstain,hard,very_short,too short
+SHORT-03,سيء,abstain,hard,very_short,too short
+SHORT-04,كنب وسخ,النظافة,hard,short,very brief but classifiable
+SHORT-05,مكيف خربان,الجو والمكان,hard,short,brief but clear
+SHORT-06,ريحة كريهه,الجو والمكان,medium,short,brief smell
+SHORT-07,زحمه قاتله,الجو والمكان,hard,short,brief crowd
+SHORT-08,موسيقى مزعجه,الجو والمكان,hard,short,brief noise
+SHORT-09,اضاءه قويه,الجو والمكان,medium,short,brief lighting
+SHORT-10,الحمام مقرف,النظافة,medium,short,brief hygiene
+LONG-01,زرت هذا المطعم بناء على توصيه من صديق وكنت متحمس بصراحه لكن لما دخلت اول حاجه لاحظتها ان الجو خانق جدا والمكيف لا يكاد يعمل وكان هناك ازدحام شديد جدا لدرجه اننا انتظرنا ربع ساعه قبل ما نلقى مكان فاضي والكراسي قاسيه على الظهر,الجو والمكان,hard,long,multi-sentence ambience review
+LONG-02,بصراحه حابب اشارك تجربتي اللي ما كانت كويسه ابدا الديكور قديم ومتهالك الجدران فيها بويه متشققه والكنب مهلوك واسفنج طالع منه والاضاءه ضعيفه ما تشوف المنيو بسهوله ولما طلبت مساعده الموظف رد بكسل,الجو والمكان,hard,long,decor + lighting + staff (ambience dominates)
+LONG-03,اول زياره لي للفرع الجديد كانت كارثيه الاكل وصل بارد وطعمه كأنه من البارحه والموظف اللي خدمنا كان مزعج جدا ما يبتسم ولا يرحب وكلما طلبت شي يرد بشكل عدائي والفاتوره طلعت اعلى من المتوقع بكثير,جودة الطعام,hard,long,food + staff + price (food primary)
+LONG-04,لاحظت اشياء كثيره قبل ما اطلب الجو في المطعم رطب جدا والمكيف يطلع هوا حر والاضاءه قويه على العين والموسيقى عاليه ما نقدر نسولف وفوق هذا كله الكنب مهلوك والطاوله تهتز كل ما اضع شي عليها,الجو والمكان,hard,long,many ambience subtypes
+LONG-05,قررت اكتب هذي المراجعه عشان تجربتي كانت سيئه جدا الموظف اللي كان يخدمنا اسلوبه كان متعالي وغير محترم واخذ وقت طويل عشان يجي ولما طلبنا تعديل في الطلب رفض بدون اي سبب وعندما اشتكينا للمدير ما اهتم,خدمة الموظفين,hard,long,staff dominant
+LONG-06,الفرع موقعه ممتاز قريب من البيت والاسعار معقوله بس المشكله ان الكراسي صلبه جدا ما تقدر تجلس فيها اكثر من نص ساعه وفوق هذا الاضاءه قويه جدا تتعب العين بعد فتره قصيره من الجلوس,الجو والمكان,hard,long,ambience-only complaint within mixed review
+LONG-07,زرنا الفرع امس مع العائله وكان الجو في غايه السوء الكنب فاضي والاسفنج طالع والمكيف ما يبرد ابدا وكنا نتعرق طول الوقت والاطفال ما قدروا يقعدون من الازعاج اللي حواليهم,الجو والمكان,hard,long,family visit ambience disaster
+LONG-08,تجربه عاديه ما فيها شي مميز الاكل كان مقبول والخدمه عاديه ولكن المكان كان ضيق جدا ومزدحم بالناس وما فيه مساحه شخصيه على الاطلاق وكان فيه ازعاج من المطبخ,الجو والمكان,hard,long,mediocre review where ambience is the main issue
+OOD-01,سيارتي تعطلت في الطريق,no_complaint,hard,out_of_domain,car issue (not restaurant)
+OOD-02,تطبيق البنك ما يفتح,no_complaint,hard,out_of_domain,banking app
+OOD-03,الانترنت بطيء جدا اليوم,no_complaint,hard,out_of_domain,internet not restaurant
+OOD-04,الجو في الرياض حار اليوم,no_complaint,hard,out_of_domain,Riyadh weather (not restaurant ambience)
+OOD-05,الطريق زحمه من الصباح,no_complaint,hard,out_of_domain,traffic jam
+OOD-06,البيت ما فيه مكيف يبرد,no_complaint,hard,out_of_domain,home AC
+OOD-07,الجامعه قاعه الدرس باردة,no_complaint,hard,out_of_domain,university classroom (not restaurant)
+OOD-08,المستشفى الانتظار طويل,no_complaint,hard,out_of_domain,hospital wait
+TYPO-01,المكنف خربان والجو حار,الجو والمكان,medium,typo,typo: المكنف vs المكيف
+TYPO-02,الجلسه قسيه ما اقدر اقعد,الجو والمكان,medium,typo,typo: قسيه vs قاسيه
+TYPO-03,الكناب وسخ من الزمن,الجو والمكان,medium,typo,typo: الكناب vs الكنب
+TYPO-04,التراسس فيه ذباب وحشرات,الجو والمكان,medium,typo,typo: التراسس
+TYPO-05,موسقى عاليه ما نقدر نسولف,الجو والمكان,medium,typo,typo: موسقى vs موسيقى
+TYPO-06,الاضاه قويه على العين,الجو والمكان,medium,typo,typo: الاضاه vs الاضاءه
+TYPO-07,الحمم خربان وما فيه صابون,الجو والمكان,medium,typo,typo: الحمم vs الحمام
+TYPO-08,المكان زحمه مووت ما لقينا مكان,الجو والمكان,medium,typo,emphasis typo: مووت
+TYPO-09,الديكوور قديم وممل,الجو والمكان,medium,typo,vowel-stretch typo
+TYPO-10,البركنج بعيد جدا,الجو والمكان,medium,typo,transliteration variant
+TYPO-11,الجو حاررررر والمكيف خربااان,الجو والمكان,medium,typo,emphasis-stretching
+TYPO-12,المكييف ضعيف والجو خانق,الجو والمكان,medium,typo,double-yaa typo
+EMOJI-01,🥶🥶 المكيف بارد بزياده,الجو والمكان,medium,emoji,emoji + ambience
+EMOJI-02,😡😡😡 الكنب وسخ,النظافة,medium,emoji,emoji + hygiene
+EMOJI-03,💸💸 الفاتوره غاليه على وجبه بسيطه,السعر والقيمة,medium,emoji,emoji + price
+EMOJI-04,🥵🥵 الجو حر ومافي تكييف,الجو والمكان,medium,emoji,emoji + ambience
+EMOJI-05,🤢 ريحة المجاري في الصاله,الجو والمكان,medium,emoji,disgust emoji + smell
+EMOJI-06,👎 الديكور قديم بزياده,الجو والمكان,medium,emoji,thumbs-down + decor
+EMOJI-07,😴😴 الموسيقى مملة وحزينه,الجو والمكان,medium,emoji,sleeping emoji + music
+EMOJI-08,💔 المكان كئيب ومحبط,الجو والمكان,medium,emoji,broken heart + vibe
+ADV-01,حر بزياده ما اقدر اكمل اكل,الجو والمكان,hard,adversarial,'حر' as ambience without explicit place word
+ADV-02,بارد بشكل لا يحتمل في الصاله,الجو والمكان,hard,adversarial,'بارد' implicit place reference
+ADV-03,قديم وما يستاهل تجي مره ثانيه,الجو والمكان,medium,adversarial,'قديم' likely about place
+ADV-04,قديم وكانه طبخ من امس,جودة الطعام,medium,adversarial,'قديم' about food despite ambiguous start
+ADV-05,تشمشم ريحة الزيت من بعيد,الجو والمكان,hard,adversarial,unusual verb + smell
+ADV-06,تشمشم ريحة الزيت من البطاطس,جودة الطعام,hard,adversarial,same verb but food source
+ADV-07,زحمه فظيعه ما يطاق,الجو والمكان,hard,adversarial,one-word context
+ADV-08,زحمه افكار في راسي قبل ما اقرر اطلب,no_complaint,hard,adversarial,'زحمه' figurative not place
+ADV-09,الجو ميت في الصاله كأنها متحف,الجو والمكان,hard,adversarial,figurative dead atmosphere
+ADV-10,الديكور حلو بس الاكل بايخ,جودة الطعام,medium,adversarial,decor praised + food bad (food complaint)
+ADV-11,المكيف يبرد مية مية والكنب نظيف,no_complaint,medium,adversarial,explicit ambience praise
+ADV-12,صراحه الجلسه مرتاحه والاضاءه ممتازه,no_complaint,medium,adversarial,multiple ambience praise
+ADV-13,الكنب جديد ولامع لكن قاسي مرة,الجو والمكان,hard,adversarial,positive then negative ambience
+ADV-14,الجلسه جنه بصراحه لو الاكل اروع,جودة الطعام,hard,adversarial,seat praised but food bad
+ADV-15,تجربه قاسيه على الاعصاب من الازعاج,الجو والمكان,medium,adversarial,figurative 'قاسيه' but explicit noise
