@@ -390,21 +390,16 @@ def is_multi_aspect(
     top: list[tuple[str, float]],
     by_aspect: dict[str, list[str]] | None = None,
 ) -> bool:
-    """Detect competing-signal predictions.
+    """Detect genuinely multi-aspect complaints.
 
-    Two paths trigger multi-aspect display:
-      1. Probability shape — top-1 < 85% AND top-2 > 15% (model is hedging)
-      2. Aspect-extraction shape — 2+ distinct aspect categories detected
-         in the text. This catches the over-confident failure mode where the
-         model returns 100% on one aspect but the text clearly mentions two
-         (e.g. "الاكل بارد والموظف غير مهذب" → 100% food, but staff phrase
-         is also unambiguously present).
+    Source of truth is aspect extraction (what's actually in the text), not
+    model probabilities (which conflate "two real aspects" with "model uncertain
+    between two related categories"). A 51%/49% split between wait-time and
+    food-quality on a pure wait-time complaint reflects model confusion, not
+    a multi-aspect input — only the aspect-extraction layer can tell the
+    difference. Fires only when 2+ distinct aspect categories are detected.
     """
-    if by_aspect is not None and len(by_aspect) >= 2:
-        return True
-    if len(top) < 2:
-        return False
-    return top[0][1] < 0.85 and top[1][1] > 0.15
+    return by_aspect is not None and len(by_aspect) >= 2
 
 
 def render_general_fallback(top: list[tuple[str, float]]) -> str:
@@ -434,16 +429,11 @@ def render_general_fallback(top: list[tuple[str, float]]) -> str:
     return (
         '<div class="general-fallback">'
         '  <div class="general-headline">'
-        '    <strong>لم يُحدَّد جانب معيّن</strong>'
-        '    <span>no specific aspect detected — input may be too vague</span>'
-        '  </div>'
-        '  <div class="general-hint">'
-        '    اذكر جانباً محدداً في شكواك '
-        '    <em>(الطعام · الخدمة · التوصيل · النظافة · السعر · وقت الانتظار · دقة الطلب)</em>'
-        '    للحصول على تصنيف أدقّ.'
+        '    <strong>شكوى عامة</strong>'
+        '    <span>general complaint — covers the overall experience</span>'
         '  </div>'
         f'  <div class="general-rail">'
-        f'    <span class="general-rail-label">قد تكون عن:</span>'
+        f'    <span class="general-rail-label">قد تتعلّق بأحد هذه الجوانب:</span>'
         f'    <div class="result-stack">{"".join(rows)}</div>'
         f'  </div>'
         '</div>'
