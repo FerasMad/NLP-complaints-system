@@ -97,6 +97,200 @@ CHART_BL_LIGHT_URI = _svg_data_uri(HERE / "charts" / "vs_baselines.svg")
 CHART_BL_DARK_URI = _svg_data_uri(HERE / "charts" / "vs_baselines.dark.svg")
 
 
+# ---- Aspect extraction (interpretability layer) ----------------------------
+# For every input, we scan for category-specific Arabic phrases. This shows
+# the user the EVIDENCE behind each prediction — the words and phrases the
+# model could have used to decide. Independent of the classifier output.
+
+ASPECT_VOCAB: dict[str, list[str]] = {
+    "جودة الطعام": [
+        # phrases (matched first because longer)
+        "اللحم محروق", "بدون طعم", "ما عجبني الاكل", "الطعم سيء",
+        # words
+        "الاكل", "الطعام", "بايخ", "مالح", "محروق", "نيء", "طعم",
+        "البرجر", "الطبخ", "الوجبه", "البيتزا", "الكبسه", "اللحم", "الدجاج",
+        "بارد", "حلو", "مذاق", "نكهه", "متقن",
+    ],
+    "التوصيل": [
+        "ضاع الطلب", "المندوب تاخر", "العنوان غلط", "ما رد المندوب",
+        "المندوب", "السائق", "ديليفري", "موصل", "العنوان", "التوصيل",
+    ],
+    "خدمة الموظفين": [
+        "غير محترم", "اسلوبه سيء", "موظف وقح", "ما يبتسم", "صاح علي",
+        "الموظف", "النادل", "الكاشير", "العمال", "وقح", "محترم", "اسلوب",
+    ],
+    "وقت الانتظار": [
+        "ساعه كامله", "وقت طويل", "قبل ان ياتي", "تاخير الخدمه",
+        "انتظر", "انتظرت", "انتظرنا", "ساعه", "ساعتين",
+        "دقيقه", "تاخير", "طويل", "جلسنا", "نص ساعه", "نصف ساعه",
+    ],
+    "النظافة": [
+        "ما ينظف", "غير نظيف",
+        "الحمام", "تواليت", "متسخ", "وسخ", "اوساخ",
+        "ذباب", "صراصير", "نظيف", "نظافه", "قذر",
+    ],
+    "السعر والقيمة": [
+        "ما يستاهل", "مبالغ فيها", "غالي جدا",
+        "غالي", "غاليه", "اسعار", "الفاتوره", "السعر", "يستاهل",
+    ],
+    "دقة الطلب": [
+        "غلط في الطلب", "الطلب غلط", "نسوا الطلب",
+        "ناقص", "نسوا", "غلط", "بدلوا", "خلطوا", "وضعوا بدلا",
+    ],
+}
+
+# Category → CSS class suffix (no Arabic in CSS selectors)
+ASPECT_CSS_ID = {
+    "جودة الطعام": "food",
+    "التوصيل": "delivery",
+    "خدمة الموظفين": "service",
+    "وقت الانتظار": "wait",
+    "النظافة": "clean",
+    "السعر والقيمة": "price",
+    "دقة الطلب": "accuracy",
+}
+
+
+# Single-char prefixes that attach to words in Arabic (و, ف, ب, ل, ك, س).
+# When checking a word boundary at the START of a phrase, allow these prefixes
+# so 'المندوب' matches inside 'والمندوب' (and-the-delivery-person).
+ARABIC_PREFIX_CHARS = set("وفبلكس")
+
+
+def _is_word_boundary_start(text: str, idx: int) -> bool:
+    """True if position idx is the start of a word (text start, after space,
+    or after a one-char Arabic prefix that itself follows a space)."""
+    if idx <= 0:
+        return True
+    if text[idx - 1].isspace():
+        return True
+    # Allow common Arabic prefix attached to the preceding char
+    if text[idx - 1] in ARABIC_PREFIX_CHARS and (idx - 2 < 0 or text[idx - 2].isspace()):
+        return True
+    return False
+
+
+def _is_word_boundary_end(text: str, idx: int) -> bool:
+    """True if position idx is the end of a word (text end or before space)."""
+    if idx >= len(text):
+        return True
+    return text[idx].isspace()
+
+
+def extract_aspects(cleaned_text: str) -> tuple[list[tuple[int, int, str, str]], dict[str, list[str]]]:
+    """Find aspect-specific phrases in the cleaned text.
+
+    Word-boundary aware: 'طعم' in 'المطعم' (restaurant) does NOT match.
+
+    Returns:
+        matches: list of (start, end, aspect, matched_phrase) sorted by start.
+                 Non-overlapping (longer matches preferred over shorter).
+        by_aspect: {aspect_name: [matched_phrases]} for the summary list.
+    """
+    raw_matches = []
+    for aspect, phrases in ASPECT_VOCAB.items():
+        for phrase in sorted(phrases, key=len, reverse=True):
+            start = 0
+            while True:
+                idx = cleaned_text.find(phrase, start)
+                if idx == -1:
+                    break
+                end = idx + len(phrase)
+                if _is_word_boundary_start(cleaned_text, idx) and _is_word_boundary_end(cleaned_text, end):
+                    raw_matches.append((idx, end, aspect, phrase))
+                start = idx + 1  # advance one char so we don't miss adjacent matches
+
+    raw_matches.sort(key=lambda m: (m[0], -(m[1] - m[0])))
+
+    final = []
+    last_end = -1
+    for m in raw_matches:
+        if m[0] >= last_end:
+            final.append(m)
+            last_end = m[1]
+
+    by_aspect: dict[str, list[str]] = {}
+    for s, e, asp, phrase in final:
+        by_aspect.setdefault(asp, []).append(phrase)
+
+    return final, by_aspect
+
+
+def annotate_text(text: str, matches: list[tuple[int, int, str, str]]) -> str:
+    """Wrap matched ranges with <mark> spans tagged by aspect."""
+    if not matches:
+        return text
+    out = []
+    last = 0
+    for s, e, aspect, _phrase in matches:
+        if s > last:
+            out.append(text[last:s])
+        css = ASPECT_CSS_ID.get(aspect, "other")
+        out.append(
+            f'<mark class="aspect-mark aspect-{css}" '
+            f'title="{CATEGORIES_EN.get(aspect, aspect)}">'
+            f'{text[s:e]}'
+            f'</mark>'
+        )
+        last = e
+    if last < len(text):
+        out.append(text[last:])
+    return "".join(out)
+
+
+def render_understanding(cleaned_text: str) -> str:
+    """Render the 'how I read this' interpretability panel."""
+    matches, by_aspect = extract_aspects(cleaned_text)
+
+    if not by_aspect:
+        return (
+            '<div class="understanding understanding-empty">'
+            '  <div class="understanding-head">'
+            '    <span class="understanding-eyebrow">how I read this</span>'
+            '    <strong>كيف فهمت شكواك</strong>'
+            '  </div>'
+            f'  <div class="understanding-text">{cleaned_text}</div>'
+            '  <p class="understanding-note">'
+            '    لم أجد أي كلمة تشير إلى جانب محدد في النص. '
+            '    <em>no aspect-specific words detected.</em>'
+            '  </p>'
+            '</div>'
+        )
+
+    annotated = annotate_text(cleaned_text, matches)
+
+    chips = []
+    for aspect, phrases in by_aspect.items():
+        css = ASPECT_CSS_ID.get(aspect, "other")
+        en = CATEGORIES_EN.get(aspect, "")
+        # dedupe phrases preserving order
+        seen = []
+        for p in phrases:
+            if p not in seen:
+                seen.append(p)
+        sample = "، ".join(seen[:4])
+        chips.append(
+            f'<div class="aspect-chip aspect-{css}">'
+            f'  <span class="aspect-chip-label">'
+            f'    <span class="aspect-chip-cat">{aspect}</span>'
+            f'    <span class="aspect-chip-en">{en}</span>'
+            f'  </span>'
+            f'  <span class="aspect-chip-evidence">{sample}</span>'
+            f'</div>'
+        )
+
+    return (
+        '<div class="understanding">'
+        '  <div class="understanding-head">'
+        '    <span class="understanding-eyebrow">how I read this</span>'
+        '    <strong>كيف فهمت شكواك</strong>'
+        '  </div>'
+        f'  <div class="understanding-text">{annotated}</div>'
+        f'  <div class="aspect-chips">{"".join(chips)}</div>'
+        '</div>'
+    )
+
+
 # ---- Prediction ------------------------------------------------------------
 
 EMPTY_RESULT = """
@@ -274,7 +468,7 @@ def predict(text: str) -> str:
     probs = apply_rescue(probs, cleaned)
     top_idx = probs.argsort()[::-1][:3]
     top = [(ID2LABEL[int(i)], float(probs[i])) for i in top_idx]
-    return render_result(top)
+    return render_result(top) + render_understanding(cleaned)
 
 
 EXAMPLES = [
@@ -886,6 +1080,171 @@ body.dark .result-rank-fallback .result-rank { color: var(--terracotta); }
 .result-rank-fallback .result-pct {
     color: var(--ink-muted);
     font-size: 1.1rem;
+}
+
+/* ---- "How I read this" interpretability panel ---- */
+
+.understanding {
+    margin-top: 22px;
+    padding: 22px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    direction: rtl;
+}
+
+body.dark .understanding { background: var(--paper); }
+
+.understanding-head {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 4px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+}
+
+.understanding-eyebrow {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    direction: ltr;
+}
+
+.understanding-head strong {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--ink);
+}
+
+.understanding-text {
+    font-size: 1.1rem;
+    line-height: 1.85;
+    color: var(--ink);
+    padding: 16px 18px;
+    background: var(--paper);
+    border-radius: 10px;
+    margin-bottom: 16px;
+    word-spacing: 0.05em;
+}
+
+body.dark .understanding-text { background: var(--paper-deep); }
+
+.understanding-note {
+    margin: 0;
+    padding: 12px 14px;
+    font-size: 0.92rem;
+    color: var(--ink-muted);
+    line-height: 1.65;
+}
+
+.understanding-note em {
+    color: var(--ink-muted);
+    font-style: italic;
+    direction: ltr;
+}
+
+/* Aspect highlight marks inline in the text */
+.aspect-mark {
+    background: transparent;
+    color: inherit;
+    padding: 1px 3px;
+    border-radius: 3px;
+    border-bottom: 2px solid;
+    margin: 0 1px;
+    cursor: help;
+}
+
+.aspect-food         { border-color: #C75D3D; background: rgba(199, 93, 61, 0.08); }
+.aspect-delivery     { border-color: #5F6845; background: rgba(95, 104, 69, 0.10); }
+.aspect-service      { border-color: #5B6E7E; background: rgba(91, 110, 126, 0.10); }
+.aspect-wait         { border-color: #C49443; background: rgba(196, 148, 67, 0.10); }
+.aspect-clean        { border-color: #4F8378; background: rgba(79, 131, 120, 0.10); }
+.aspect-price        { border-color: #7A5C84; background: rgba(122, 92, 132, 0.10); }
+.aspect-accuracy     { border-color: #C77556; background: rgba(199, 117, 86, 0.10); }
+
+body.dark .aspect-food         { background: rgba(216, 120, 82, 0.18); border-color: #D87852; }
+body.dark .aspect-delivery     { background: rgba(138, 148, 104, 0.18); border-color: #8A9468; }
+body.dark .aspect-service      { background: rgba(140, 162, 178, 0.18); border-color: #8CA2B2; }
+body.dark .aspect-wait         { background: rgba(220, 175, 92, 0.18); border-color: #DCAF5C; }
+body.dark .aspect-clean        { background: rgba(122, 175, 165, 0.18); border-color: #7AAFA5; }
+body.dark .aspect-price        { background: rgba(168, 130, 184, 0.18); border-color: #A882B8; }
+body.dark .aspect-accuracy     { background: rgba(220, 145, 115, 0.18); border-color: #DC9173; }
+
+/* Detected-aspects chip rail below the highlighted text */
+.aspect-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.aspect-chip {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--paper);
+    direction: rtl;
+    flex: 1 1 220px;
+    min-width: 0;
+}
+
+body.dark .aspect-chip { background: var(--paper-deep); }
+
+.aspect-chip-label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
+}
+
+.aspect-chip-cat {
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: var(--ink);
+}
+
+.aspect-chip-en {
+    font-size: 0.72rem;
+    color: var(--ink-muted);
+    direction: ltr;
+    text-align: right;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.aspect-chip-evidence {
+    font-size: 0.88rem;
+    color: var(--ink-muted);
+    line-height: 1.5;
+    direction: rtl;
+    text-align: right;
+}
+
+/* Color the chip's left border to match its aspect */
+.aspect-chip.aspect-food     .aspect-chip-cat { color: #C75D3D; }
+.aspect-chip.aspect-delivery .aspect-chip-cat { color: #5F6845; }
+.aspect-chip.aspect-service  .aspect-chip-cat { color: #5B6E7E; }
+.aspect-chip.aspect-wait     .aspect-chip-cat { color: #C49443; }
+.aspect-chip.aspect-clean    .aspect-chip-cat { color: #4F8378; }
+.aspect-chip.aspect-price    .aspect-chip-cat { color: #7A5C84; }
+.aspect-chip.aspect-accuracy .aspect-chip-cat { color: #C77556; }
+
+body.dark .aspect-chip.aspect-food     .aspect-chip-cat { color: #D87852; }
+body.dark .aspect-chip.aspect-delivery .aspect-chip-cat { color: #8A9468; }
+body.dark .aspect-chip.aspect-service  .aspect-chip-cat { color: #8CA2B2; }
+body.dark .aspect-chip.aspect-wait     .aspect-chip-cat { color: #DCAF5C; }
+body.dark .aspect-chip.aspect-clean    .aspect-chip-cat { color: #7AAFA5; }
+body.dark .aspect-chip.aspect-price    .aspect-chip-cat { color: #A882B8; }
+body.dark .aspect-chip.aspect-accuracy .aspect-chip-cat { color: #DC9173; }
+
+.understanding-empty .understanding-text {
+    color: var(--ink-muted);
+    opacity: 0.85;
 }
 
 /* Multi-aspect: rank 1 and 2 share equal visual weight */
