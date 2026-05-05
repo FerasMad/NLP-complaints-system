@@ -71,7 +71,7 @@ def load_model(model_dir: Path):
 
 
 def predict_batch(texts: list[str], tokenizer, model, device, torch_mod, batch_size: int = 32):
-    """Return (top_categories, top_confidences, full_probs)."""
+    """Return (top_categories, top_confidences, full_probs, label_map)."""
     label_map = {int(i): cat for i, cat in (model.config.id2label or {}).items()}
     if not label_map:
         # Fallback: assume canonical 9-class order
@@ -91,6 +91,43 @@ def predict_batch(texts: list[str], tokenizer, model, device, torch_mod, batch_s
     top_conf = all_probs[np.arange(len(texts)), top_idx]
     top_cat = [label_map[int(i)] for i in top_idx]
     return top_cat, top_conf, all_probs, label_map
+
+
+def apply_ambience_threshold(
+    all_probs: np.ndarray,
+    label_map: dict[int, str],
+    ambience_threshold: float,
+) -> tuple[list[str], np.ndarray]:
+    """Override per-row prediction to ambience when its softmax >= threshold.
+
+    The trained model is high-precision (~96%) but low-recall (~67%) on
+    ambience. Lowering its decision threshold trades a small amount of
+    precision for a meaningful recall gain. This function does that
+    post-hoc without retraining: if ambience's softmax probability is
+    >= `ambience_threshold`, we predict ambience even when another class
+    has a higher softmax.
+
+    Returns (predicted_categories, confidences). Confidence is always
+    the chosen class's softmax (ambience's if overridden, else top-1).
+    """
+    cat_to_idx = {cat: i for i, cat in label_map.items()}
+    if "الجو والمكان" not in cat_to_idx:
+        # Schema doesn't include ambience — no override possible
+        top_idx = all_probs.argmax(axis=-1)
+        return [label_map[int(i)] for i in top_idx], all_probs[np.arange(len(all_probs)), top_idx]
+
+    amb_idx = cat_to_idx["الجو والمكان"]
+    amb_probs = all_probs[:, amb_idx]
+    top_idx = all_probs.argmax(axis=-1)
+
+    overridden_idx = np.where(
+        (amb_probs >= ambience_threshold) & (top_idx != amb_idx),
+        amb_idx,
+        top_idx,
+    )
+    predicted = [label_map[int(i)] for i in overridden_idx]
+    confidence = all_probs[np.arange(len(all_probs)), overridden_idx]
+    return predicted, confidence
 
 
 # ---------------------------------------------------------------------------
@@ -254,6 +291,26 @@ def main() -> int:
                    help="Where to write reports (default: reports/ambience)")
     p.add_argument("--abstain-threshold", type=float, default=0.40,
                    help="Confidence below this counts as abstain (default: 0.40)")
+    p.add_argument(
+        "--ambience-threshold",
+        type=float,
+        default=None,
+        help=(
+            "If set, override prediction to ambience whenever the ambience "
+            "softmax >= this threshold (even if another class is higher). "
+            "Trades precision for recall. Default None = pure argmax."
+        ),
+    )
+    p.add_argument(
+        "--threshold-sweep",
+        type=str,
+        default=None,
+        help=(
+            "Comma-separated list of thresholds to sweep (e.g. '0.10,0.15,0.20,0.25'). "
+            "Runs evaluation at each, writes a sweep summary CSV, and exits without "
+            "writing the per-row reports. Useful for finding the F1-maximizing point."
+        ),
+    )
     p.add_argument("--gate-on-failures", action="store_true",
                    help="Exit 1 if any quality gate fails (use in CI)")
     args = p.parse_args()
@@ -275,9 +332,84 @@ def main() -> int:
 
     print("[predict] running inference...")
     texts = df["text"].astype(str).tolist()
-    top_cat, top_conf, _, _ = predict_batch(texts, tokenizer, model, device, torch_mod)
-    df["predicted"] = top_cat
-    df["confidence"] = top_conf
+    top_cat, top_conf, all_probs, label_map = predict_batch(texts, tokenizer, model, device, torch_mod)
+
+    # Threshold sweep mode — run evaluation at each threshold and write a
+    # summary CSV. Skip the per-row reports (caller will pick a threshold
+    # and re-run normally with that one).
+    if args.threshold_sweep:
+        thresholds = [float(t.strip()) for t in args.threshold_sweep.split(",") if t.strip()]
+        print(f"[sweep] evaluating at thresholds: {thresholds}")
+        sweep_rows = []
+        # Baseline (pure argmax, no override)
+        baseline_df = df.copy()
+        baseline_df["predicted"] = top_cat
+        baseline_df["confidence"] = top_conf
+        baseline_df["pass"] = [
+            score_row(r["expected_label"], r["predicted"], r["confidence"], args.abstain_threshold)
+            for _, r in baseline_df.iterrows()
+        ]
+        baseline_summary = generate_report(baseline_df, args.output_dir / "_sweep_baseline")
+        sweep_rows.append({
+            "threshold": "argmax",
+            "overall_accuracy": baseline_summary["overall_accuracy"],
+            "ambience_f1": baseline_summary["ambience_f1"],
+            "easy_accuracy": baseline_summary["easy_accuracy"],
+            "min_attack_type_accuracy": baseline_summary["min_attack_type_accuracy"],
+        })
+        for thresh in sorted(thresholds):
+            preds, confs = apply_ambience_threshold(all_probs, label_map, thresh)
+            sweep_df = df.copy()
+            sweep_df["predicted"] = preds
+            sweep_df["confidence"] = confs
+            sweep_df["pass"] = [
+                score_row(r["expected_label"], r["predicted"], r["confidence"], args.abstain_threshold)
+                for _, r in sweep_df.iterrows()
+            ]
+            sub_dir = args.output_dir / f"_sweep_t{thresh:.2f}".replace(".", "_")
+            summary = generate_report(sweep_df, sub_dir)
+            sweep_rows.append({
+                "threshold": thresh,
+                "overall_accuracy": summary["overall_accuracy"],
+                "ambience_f1": summary["ambience_f1"],
+                "easy_accuracy": summary["easy_accuracy"],
+                "min_attack_type_accuracy": summary["min_attack_type_accuracy"],
+            })
+
+        sweep_csv = args.output_dir / "threshold_sweep.csv"
+        args.output_dir.mkdir(parents=True, exist_ok=True)
+        pd.DataFrame(sweep_rows).to_csv(sweep_csv, index=False, encoding="utf-8-sig")
+        print()
+        print("=" * 80)
+        print(f"  Threshold sweep results -> {sweep_csv}")
+        print()
+        print(f"  {'threshold':<12} {'overall':>10} {'ambience F1':>14} {'easy':>10} {'min_attack':>12}")
+        for r in sweep_rows:
+            t = r["threshold"] if isinstance(r["threshold"], str) else f"{r['threshold']:.2f}"
+            print(
+                f"  {t:<12} "
+                f"{r['overall_accuracy']:>9.2%} "
+                f"{r['ambience_f1']:>13.2%} "
+                f"{r['easy_accuracy']:>9.2%} "
+                f"{r['min_attack_type_accuracy']:>11.2%}"
+            )
+        # Find the best F1
+        best = max(sweep_rows, key=lambda r: r["ambience_f1"])
+        best_t = best["threshold"] if isinstance(best["threshold"], str) else f"{best['threshold']:.2f}"
+        print()
+        print(f"  Best ambience F1: {best['ambience_f1']:.2%} at threshold={best_t}")
+        print("=" * 80)
+        return 0
+
+    # Normal mode: single threshold (or argmax if None)
+    if args.ambience_threshold is not None:
+        print(f"[predict] applying ambience-threshold override at {args.ambience_threshold}")
+        preds, confs = apply_ambience_threshold(all_probs, label_map, args.ambience_threshold)
+        df["predicted"] = preds
+        df["confidence"] = confs
+    else:
+        df["predicted"] = top_cat
+        df["confidence"] = top_conf
 
     df["pass"] = [
         score_row(r["expected_label"], r["predicted"], r["confidence"], args.abstain_threshold)

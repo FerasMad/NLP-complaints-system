@@ -257,13 +257,32 @@ def train(args, T) -> dict:
     class_weights = T["torch"].tensor(class_weights, dtype=T["torch"].float32)
     print(f"[train] class weights: {dict(zip(CATEGORIES_9CLASS, class_weights.tolist()))}")
 
+    use_focal = bool(args.use_focal_loss)
+    focal_gamma = args.focal_gamma
+
     class WeightedTrainer(T["Trainer"]):
         def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
             labels = inputs.pop("labels")
             outputs = model(**inputs)
-            loss = T["nn"].functional.cross_entropy(
-                outputs.logits, labels, weight=class_weights.to(outputs.logits.device)
-            )
+            logits = outputs.logits
+            weights_on_device = class_weights.to(logits.device)
+            if use_focal:
+                # Class-weighted focal loss. Designed for high-precision /
+                # low-recall imbalance (exactly what v5 ambience hit on
+                # run 1: precision 95%, recall 67%). The (1 - p_t)^gamma
+                # factor down-weights easy correct examples and up-weights
+                # hard wrong ones.
+                log_probs = T["nn"].functional.log_softmax(logits, dim=-1)
+                probs = log_probs.exp()
+                target_log_probs = log_probs.gather(1, labels.unsqueeze(1)).squeeze(1)
+                target_probs = probs.gather(1, labels.unsqueeze(1)).squeeze(1)
+                focal_weight = (1.0 - target_probs).clamp(min=0.0).pow(focal_gamma)
+                per_sample = -focal_weight * target_log_probs * weights_on_device[labels]
+                loss = per_sample.mean()
+            else:
+                loss = T["nn"].functional.cross_entropy(
+                    logits, labels, weight=weights_on_device
+                )
             return (loss, outputs) if return_outputs else loss
 
     def compute_metrics(eval_pred):
@@ -430,6 +449,34 @@ def main() -> int:
             "outperformed the 'best' on the adversarial fixture."
         ),
     )
+    p.add_argument(
+        "--exclude-source",
+        nargs="*",
+        default=[],
+        metavar="SOURCE",
+        help=(
+            "Drop ambience rows whose source matches one of these names. "
+            "Recommended: --exclude-source synthetic — the 1933 v3-era "
+            "templated ambience rows are noisy and likely hurt training. "
+            "Non-ambience rows from the same source are kept."
+        ),
+    )
+    p.add_argument(
+        "--use-focal-loss",
+        action="store_true",
+        help=(
+            "Use class-weighted focal loss instead of plain weighted CE. "
+            "Designed for high-precision/low-recall imbalance — the exact "
+            "pattern run 1 hit (95%% precision, 67%% recall on ambience). "
+            "Recommended for ambience-experiment runs."
+        ),
+    )
+    p.add_argument(
+        "--focal-gamma",
+        type=float,
+        default=2.0,
+        help="Focal loss focusing parameter (default 2.0; only used with --use-focal-loss)",
+    )
     args = p.parse_args()
 
     if not args.skip_split:
@@ -439,6 +486,24 @@ def main() -> int:
             print("[data] ERROR: no rows loaded. Run generate_ambience_synthetic.py first "
                   "OR pass --skip-split if data is already prepared.", file=sys.stderr)
             return 1
+
+        # --exclude-source filter. Use this to drop the 1933 v3-era
+        # `synthetic` ambience rows from the baseline; they're templated
+        # and grammatically wonky and likely confuse training.
+        if args.exclude_source:
+            excluded_set = set(args.exclude_source)
+            before = len(combined)
+            # Only drop rows where category is ambience AND source is in the
+            # excluded set. Keeps the same source name's non-ambience rows
+            # intact (e.g. `synthetic` rows for other categories stay).
+            mask = ~(
+                combined["category"].eq("الجو والمكان")
+                & combined["source"].isin(excluded_set)
+            )
+            combined = combined[mask].reset_index(drop=True)
+            print(f"[data] --exclude-source dropped "
+                  f"{before - len(combined)} ambience rows from sources: {sorted(excluded_set)}")
+
         print(f"[data] combined size: {len(combined)} rows; class distribution:")
         for cat, n in Counter(combined["category"]).most_common():
             print(f"  {cat}: {n}")
