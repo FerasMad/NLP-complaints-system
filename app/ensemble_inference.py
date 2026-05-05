@@ -144,31 +144,19 @@ def apply_keyword_priors(
     cleaned_text: str,
     label2id: dict,
     *,
-    boost: float = 0.25,
     rescue_floor: float = 0.55,
-    food_penalty: float = 0.5,
 ) -> np.ndarray:
     """Apply defensive keyword evidence to model probabilities.
 
-    Three layers:
-      1. Soft boost for any category whose keywords appear in input.
-      2. Strong rescue for unambiguous phrases (force matched category to top).
-      3. Food-quality penalty when no food keywords present but model
-         confidently predicted food (over-prediction fallback).
+    Conservative single-layer design (after audit showed soft-boost variants
+    regress on held-out test): only the strong rescue activates, and only
+    on unambiguous phrases. This catches the most egregious failures (e.g.
+    bathroom complaints classified as food quality) without over-firing.
 
     All operations preserve the simplex (sum = 1).
     """
     out = probs.copy()
-    food_idx = label2id.get("جودة الطعام")
 
-    # Layer 1: soft boost
-    for cat, patterns in KEYWORD_PRIORS.items():
-        if cat not in label2id:
-            continue
-        if _keyword_match(cleaned_text, patterns):
-            out[label2id[cat]] += boost
-
-    # Layer 2: strong rescue
     for cat, phrases in RESCUE_RULES:
         if cat not in label2id:
             continue
@@ -177,12 +165,6 @@ def apply_keyword_priors(
             current = float(out.max())
             out[cat_idx] = max(out[cat_idx], current + 0.05, rescue_floor)
 
-    # Layer 3: food-quality fallback penalty
-    if food_idx is not None and out[food_idx] > 0.5:
-        if not _keyword_match(cleaned_text, FOOD_QUALITY_KEYWORDS):
-            out[food_idx] *= food_penalty
-
-    # Renormalize to a valid probability distribution
     s = out.sum()
     if s > 0:
         out = out / s
