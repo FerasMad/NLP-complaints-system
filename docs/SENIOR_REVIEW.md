@@ -144,7 +144,7 @@ where to invest more labeling effort.
 | `tests/test_ambience_boundaries.py` | 14 boundary tests (3 aggregate + 11 parametrized) | shipped, passing |
 | `tests/test_ambience_split_integrity.py` | 5 splitter integrity tests | shipped, passing |
 | `tests/fixtures/ambience_boundary_examples.csv` | 90-row hand-written fixture | shipped |
-| `tests/fixtures/ambience_adversarial.csv` | **~150 hard cases** across 12 attack types (clean, boundary, negation, sarcasm, mixed_dialect, multi_aspect, very_short, long, out_of_domain, typo, emoji, adversarial) | shipped |
+| `tests/fixtures/ambience_adversarial.csv` | **183 hard cases** across 13 attack types (clean, boundary, negation, sarcasm, mixed_dialect, multi_aspect, short, very_short, long, out_of_domain, typo, emoji, adversarial — `short` and `very_short` are tracked separately) | shipped |
 | `docs/AMBIENCE_BOUNDARIES.md` | The exact rule + 12 boundary examples + bathroom edge case | shipped |
 | `docs/AMBIENCE_DATA_SOURCES.md` | Tier 1/2/3 source ranking | shipped |
 | `docs/DATA_SCHEMA_AMBIENCE.md` | 19-column schema reference | shipped |

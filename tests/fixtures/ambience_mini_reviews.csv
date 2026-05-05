@@ -1,0 +1,21 @@
+text,aspect,rating,city,restaurant_name,domain,source_url
+المكان بارد والمكيف قوي,environment,2,الرياض,مطعم أ,restaurant,https://example.test/1
+الأكل بارد,food,1,الرياض,مطعم أ,restaurant,https://example.test/2
+الشاورما حارة,food,2,جدة,مطعم ب,restaurant,https://example.test/3
+المطعم حار والمكيف خربان,environment,1,جدة,مطعم ب,restaurant,https://example.test/4
+ريحة الزيت ماسكة في المطعم,environment,2,الخبر,مطعم ج,restaurant,https://example.test/5
+البطاطس مليانة زيت,food,2,الخبر,مطعم ج,restaurant,https://example.test/6
+الموظف كان بارد في التعامل,service,1,الرياض,مطعم د,restaurant,https://example.test/7
+الطاولة وصخة فيها بقع طعام,food,1,الرياض,مطعم د,restaurant,https://example.test/8
+الطاولة تهتز كل ما تحط شي,environment,2,جدة,مطعم هـ,restaurant,https://example.test/9
+الحمام وصخ,food,1,جدة,مطعم هـ,restaurant,https://example.test/10
+الحمام خربان وما فيه صابون,environment,1,الدمام,مطعم و,restaurant,https://example.test/11
+الموسيقى صوتها عالي,environment,2,الدمام,مطعم و,restaurant,https://example.test/12
+المندوب وصل متأخر,service,1,الرياض,مطعم ز,restaurant,https://example.test/13
+المكان زحمة والانتظار طويل,environment;service,2,الرياض,مطعم ز,restaurant,https://example.test/14
+السعر غالي جدا,price,1,جدة,مطعم ح,restaurant,https://example.test/15
+ما فيه مواقف قريبة,environment,2,جدة,مطعم ح,restaurant,https://example.test/16
+الإضاءة قوية على العين,environment,2,الخبر,مطعم ط,restaurant,https://example.test/17
+الطلب ناقص وما وصل الصوص,food,1,الخبر,مطعم ط,restaurant,https://example.test/18
+English only review,food,1,Riyadh,Restaurant,restaurant,https://example.test/19
+12345,food,1,Riyadh,Restaurant,restaurant,https://example.test/20

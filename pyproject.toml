@@ -62,6 +62,9 @@ scraping = [
     "google-play-scraper>=1.2",
     "requests>=2.31",
 ]
+ambience_data = [
+    "openpyxl>=3.1",
+]
 
 [project.urls]
 Homepage = "https://github.com/FerasMad/NLP-complaints-system"
