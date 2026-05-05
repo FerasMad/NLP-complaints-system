@@ -84,4 +84,4 @@ Feras (lead, evaluation), Lana (text cleaning), Khowla (labeling/splitting), Rim
 
 ## Live demo
 
-https://huggingface.co/spaces/<your-username>/arabic-complaints-classifier
+https://huggingface.co/spaces/FerasMad/arabic-complaints-classifier
