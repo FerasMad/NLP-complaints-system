@@ -23,6 +23,8 @@ SOURCE = ROOT / "models" / "bakeoff" / "camelbert-mix_8c_capALL_s2024_v2_final"
 MODEL_CARD = """---
 language: ar
 license: mit
+pipeline_tag: text-classification
+library_name: transformers
 tags:
 - arabic
 - classification
@@ -31,6 +33,15 @@ tags:
 - dialectal-arabic
 - bert
 base_model: CAMeL-Lab/bert-base-arabic-camelbert-mix
+widget:
+- text: "الاكل بايخ ومالح والطبخ مو متقن"
+  example_title: جودة الطعام
+- text: "وصل الطلب بارد جدا والمندوب تاخر اكثر من ساعتين"
+  example_title: التوصيل
+- text: "الموظف اسلوبه سيء وغير محترم"
+  example_title: خدمة الموظفين
+- text: "الاسعار مبالغ فيها لا تناسب الجوده"
+  example_title: السعر والقيمة
 ---
 
 # Arabic Restaurant Complaints Classifier (CAMeLBERT-mix, 8-class)

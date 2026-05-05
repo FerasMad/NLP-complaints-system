@@ -234,13 +234,54 @@ label > span {{
 
 /* Prediction label component */
 .output-class, .output-label {{
-    background: linear-gradient(135deg, rgba(22,193,114,0.15) 0%, rgba(22,193,114,0.05) 100%) !important;
-    border: 1px solid rgba(22,193,114,0.3) !important;
+    background: rgba(0,0,0,0.2) !important;
+    border: 1px solid {BORDER} !important;
     border-radius: 12px !important;
+    padding: 4px !important;
 }}
 
-.output-label .confidence-set .confidence-bar {{
+/* Top-1 prediction — emerald (the answer) */
+.output-label .confidence-set:nth-child(1) .confidence,
+.gradio-container [data-testid="label"] > div > div:nth-child(1) > div > div {{
     background: linear-gradient(90deg, {ACCENT} 0%, #1ad888 100%) !important;
+}}
+.output-label .confidence-set:nth-child(1),
+.gradio-container [data-testid="label"] > div > div:nth-child(1) {{
+    border-left: 3px solid {ACCENT} !important;
+}}
+
+/* Top-2 prediction — amber (alternative) */
+.output-label .confidence-set:nth-child(2) .confidence,
+.gradio-container [data-testid="label"] > div > div:nth-child(2) > div > div {{
+    background: linear-gradient(90deg, #d4a017 0%, #e6b830 100%) !important;
+}}
+.output-label .confidence-set:nth-child(2),
+.gradio-container [data-testid="label"] > div > div:nth-child(2) {{
+    border-left: 3px solid #d4a017 !important;
+}}
+
+/* Top-3 prediction — muted (least likely) */
+.output-label .confidence-set:nth-child(3) .confidence,
+.gradio-container [data-testid="label"] > div > div:nth-child(3) > div > div {{
+    background: linear-gradient(90deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.5) 100%) !important;
+}}
+.output-label .confidence-set:nth-child(3),
+.gradio-container [data-testid="label"] > div > div:nth-child(3) {{
+    border-left: 3px solid rgba(255,255,255,0.4) !important;
+}}
+
+.output-label .confidence-set,
+.gradio-container [data-testid="label"] > div > div {{
+    margin-bottom: 8px !important;
+    padding: 10px 12px !important;
+    border-radius: 8px !important;
+    background: rgba(0,0,0,0.15) !important;
+}}
+
+.output-label .confidence-set span,
+.gradio-container [data-testid="label"] > div > div span {{
+    color: {TEXT} !important;
+    font-weight: 700 !important;
 }}
 
 /* Examples row */
