@@ -21,7 +21,7 @@ Warm, hospitable, Saudi-rooted. Confident without flash. The aesthetic is closer
 - Generic dark + neon green SaaS / "AI dashboard" look (currently deployed — replacing it)
 - Heavy Arabic-cultural ornamentation: geometric Islamic patterns, gold-on-green, royal typography. Feels kitsch for an NLP tool.
 - Bare default Gradio look — no branding, looks like a debug page
-- Rashidbm/saudi-date-classifier — friend's Space, similar domain, different aesthetic; deliberately differentiate
+- Rashidbm/saudi-date-classifier — useful as **inspiration** for multi-section page architecture (hero scene, overlapping stats strip, performance section, footer) but deliberately different aesthetic: warm dusk vs his desert night, terracotta vs his gold-on-midnight, cream surface vs his glass-on-dark
 
 ## Design Principles
 
