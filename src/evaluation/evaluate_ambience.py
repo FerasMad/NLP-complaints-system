@@ -93,6 +93,53 @@ def predict_batch(texts: list[str], tokenizer, model, device, torch_mod, batch_s
     return top_cat, top_conf, all_probs, label_map
 
 
+def apply_abstain_logic(
+    texts: list[str],
+    predicted: list[str],
+    confidences: np.ndarray,
+    abstain_threshold: float = 0.40,
+) -> tuple[list[str], np.ndarray]:
+    """Override predictions to abstain for very-short and out-of-domain inputs.
+
+    This is the v5 inference wrapper's abstain layer. Two gates:
+
+      1. **Length gate** — fewer than 2 words after cleaning → abstain.
+         Forces predictions on 1-word topic-only inputs (like 'حر') down
+         to confidence=0 so the eval scoring treats them as abstain.
+
+      2. **Out-of-domain gate** — no restaurant-domain anchor word
+         (food / staff / delivery / price / order / hygiene / wait /
+         ambience-related) → abstain. Catches inputs like 'سيارتي تعطلت'.
+
+    Both gates work by setting confidence to 0.0 on the matching rows.
+    The existing `score_row` treats any prediction with confidence below
+    `abstain_threshold` as an abstain, which already passes when the
+    expected label is 'abstain' or 'no_complaint'.
+    """
+    # Local import to avoid coupling the evaluator's top-level imports
+    sys.path.insert(0, str(ROOT / "src"))
+    from utils.arabic_normalization import clean
+    from config.ambience_keywords import has_restaurant_domain_anchor
+
+    new_preds = list(predicted)
+    new_confs = confidences.copy()
+
+    for i, raw in enumerate(texts):
+        cleaned = clean(raw)
+        # Length gate
+        if len(cleaned.split()) < 2:
+            new_preds[i] = "abstain"
+            new_confs[i] = 0.0
+            continue
+        # OOD gate
+        if not has_restaurant_domain_anchor(cleaned):
+            new_preds[i] = "abstain"
+            new_confs[i] = 0.0
+            continue
+
+    return new_preds, new_confs
+
+
 def apply_ambience_threshold(
     all_probs: np.ndarray,
     label_map: dict[int, str],
@@ -311,6 +358,17 @@ def main() -> int:
             "writing the per-row reports. Useful for finding the F1-maximizing point."
         ),
     )
+    p.add_argument(
+        "--enable-abstain",
+        action="store_true",
+        help=(
+            "Apply v5 inference wrapper abstain logic before scoring: short "
+            "(<2 words) and out-of-domain (no restaurant-domain anchor) inputs "
+            "are demoted to confidence=0 so they pass the abstain/no_complaint "
+            "expected labels. Closes the very_short and out_of_domain attack-type "
+            "gates without touching the model."
+        ),
+    )
     p.add_argument("--gate-on-failures", action="store_true",
                    help="Exit 1 if any quality gate fails (use in CI)")
     args = p.parse_args()
@@ -405,11 +463,18 @@ def main() -> int:
     if args.ambience_threshold is not None:
         print(f"[predict] applying ambience-threshold override at {args.ambience_threshold}")
         preds, confs = apply_ambience_threshold(all_probs, label_map, args.ambience_threshold)
-        df["predicted"] = preds
-        df["confidence"] = confs
     else:
-        df["predicted"] = top_cat
-        df["confidence"] = top_conf
+        preds, confs = list(top_cat), top_conf.copy()
+
+    # Optionally apply v5 abstain wrapper: length gate + OOD gate.
+    if args.enable_abstain:
+        print(f"[predict] applying v5 abstain logic (length + OOD gates)")
+        preds, confs = apply_abstain_logic(texts, preds, confs, args.abstain_threshold)
+        n_abstained = sum(1 for p in preds if p == "abstain")
+        print(f"[predict]   {n_abstained}/{len(preds)} rows abstained")
+
+    df["predicted"] = preds
+    df["confidence"] = confs
 
     df["pass"] = [
         score_row(r["expected_label"], r["predicted"], r["confidence"], args.abstain_threshold)

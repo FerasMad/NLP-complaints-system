@@ -250,6 +250,33 @@ ALL_HARD_NEGATIVES: set[str] = (
 
 
 # ---------------------------------------------------------------------------
+# Restaurant domain anchors — used by the v5 inference wrapper for OOD detection.
+# ---------------------------------------------------------------------------
+# If an input contains NONE of these anchors AND no ambience keyword either,
+# it's almost certainly out-of-domain (not a restaurant complaint).
+# The wrapper abstains in that case to avoid forcing a category prediction.
+# Combines: generic place words + the 8 production hard-negative sets +
+# the ambience single tokens. Effectively "this text mentions something
+# restaurant-related in any of the 9 schema categories".
+
+RESTAURANT_DOMAIN_ANCHORS: set[str] = (
+    NEGATIVE_FOOD | NEGATIVE_SERVICE | NEGATIVE_DELIVERY |
+    NEGATIVE_PRICE | NEGATIVE_ORDER | NEGATIVE_HYGIENE | NEGATIVE_WAIT |
+    set(AMBIENCE_SINGLE_TOKENS) |
+    # Multi-word ambience phrases that don't fit the single-tokens set
+    {phrase for phrase in AMBIENCE_HIGH_PRECISION_PHRASES} |
+    # Add common restaurant-context words not in any of the above
+    {
+        "مطعم", "كافيه", "كوفي", "مقهى", "بوفيه",
+        "وجبه", "وجبة", "افطار", "غداء", "عشاء",
+        "حجز", "حجزت", "حجزنا",
+        "زرت", "زرنا", "ذهبت", "رحت", "روحت",
+        "تجربه", "تجربة",
+    }
+)
+
+
+# ---------------------------------------------------------------------------
 # Subtype keyword index — for tagging ambience candidates with their subtype
 # ---------------------------------------------------------------------------
 
@@ -259,3 +286,73 @@ def subtype_for_phrase(phrase: str) -> str | None:
         if phrase in phrases:
             return subtype
     return None
+
+
+# Pre-normalize the anchor set at module load so matching is fast and
+# orthography-tolerant. The vocab includes mixed orthography (with/without
+# tashkeel, ة vs ه, etc.); cleaned input always has the normalized form.
+def _normalize_anchor(s: str) -> str:
+    """Same normalization as src/utils/arabic_normalization.py:clean(),
+    inlined here to avoid a circular import (utils → config OK; config → utils
+    creates a cycle if config is later imported earlier in the chain)."""
+    import re
+    if not s:
+        return ""
+    s = re.sub(r"[ً-ٟ]", "", s)
+    s = s.translate(str.maketrans({
+        "أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا",
+        "ى": "ي",
+        "ة": "ه",
+        "پ": "ب", "چ": "ج", "گ": "ك", "ک": "ك", "ی": "ي",
+    }))
+    s = re.sub(r"[^؀-ۿa-zA-Z0-9٠-٩\s]", " ", s)
+    return re.sub(r"\s+", " ", s).strip().lower()
+
+
+_NORMALIZED_ANCHORS_SINGLE: set[str] = set()
+_NORMALIZED_ANCHORS_MULTI: list[str] = []
+for _anchor in RESTAURANT_DOMAIN_ANCHORS:
+    _norm = _normalize_anchor(_anchor)
+    if not _norm:
+        continue
+    if " " in _norm:
+        _NORMALIZED_ANCHORS_MULTI.append(_norm)
+    else:
+        _NORMALIZED_ANCHORS_SINGLE.add(_norm)
+        # Symmetric ال-prefix handling — anchors are stored mixed
+        # ('المكيف' with ال, 'موسيقي' without). Add both forms so
+        # cleaned input matches regardless of which form the anchor uses.
+        if _norm.startswith("ال") and len(_norm) > 3:
+            _NORMALIZED_ANCHORS_SINGLE.add(_norm[2:])
+# Sort multi by length desc — longer phrases first (better precision)
+_NORMALIZED_ANCHORS_MULTI.sort(key=len, reverse=True)
+
+
+def has_restaurant_domain_anchor(cleaned_text: str) -> bool:
+    """True if the cleaned text contains at least one restaurant-domain word.
+
+    Used by the v5 inference wrapper to detect out-of-domain inputs.
+    Conservative: a single anchor word is enough to PASS this gate.
+
+    Matching:
+    - Multi-word anchors → substring check (already cleaned both sides)
+    - Single-word anchors → exact word OR ال-prefix-stripped word match
+      (Arabic words frequently appear with the definite article ال
+      attached; e.g. cleaned input has 'الموسيقي' but anchor is 'موسيقي').
+    """
+    if not cleaned_text:
+        return False
+    # Multi-word substring check
+    for anchor in _NORMALIZED_ANCHORS_MULTI:
+        if anchor in cleaned_text:
+            return True
+    # Single-word check with ال-prefix tolerance
+    words = cleaned_text.split()
+    for word in words:
+        if word in _NORMALIZED_ANCHORS_SINGLE:
+            return True
+        # Strip ال prefix and try again (handles ambience vocab like 'موسيقي'
+        # matching cleaned input 'الموسيقي')
+        if word.startswith("ال") and len(word) > 3 and word[2:] in _NORMALIZED_ANCHORS_SINGLE:
+            return True
+    return False
