@@ -22,6 +22,8 @@ models/*.png
 
 # Local-only docs
 PROJECT_HANDOFF.md
+team_message.pdf
+documentation.pdf
 
 # Python
 __pycache__/
