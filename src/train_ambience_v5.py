@@ -151,12 +151,25 @@ def stratified_split(
     test_frac: float = 0.15,
     seed: int = 42,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Split per-category into train/val/test. Train-only sources stay in train."""
+    """Split per-category into train/val/test. Train-only sources stay in train.
+
+    Raises ValueError if there are zero real (non-train-only) rows — training
+    on synthetic-only data with no held-out evaluation set is pointless and
+    would crash downstream code.
+    """
     rng = np.random.RandomState(seed)
     real = df[~df["source"].isin(TRAIN_ONLY_SOURCES)].copy()
     train_only = df[df["source"].isin(TRAIN_ONLY_SOURCES)].copy()
 
-    train_parts: list[pd.DataFrame] = [train_only]
+    if real.empty:
+        raise ValueError(
+            f"No real (non-train-only) rows found in input. Got {len(train_only)} "
+            f"rows from train-only sources ({sorted(set(train_only['source']))}). "
+            f"Training requires real data for val/test splits — check your "
+            f"--baseline-csv path. (Train-only sources: {sorted(TRAIN_ONLY_SOURCES)})"
+        )
+
+    train_parts: list[pd.DataFrame] = [train_only] if not train_only.empty else []
     val_parts: list[pd.DataFrame] = []
     test_parts: list[pd.DataFrame] = []
 
@@ -167,12 +180,20 @@ def stratified_split(
         n_val = int(round(n * val_frac))
         n_train = n - n_test - n_val
         train_parts.append(group.iloc[:n_train])
-        val_parts.append(group.iloc[n_train:n_train + n_val])
-        test_parts.append(group.iloc[n_train + n_val:])
+        if n_val > 0:
+            val_parts.append(group.iloc[n_train:n_train + n_val])
+        if n_test > 0:
+            test_parts.append(group.iloc[n_train + n_val:])
 
-    train = pd.concat(train_parts, ignore_index=True).sample(frac=1.0, random_state=rng).reset_index(drop=True)
-    val = pd.concat(val_parts, ignore_index=True).sample(frac=1.0, random_state=rng).reset_index(drop=True)
-    test = pd.concat(test_parts, ignore_index=True).sample(frac=1.0, random_state=rng).reset_index(drop=True)
+    # Guard the concats — empty parts means no rows to concatenate
+    def _safe_concat_shuffle(parts: list[pd.DataFrame]) -> pd.DataFrame:
+        if not parts:
+            return df.iloc[0:0].copy()  # empty frame with same columns
+        return pd.concat(parts, ignore_index=True).sample(frac=1.0, random_state=rng).reset_index(drop=True)
+
+    train = _safe_concat_shuffle(train_parts)
+    val = _safe_concat_shuffle(val_parts)
+    test = _safe_concat_shuffle(test_parts)
     return train, val, test
 
 
