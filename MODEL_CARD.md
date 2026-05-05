@@ -22,6 +22,9 @@ model-index:
       - task:
           type: text-classification
           name: Arabic Restaurant Complaint Classification
+        dataset:
+          type: custom
+          name: Arabic Restaurant Complaints (held-out test set)
         metrics:
           - type: accuracy
             value: 0.9505
