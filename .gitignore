@@ -1,7 +1,8 @@
-# Data — training-only artifacts not shipped; canary set is the exception
-data/
-!data/canary/
-!data/canary/*
+# Data — training-only artifacts not shipped; canary set is the exception.
+# Leading slash anchors to the repo root so src/data/ (Python package) is unaffected.
+/data/
+!/data/canary/
+!/data/canary/*
 
 # Trained models — too large for git, fetched from HF Hub at deploy time
 models/bakeoff/
@@ -24,10 +25,6 @@ models/*.png
 PROJECT_HANDOFF.md
 team_message.pdf
 documentation.pdf
-
-# Ambience revival sandbox — smoke-test outputs and any local triage runs
-research/ambience_revival/_smoke_test_output/
-research/ambience_revival/_*/
 
 # Python
 __pycache__/
