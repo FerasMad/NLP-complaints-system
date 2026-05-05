@@ -69,11 +69,23 @@ model = AutoModelForSequenceClassification.from_pretrained(HF_REPO_ID).to(device
 print(f"Model loaded on {device}.")
 
 HERE = Path(__file__).parent
-HERO_SVG = (HERE / "hero.svg").read_text(encoding="utf-8")
-CHART_F1_LIGHT = (HERE / "charts" / "per_class_f1.svg").read_text(encoding="utf-8")
-CHART_F1_DARK = (HERE / "charts" / "per_class_f1.dark.svg").read_text(encoding="utf-8")
-CHART_BL_LIGHT = (HERE / "charts" / "vs_baselines.svg").read_text(encoding="utf-8")
-CHART_BL_DARK = (HERE / "charts" / "vs_baselines.dark.svg").read_text(encoding="utf-8")
+
+
+def _load_svg(path: Path) -> str:
+    """Read an SVG file and strip XML/DOCTYPE prologue so it inlines cleanly."""
+    text = path.read_text(encoding="utf-8")
+    if text.startswith("<?xml"):
+        text = text.split("?>", 1)[1].lstrip()
+    if text.startswith("<!DOCTYPE"):
+        text = text.split(">", 1)[1].lstrip()
+    return text
+
+
+HERO_SVG = _load_svg(HERE / "hero.svg")
+CHART_F1_LIGHT = _load_svg(HERE / "charts" / "per_class_f1.svg")
+CHART_F1_DARK = _load_svg(HERE / "charts" / "per_class_f1.dark.svg")
+CHART_BL_LIGHT = _load_svg(HERE / "charts" / "vs_baselines.svg")
+CHART_BL_DARK = _load_svg(HERE / "charts" / "vs_baselines.dark.svg")
 
 
 # ---- Prediction ------------------------------------------------------------

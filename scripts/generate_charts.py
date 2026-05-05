@@ -64,7 +64,7 @@ BASELINES_DATA = [
 
 
 def _style_axes(ax, palette, *, with_xaxis: bool = False) -> None:
-    ax.set_facecolor(palette["surface"])
+    ax.set_facecolor("none")
     for side in ("top", "right", "left"):
         ax.spines[side].set_visible(False)
     ax.spines["bottom"].set_color(palette["border"])
@@ -79,7 +79,7 @@ def _style_axes(ax, palette, *, with_xaxis: bool = False) -> None:
 
 def per_class_f1(palette, suffix: str) -> Path:
     fig, ax = plt.subplots(figsize=(9.0, 5.6))
-    fig.patch.set_facecolor(palette["surface"])
+    fig.patch.set_alpha(0)
 
     labels = [en for _, en, _ in PER_CLASS_DATA][::-1]
     values = [v for _, _, v in PER_CLASS_DATA][::-1]
@@ -115,7 +115,7 @@ def per_class_f1(palette, suffix: str) -> Path:
 
     fig.subplots_adjust(left=0.22, right=0.92, top=0.94, bottom=0.10)
     out = OUT / f"per_class_f1{suffix}.svg"
-    fig.savefig(out, format="svg", facecolor=palette["surface"], transparent=False)
+    fig.savefig(out, format="svg", transparent=True)
     plt.close(fig)
     return out
 
@@ -126,7 +126,7 @@ def vs_baselines(palette, suffix: str) -> Path:
     captions = [d[2] for d in BASELINES_DATA]
 
     fig, ax = plt.subplots(figsize=(9.0, 5.0))
-    fig.patch.set_facecolor(palette["surface"])
+    fig.patch.set_alpha(0)
 
     colors = [palette["paper"], palette["ink_muted"], palette["olive"], palette["terracotta"]]
     bars = ax.bar(range(len(values)), values, color=colors, width=0.55, zorder=3)
@@ -162,7 +162,7 @@ def vs_baselines(palette, suffix: str) -> Path:
 
     fig.subplots_adjust(left=0.06, right=0.96, top=0.94, bottom=0.18)
     out = OUT / f"vs_baselines{suffix}.svg"
-    fig.savefig(out, format="svg", facecolor=palette["surface"], transparent=False)
+    fig.savefig(out, format="svg", transparent=True)
     plt.close(fig)
     return out
 
