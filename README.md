@@ -25,6 +25,47 @@ Classify Arabic restaurant complaints into 8 actionable categories. Saudi-Gulf d
 
 Held-out test set, 13,986 real reviews. Every class ≥80% F1.
 
+## Architecture
+
+```
+   ~98K Arabic complaints (production + Saudi delivery apps)
+                        │
+                        ▼
+            ┌──────────────────────────┐
+            │  Data pipeline   src/    │
+            │  scrape · clean ·        │
+            │  augment · split         │
+            └────────────┬─────────────┘
+                         │
+                         ▼
+            ┌──────────────────────────┐
+            │  Bake-off       src/     │
+            │  CAMeLBERT-mix · MARBERT │
+            │  AraBERTv02 · XLM-R      │
+            └────────────┬─────────────┘
+                         │
+                         ▼
+            ┌──────────────────────────┐
+            │  4-model ensemble        │
+            │  uniform softmax avg     │
+            │  + temperature scaling   │
+            │  models/ensemble_final/  │
+            └────────────┬─────────────┘
+                         │
+                         ▼
+            ┌──────────────────────────┐
+            │  Inference     app/      │
+            │  EnsembleClassifier      │
+            └────────────┬─────────────┘
+                         │
+            ┌────────────┼────────────┐
+            ▼            ▼            ▼
+        FastAPI      Gradio        Colab
+        app/api.py   hf_space/     notebooks/
+```
+
+`src/` is the offline pipeline (data + training + eval). `app/` is the runtime (loads the ensemble, exposes `predict`). `hf_space/` is the live demo. `notebooks/colab_demo.ipynb` runs the model on free-tier Colab.
+
 ## Quick start
 
 No GPU? Open the [Colab notebook](notebooks/colab_demo.ipynb) — [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/FerasMad/NLP-complaints-system/blob/main/notebooks/colab_demo.ipynb) — runs on the free tier.
