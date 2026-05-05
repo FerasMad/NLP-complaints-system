@@ -1,8 +1,8 @@
 """HuggingFace Spaces entry point for the Arabic Restaurant Complaints Classifier.
 
-Visual identity is warm, hospitable, Saudi-rooted. Multi-section page:
-hero scene at golden hour, stats strip, classify, performance, about, footer.
-Cream working surface, terracotta accent, deep ink type. Almarai font.
+Visual identity is warm, hospitable, Saudi-rooted. Multi-section page with a
+golden-hour SVG hero, overlapping stats strip, classify, performance charts,
+inline about, and footer. Light + dark themes (toggle top-right). Almarai font.
 """
 import os
 import re
@@ -70,8 +70,10 @@ print(f"Model loaded on {device}.")
 
 HERE = Path(__file__).parent
 HERO_SVG = (HERE / "hero.svg").read_text(encoding="utf-8")
-CHART_F1_SVG = (HERE / "charts" / "per_class_f1.svg").read_text(encoding="utf-8")
-CHART_BASELINES_SVG = (HERE / "charts" / "vs_baselines.svg").read_text(encoding="utf-8")
+CHART_F1_LIGHT = (HERE / "charts" / "per_class_f1.svg").read_text(encoding="utf-8")
+CHART_F1_DARK = (HERE / "charts" / "per_class_f1.dark.svg").read_text(encoding="utf-8")
+CHART_BL_LIGHT = (HERE / "charts" / "vs_baselines.svg").read_text(encoding="utf-8")
+CHART_BL_DARK = (HERE / "charts" / "vs_baselines.dark.svg").read_text(encoding="utf-8")
 
 
 # ---- Prediction ------------------------------------------------------------
@@ -79,8 +81,8 @@ CHART_BASELINES_SVG = (HERE / "charts" / "vs_baselines.svg").read_text(encoding=
 EMPTY_RESULT = """
 <div class="result-empty">
   <div class="result-empty-text">
-    <strong>اكتب شكوى وستظهر النتيجة هنا</strong>
-    <span>type a complaint to see the prediction</span>
+    <strong>اكتب شكوى أو اضغط على مثال أدناه</strong>
+    <span>type a complaint above, or pick an example below</span>
   </div>
 </div>
 """
@@ -147,13 +149,61 @@ EXAMPLES = [
 ]
 
 
+# ---- Theme toggle (head injection: favicon + theme JS) ---------------------
+
+HEAD = """
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='15' fill='%23C75D3D'/><text x='16' y='23' font-size='20' font-weight='800' text-anchor='middle' fill='%23F5EFE6' font-family='sans-serif'>ش</text></svg>">
+<script>
+(function() {
+  const KEY = 'arabic-complaints-theme';
+  function apply(theme) {
+    if (theme === 'dark') {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
+  }
+  function wireToggle() {
+    const btn = document.getElementById('theme-toggle');
+    if (!btn || btn.dataset.wired === '1') return false;
+    btn.dataset.wired = '1';
+    btn.addEventListener('click', function() {
+      const next = document.body.classList.contains('dark') ? 'light' : 'dark';
+      try { localStorage.setItem(KEY, next); } catch (e) {}
+      apply(next);
+    });
+    return true;
+  }
+  function init() {
+    let saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) {}
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    apply(saved || (prefersDark ? 'dark' : 'light'));
+
+    if (wireToggle()) return;
+    const observer = new MutationObserver(function() {
+      if (wireToggle()) observer.disconnect();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+"""
+
+
 # ---- Visual identity --------------------------------------------------------
 
 CSS = """
 @import url('https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap');
 
 :root {
-    --cream: #F5EFE6;
+    /* Light theme tokens */
+    --surface: #F5EFE6;
     --paper: #EEE6D7;
     --paper-deep: #E5DAC5;
     --ink: #2D211A;
@@ -165,15 +215,40 @@ CSS = """
     --olive-tint: rgba(95, 104, 69, 0.10);
     --border: #D9CFC0;
     --border-strong: #C9BDA8;
+    --shadow: 0 12px 40px -12px rgba(45, 17, 8, 0.25);
+    --hero-ground: #3A1810;
+    --footer-bg: #2D211A;
+    --footer-text: rgba(245, 239, 230, 0.7);
+}
+
+body.dark {
+    /* Dark theme tokens — warm-tinted, never pure black */
+    --surface: #1A140F;
+    --paper: #241B14;
+    --paper-deep: #2E2218;
+    --ink: #F0E7D8;
+    --ink-muted: #A89C8C;
+    --terracotta: #D87852;
+    --terracotta-deep: #C75D3D;
+    --terracotta-tint: rgba(216, 120, 82, 0.14);
+    --olive: #8A9468;
+    --olive-tint: rgba(138, 148, 104, 0.12);
+    --border: #3A2D24;
+    --border-strong: #4A3A2D;
+    --shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.65);
+    --hero-ground: #0F0805;
+    --footer-bg: #0F0A07;
+    --footer-text: rgba(240, 231, 216, 0.6);
 }
 
 * { font-family: 'Almarai', system-ui, -apple-system, sans-serif !important; box-sizing: border-box; }
 
 html, body, .gradio-container {
-    background: var(--cream) !important;
+    background: var(--surface) !important;
     color: var(--ink) !important;
     margin: 0 !important;
     padding: 0 !important;
+    transition: background-color 240ms ease, color 240ms ease;
 }
 
 .gradio-container {
@@ -189,6 +264,54 @@ html, body, .gradio-container {
     gap: 0 !important;
 }
 
+/* ---- Theme toggle ---- */
+
+#theme-toggle-wrap {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 50;
+}
+
+#theme-toggle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid rgba(245, 239, 230, 0.30);
+    background: rgba(45, 17, 8, 0.55);
+    backdrop-filter: blur(8px);
+    color: #F5EFE6;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+#theme-toggle:hover {
+    background: rgba(45, 17, 8, 0.75);
+    border-color: rgba(245, 239, 230, 0.55);
+    transform: scale(1.05);
+}
+
+#theme-toggle:active { transform: scale(0.95); }
+
+#theme-toggle svg { width: 18px; height: 18px; }
+#theme-toggle .icon-sun { display: none; }
+#theme-toggle .icon-moon { display: block; }
+
+body.dark #theme-toggle {
+    background: rgba(240, 231, 216, 0.10);
+    border-color: rgba(240, 231, 216, 0.25);
+    color: #F0E7D8;
+}
+body.dark #theme-toggle:hover {
+    background: rgba(240, 231, 216, 0.18);
+}
+body.dark #theme-toggle .icon-sun { display: block; }
+body.dark #theme-toggle .icon-moon { display: none; }
+
 /* ---- Hero ---- */
 
 #hero {
@@ -196,22 +319,12 @@ html, body, .gradio-container {
     width: 100%;
     height: clamp(440px, 60vh, 560px);
     overflow: hidden;
-    color: var(--cream);
-    background: #3A1810;
+    color: #F5EFE6;
+    background: var(--hero-ground);
 }
 
-#hero .hero-bg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-}
-
-#hero .hero-bg svg {
-    width: 100%;
-    height: 100%;
-    display: block;
-}
+#hero .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+#hero .hero-bg svg { width: 100%; height: 100%; display: block; }
 
 #hero .hero-content {
     position: relative;
@@ -243,7 +356,7 @@ html, body, .gradio-container {
     line-height: 1.1;
     letter-spacing: -0.01em;
     margin: 0 0 14px;
-    color: var(--cream);
+    color: #F5EFE6;
     max-width: 16ch;
     text-shadow: 0 2px 24px rgba(45, 17, 8, 0.35);
 }
@@ -259,10 +372,7 @@ html, body, .gradio-container {
 
 /* ---- Stats strip overlapping hero ---- */
 
-#stats-wrap {
-    width: 100%;
-    background: transparent;
-}
+#stats-wrap { width: 100%; background: transparent; }
 
 #stats {
     max-width: 1080px;
@@ -275,11 +385,12 @@ html, body, .gradio-container {
 #stats .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    background: var(--cream);
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 16px;
-    box-shadow: 0 12px 40px -12px rgba(45, 17, 8, 0.25);
+    box-shadow: var(--shadow);
     overflow: hidden;
+    transition: background-color 240ms ease, border-color 240ms ease;
 }
 
 #stats .stat {
@@ -320,15 +431,12 @@ html, body, .gradio-container {
 .section {
     width: 100%;
     padding: clamp(56px, 8vw, 96px) clamp(24px, 5vw, 56px);
+    transition: background-color 240ms ease;
 }
 
-.section-inner {
-    max-width: 1080px;
-    margin: 0 auto;
-}
-
+.section-inner { max-width: 1080px; margin: 0 auto; }
 .section--paper { background: var(--paper); }
-.section--cream { background: var(--cream); }
+.section--surface { background: var(--surface); }
 
 .section-eyebrow {
     font-size: 0.74rem !important;
@@ -377,7 +485,7 @@ html, body, .gradio-container {
 
 #input_panel textarea {
     width: 100%;
-    background: var(--cream) !important;
+    background: var(--surface) !important;
     color: var(--ink) !important;
     border: 1px solid var(--border) !important;
     border-radius: 14px !important;
@@ -385,15 +493,18 @@ html, body, .gradio-container {
     font-size: 1.15rem !important;
     line-height: 1.7 !important;
     font-weight: 400 !important;
-    transition: border-color 160ms ease, box-shadow 160ms ease;
+    transition: border-color 160ms ease, box-shadow 160ms ease, background-color 240ms ease, color 240ms ease;
     resize: vertical;
     min-height: 140px;
     direction: rtl;
     text-align: right;
 }
 
+body.dark #input_panel textarea { background: var(--paper) !important; }
+
 #input_panel textarea::placeholder {
-    color: rgba(45, 33, 26, 0.35) !important;
+    color: var(--ink-muted) !important;
+    opacity: 0.55;
     font-weight: 400;
 }
 
@@ -405,27 +516,23 @@ html, body, .gradio-container {
 
 #input_panel label > span { display: none !important; }
 
-#actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 18px;
-    direction: rtl;
-}
+#actions { display: flex; gap: 12px; margin-top: 18px; direction: rtl; }
 
 button.primary {
     background: var(--ink) !important;
-    color: var(--cream) !important;
+    color: var(--surface) !important;
     border: none !important;
     border-radius: 12px !important;
     padding: 14px 28px !important;
     font-size: 1rem !important;
     font-weight: 700 !important;
     cursor: pointer;
-    transition: background 140ms ease, transform 140ms ease;
+    transition: background 140ms ease, transform 140ms ease, color 240ms ease;
 }
 
 button.primary:hover {
     background: var(--terracotta-deep) !important;
+    color: #F5EFE6 !important;
     transform: translateY(-1px);
 }
 
@@ -442,7 +549,7 @@ button.secondary {
 }
 
 button.secondary:hover {
-    background: var(--cream) !important;
+    background: var(--paper) !important;
     color: var(--ink) !important;
     border-color: var(--ink-muted) !important;
 }
@@ -466,10 +573,12 @@ button.secondary:hover {
     padding: 28px 24px;
     border: 1px dashed var(--border-strong);
     border-radius: 14px;
-    background: var(--cream);
+    background: var(--surface);
     color: var(--ink-muted);
     direction: rtl;
 }
+body.dark .result-empty { background: var(--paper); }
+
 .result-empty-text { display: flex; flex-direction: column; gap: 4px; }
 .result-empty-text strong { font-size: 1.05rem; font-weight: 700; color: var(--ink); }
 .result-empty-text span { font-size: 0.9rem; color: var(--ink-muted); }
@@ -479,7 +588,7 @@ button.secondary:hover {
     flex-direction: column;
     gap: 6px;
     padding: 22px 24px;
-    background: var(--cream);
+    background: var(--paper);
     border: 1px solid var(--border);
     border-radius: 14px;
     direction: rtl;
@@ -496,7 +605,7 @@ button.secondary:hover {
     gap: 18px;
     padding: 22px 24px;
     border-radius: 14px;
-    transition: transform 140ms ease;
+    transition: transform 140ms ease, background-color 240ms ease;
 }
 
 .result-row:hover { transform: translateX(-2px); }
@@ -512,14 +621,14 @@ button.secondary:hover {
 .result-rank {
     font-size: 0.78rem;
     font-weight: 800;
-    letter-spacing: 0.04em;
     font-variant-numeric: tabular-nums;
 }
 
 .result-en {
     font-size: 0.78rem;
-    color: rgba(45, 33, 26, 0.55);
+    color: var(--ink-muted);
     direction: ltr;
+    opacity: 0.75;
 }
 
 .result-cat {
@@ -537,26 +646,34 @@ button.secondary:hover {
     direction: ltr;
 }
 
-.result-rank-1 { background: var(--terracotta); color: var(--cream); }
+.result-rank-1 { background: var(--terracotta); color: #F5EFE6; }
 .result-rank-1 .result-rank,
 .result-rank-1 .result-cat,
-.result-rank-1 .result-pct { color: var(--cream); }
-.result-rank-1 .result-en { color: rgba(245, 239, 230, 0.7); }
+.result-rank-1 .result-pct { color: #F5EFE6; }
+.result-rank-1 .result-en { color: rgba(245, 239, 230, 0.75); }
 
 .result-rank-2 {
     background: var(--olive-tint);
     border: 1px solid rgba(95, 104, 69, 0.22);
 }
+body.dark .result-rank-2 { border-color: rgba(138, 148, 104, 0.30); }
 .result-rank-2 .result-rank { color: var(--olive); }
 
 .result-rank-3 {
-    background: var(--cream);
+    background: var(--paper);
     border: 1px solid var(--border);
     opacity: 0.92;
 }
 .result-rank-3 .result-cat { color: var(--ink-muted); font-weight: 700; }
 .result-rank-3 .result-pct { color: var(--ink-muted); }
 .result-rank-3 .result-rank { color: var(--ink-muted); }
+
+/* Loading pulse during prediction */
+.gradio-container .pending #result_panel { animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+}
 
 /* ---- Examples ---- */
 
@@ -593,7 +710,7 @@ button.secondary:hover {
 
 #examples_panel button:hover {
     background: var(--ink) !important;
-    color: var(--cream) !important;
+    color: var(--surface) !important;
     border-color: var(--ink) !important;
 }
 
@@ -606,11 +723,12 @@ button.secondary:hover {
 }
 
 .perf-card {
-    background: var(--cream);
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 16px;
     padding: clamp(24px, 3vw, 32px);
     box-shadow: 0 1px 2px rgba(45, 33, 26, 0.04);
+    transition: background-color 240ms ease, border-color 240ms ease;
 }
 
 .perf-card-head {
@@ -642,6 +760,11 @@ button.secondary:hover {
     display: block;
 }
 
+/* Light/dark chart swap */
+.chart-dark { display: none; }
+body.dark .chart-light { display: none; }
+body.dark .chart-dark { display: block; }
+
 .perf-card-caption {
     font-size: 0.92rem;
     color: var(--ink-muted);
@@ -651,82 +774,77 @@ button.secondary:hover {
     text-align: right;
 }
 
-/* ---- About accordion ---- */
+/* ---- Inline About section (no accordion) ---- */
 
-#workspace .gradio-accordion,
-.gradio-container .accordion {
-    background: transparent !important;
-    border: none !important;
-    border-top: 1px solid var(--border) !important;
-    border-radius: 0 !important;
-    margin-top: clamp(36px, 5vw, 48px) !important;
-    padding-top: clamp(20px, 3vw, 24px) !important;
+.about-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(32px, 4vw, 48px);
 }
 
-.gradio-container .accordion .label-wrap {
-    color: var(--ink) !important;
-    font-weight: 700 !important;
-    font-size: 1rem !important;
+.about-block {
     direction: rtl;
 }
 
-.gradio-container .accordion .prose {
-    color: var(--ink) !important;
-    line-height: 1.75;
-    direction: rtl;
-    text-align: right;
-}
-
-.gradio-container .accordion .prose h3 {
-    color: var(--ink) !important;
+.about-block h3 {
     font-size: 1.05rem;
     font-weight: 800;
-    margin: 28px 0 12px;
-}
-
-.gradio-container .accordion .prose p { color: var(--ink-muted) !important; }
-
-.gradio-container .accordion .prose strong { color: var(--ink) !important; font-weight: 700; }
-
-.gradio-container .accordion .prose a {
-    color: var(--terracotta-deep) !important;
-    text-decoration: none;
-    border-bottom: 1px solid var(--terracotta-tint);
-}
-.gradio-container .accordion .prose a:hover {
-    border-bottom-color: var(--terracotta) !important;
-}
-
-.gradio-container .accordion .prose table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 12px 0 24px;
+    color: var(--ink);
+    margin: 0 0 10px;
     direction: rtl;
-}
-
-.gradio-container .accordion .prose th,
-.gradio-container .accordion .prose td {
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--border);
     text-align: right;
-    color: var(--ink) !important;
 }
 
-.gradio-container .accordion .prose th {
-    color: var(--ink-muted) !important;
-    font-weight: 700;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+.about-block p {
+    font-size: 0.98rem;
+    color: var(--ink);
+    line-height: 1.8;
+    margin: 0;
+    max-width: 64ch;
+    direction: rtl;
+    text-align: right;
+}
+
+.about-block p strong { color: var(--ink); font-weight: 700; }
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.category-cell {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    direction: rtl;
+    transition: background-color 240ms ease, border-color 240ms ease;
+}
+
+.category-cell .cat-ar {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--ink);
+    display: block;
+    margin-bottom: 2px;
+}
+
+.category-cell .cat-en {
+    font-size: 0.82rem;
+    color: var(--ink-muted);
+    direction: ltr;
 }
 
 /* ---- Footer ---- */
 
 #footer {
     width: 100%;
-    background: var(--ink);
-    color: rgba(245, 239, 230, 0.7);
+    background: var(--footer-bg);
+    color: var(--footer-text);
     padding: clamp(36px, 5vw, 48px) clamp(24px, 5vw, 56px);
+    transition: background-color 240ms ease;
 }
 
 #footer .footer-inner {
@@ -743,7 +861,7 @@ button.secondary:hover {
 #footer .links { display: flex; gap: 24px; flex-wrap: wrap; }
 
 #footer a {
-    color: var(--cream) !important;
+    color: #F5EFE6 !important;
     text-decoration: none;
     font-weight: 700;
     border-bottom: 1px solid transparent;
@@ -784,40 +902,80 @@ footer { display: none !important; }
     #stats .stats-grid { grid-template-columns: 1fr; }
     #stats .stat { border-right: none; border-bottom: 1px solid var(--border); }
     #stats .stat:last-child { border-bottom: none; }
+    #theme-toggle { width: 38px; height: 38px; }
 }
 """
 
 
-CATEGORIES_TABLE = "\n".join(
-    f"| {ar} | {CATEGORIES_EN[ar]} |" for ar in CATEGORIES
-)
+# ---- Build the about section as raw HTML (no accordion) --------------------
 
-ABOUT_MD = f"""
-### What this is
+ABOUT_BLOCKS = [
+    (
+        "ما هو هذا النموذج؟",
+        "نموذج <strong>CAMeLBERT-mix</strong> مدرّب على ٨ فئات من شكاوى المطاعم العربية. "
+        "بُني من البداية إلى النهاية بواسطة فريق NLP في AI Club.",
+    ),
+    (
+        "الأداء",
+        "<strong>٩٥٫٠٥٪ دقّة</strong> على مجموعة اختبار من ١٣٬٩٨٦ مراجعة حقيقية محتجزة. "
+        "بفاصل ثقة ٩٥٪ بين [٩٤٫٧٠٪، ٩٥٫٤١٪]. جميع الفئات فوق ٨٠٪ F1. "
+        "خطأ المعايرة (ECE) بعد التنعيم الحراري: ٠٫٠١٤.",
+    ),
+    (
+        "بيانات التدريب",
+        "<strong>~٩٨ ألف</strong> شكوى عربية مُصنّفة. المصادر: مجموعة شكاوى إنتاجية، "
+        "ومراجعات مستخرجة من تطبيقات التوصيل السعودية (HungerStation, Jahez, Mrsool, Talabat). "
+        "البيانات الاصطناعية والمعزّزة تُستخدم في التدريب فقط، ولا تظهر أبداً في التحقق أو الاختبار.",
+    ),
+    (
+        "التخصص",
+        "النموذج <strong>متخصّص في اللهجة السعودية الخليجية</strong> بقصد تصميمي. "
+        "أرقام الأداء على لهجات أخرى: السعودية ٦٧٪، الشامية ٦٠٪، المصرية والفصحى الخالصة ٥٠٪. "
+        "للاستخدام الإنتاجي بلهجات أخرى يلزم إعادة تدريب على بياناتها.",
+    ),
+    (
+        "الحدود والقيود",
+        "تصنيف بفئة واحدة. للشكاوى متعدّدة الجوانب (طعام بارد + موظف غير مهذب)، "
+        "ستظهر الفئتان الثانية والثالثة كبدائل في النتيجة. ليس مخصّصاً للقرارات ذات المخاطر العالية.",
+    ),
+]
 
-A fine-tuned Arabic BERT classifier (CAMeLBERT-mix) that sorts restaurant complaints into 8 actionable categories. Built end-to-end by the NLP team at AI Club.
 
-### Performance
+def render_about_blocks() -> str:
+    parts = []
+    for title, body in ABOUT_BLOCKS:
+        parts.append(
+            f'<div class="about-block">'
+            f'  <h3>{title}</h3>'
+            f'  <p>{body}</p>'
+            f'</div>'
+        )
+    return f'<div class="about-grid">{"".join(parts)}</div>'
 
-95.05% test accuracy on 13,986 held-out real reviews. Bootstrap 95% CI: [94.70%, 95.41%]. Macro F1 92.03%, every class above 80% F1. Calibration ECE 0.014 after temperature scaling.
 
-### Training data
+CATEGORIES_GRID_HTML = '<div class="categories-grid">' + "".join(
+    f'<div class="category-cell">'
+    f'  <span class="cat-ar">{ar}</span>'
+    f'  <span class="cat-en">{CATEGORIES_EN[ar]}</span>'
+    f'</div>'
+    for ar in CATEGORIES
+) + "</div>"
 
-About 98K labeled Arabic complaints. Sources: a production complaints corpus and scraped reviews from Saudi food delivery apps (HungerStation, Jahez, Mrsool, Talabat). Synthetic and augmented rows are train-only, never in val or test.
 
-### Specialization
+# ---- Build UI ---------------------------------------------------------------
 
-The model is Saudi-Gulf dialect by design. Cross-dialect canary numbers: Saudi 67%, Levantine 60%, Egyptian and pure-MSA 50%. For Egyptian or Levantine production use, retrain on data from those dialects.
-
-### Limits
-
-Single-label classification. For multi-aspect complaints (cold food plus rude server), the second and third predictions show the alternative aspects. Not for safety-critical decisions.
-
-### Categories
-
-| Arabic | English |
-|---|---|
-{CATEGORIES_TABLE}
+THEME_TOGGLE_HTML = """
+<div id="theme-toggle-wrap">
+  <button id="theme-toggle" type="button" aria-label="Toggle dark mode">
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="4"/>
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+    </svg>
+  </button>
+</div>
 """
 
 
@@ -826,8 +984,12 @@ with gr.Blocks(
     analytics_enabled=False,
     theme=gr.themes.Base(),
     css=CSS,
+    head=HEAD,
 ) as demo:
-    # Hero with embedded SVG dusk scene
+    # Theme toggle (fixed top-right)
+    gr.HTML(THEME_TOGGLE_HTML)
+
+    # Hero with embedded SVG dusk scene + stats strip
     gr.HTML(
         f"""
         <section id="hero">
@@ -872,7 +1034,7 @@ with gr.Blocks(
     )
 
     # Classify section
-    with gr.Column(elem_id="section-classify", elem_classes=["section", "section--cream"]):
+    with gr.Column(elem_id="section-classify", elem_classes=["section", "section--surface"]):
         gr.HTML(
             """
             <div class="section-inner">
@@ -910,7 +1072,7 @@ with gr.Blocks(
                 label=None,
             )
 
-    # Performance section
+    # Performance section with light + dark chart variants
     gr.HTML(
         f"""
         <section class="section section--paper">
@@ -928,7 +1090,8 @@ with gr.Blocks(
                   <div class="perf-card-title">F1 لكل فئة</div>
                   <div class="perf-card-sub">test set, 13,986 reviews</div>
                 </div>
-                <div class="perf-card-chart">{CHART_F1_SVG}</div>
+                <div class="perf-card-chart chart-light">{CHART_F1_LIGHT}</div>
+                <div class="perf-card-chart chart-dark">{CHART_F1_DARK}</div>
                 <p class="perf-card-caption">
                   أعلى فئة (جودة الطعام) ٩٦٫٢٪، أدنى فئة (عامة) ٨٤٫٩٪. الفارق ١١٫٣ نقطة فقط.
                 </p>
@@ -939,7 +1102,8 @@ with gr.Blocks(
                   <div class="perf-card-title">رحلة النموذج</div>
                   <div class="perf-card-sub">accuracy across iterations</div>
                 </div>
-                <div class="perf-card-chart">{CHART_BASELINES_SVG}</div>
+                <div class="perf-card-chart chart-light">{CHART_BL_LIGHT}</div>
+                <div class="perf-card-chart chart-dark">{CHART_BL_DARK}</div>
                 <p class="perf-card-caption">
                   بدأنا بنموذج TF-IDF كأساس، ثم انتقلنا إلى BERT، ثم إلى المجموعة، ثم حذفنا فئة "الجو والمكان"
                   بعد تدقيق كشف أن ٩٩٪ من بياناتها كانت غير دقيقة.
@@ -951,19 +1115,32 @@ with gr.Blocks(
         """
     )
 
-    # About accordion (still useful for category list + methodology details)
-    with gr.Column(elem_classes=["section", "section--cream"]):
-        gr.HTML(
-            """
-            <div class="section-inner">
-              <div class="section-eyebrow">About</div>
-              <h2 class="section-title">عن النموذج</h2>
-            </div>
-            """
-        )
-        with gr.Column(elem_id="workspace"):
-            with gr.Accordion("التفاصيل التقنية والمنهجية · technical details", open=False):
-                gr.Markdown(ABOUT_MD)
+    # About section (inline, no accordion)
+    gr.HTML(
+        f"""
+        <section class="section section--surface">
+          <div class="section-inner">
+            <div class="section-eyebrow">About</div>
+            <h2 class="section-title">عن النموذج</h2>
+            <p class="section-lede">
+              ما الذي يفعله النموذج، كيف بُني، وعلى أي بيانات تدرّب.
+            </p>
+            {render_about_blocks()}
+          </div>
+        </section>
+
+        <section class="section section--paper">
+          <div class="section-inner">
+            <div class="section-eyebrow">Categories</div>
+            <h2 class="section-title">الفئات الثمانية</h2>
+            <p class="section-lede">
+              تم اختيار هذه الفئات بحيث تكون قابلة للتصرّف عملياً (تذهب لفريق العمليات المناسب).
+            </p>
+            {CATEGORIES_GRID_HTML}
+          </div>
+        </section>
+        """
+    )
 
     # Footer
     gr.HTML(
