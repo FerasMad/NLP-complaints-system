@@ -1,0 +1,251 @@
+﻿text,category,ambience_subtype,source,is_hard_negative,risk_keyword,contrast_group_id,quality_score,notes
+المكان بارد والمكيف قوي ما نقدر نقعد,الجو والمكان,temperature_ac,ambience_synthetic,False,بارد,g001,5,ambience positive — place temp vs food temp
+الاكل بارد لما وصل ما عجبني الطعم,جودة الطعام,,ambience_synthetic,True,بارد,g001,5,contrastive hard-negative — place temp vs food temp
+المطعم حار والمكيف ما يبرد جلسنا نتعرق,الجو والمكان,temperature_ac,ambience_synthetic,False,حار,g002,5,ambience positive — place temp vs food spice
+الشاورما حارة بزياده ما اقدر اكلها,جودة الطعام,,ambience_synthetic,True,حار,g002,5,contrastive hard-negative — place temp vs food spice
+التكييف ضعيف والجو خانق,الجو والمكان,temperature_ac,ambience_synthetic,False,بارد,g003,5,ambience positive — AC vs cold drink
+القهوة باردة ما لها طعم ابدا,جودة الطعام,,ambience_synthetic,True,بارد,g003,5,contrastive hard-negative — AC vs cold drink
+المكيف بارد بزياده يثلج,الجو والمكان,temperature_ac,ambience_synthetic,False,بارد,g004,5,ambience positive — AC over-cold vs melted dessert
+الايس كريم ذايب وحامض الطعم,جودة الطعام,,ambience_synthetic,True,بارد,g004,5,contrastive hard-negative — AC over-cold vs melted dessert
+الفرع حار جدا الجو ما يطاق,الجو والمكان,temperature_ac,ambience_synthetic,False,حار,g005,5,ambience positive — place hot vs food over-fried
+البرجر مقلي زياده ومحروق من برا,جودة الطعام,,ambience_synthetic,True,حار,g005,5,contrastive hard-negative — place hot vs food over-fried
+المكيف خربان ودخلنا في حر فظيع,الجو والمكان,temperature_ac,ambience_synthetic,False,بارد,g006,5,ambience positive — broken AC vs cold soup
+الشوربه طلعت بارده وما لها طعم,جودة الطعام,,ambience_synthetic,True,بارد,g006,5,contrastive hard-negative — broken AC vs cold soup
+الجو في المطعم خانق ومالقينا تهويه,الجو والمكان,temperature_ac,ambience_synthetic,False,خانق,g007,5,ambience positive — stuffy place vs over-spiced food
+الطلب جاء خانق بالبهارات وما اقدر اكله,جودة الطعام,,ambience_synthetic,True,خانق,g007,5,contrastive hard-negative — stuffy place vs over-spiced food
+المكيف يطلع هوا ساخن وحار,الجو والمكان,temperature_ac,ambience_synthetic,False,حار,g008,5,ambience positive — broken AC blowing hot vs spicy rice
+الكبسه طلعت حاره بزياده والفلفل قوي,جودة الطعام,,ambience_synthetic,True,حار,g008,5,contrastive hard-negative — broken AC blowing hot vs spicy rice
+التهوية سيئه والمكان رطوبه,الجو والمكان,temperature_ac,ambience_synthetic,False,رطوبه,g009,5,ambience positive — humid place vs stale bread
+الخبز فيه رطوبه وكأنه قديم,جودة الطعام,,ambience_synthetic,True,رطوبه,g009,5,contrastive hard-negative — humid place vs stale bread
+المكان مثل الثلاجه من برد المكيف,الجو والمكان,temperature_ac,ambience_synthetic,False,ثلج,g010,5,ambience positive — freezing room vs frozen drink
+الكوكا طلعت ثلج ما اقدر اشربها,جودة الطعام,,ambience_synthetic,True,ثلج,g010,5,contrastive hard-negative — freezing room vs frozen drink
+جلسنا في كنبات حر والمكيف بعيد,الجو والمكان,temperature_ac,ambience_synthetic,False,حر,g011,5,ambience positive — hot seats vs scalding fries
+البطاطس وصلت حر زياده يحرق اللسان,جودة الطعام,,ambience_synthetic,True,حر,g011,5,contrastive hard-negative — hot seats vs scalding fries
+المكيف يصقع والاطفال صار يبردون,الجو والمكان,temperature_ac,ambience_synthetic,False,يصقع,g012,5,ambience positive — freezing AC vs cold tea
+الشاي صقعان ما اقدر اشربه,جودة الطعام,,ambience_synthetic,True,يصقع,g012,5,contrastive hard-negative — freezing AC vs cold tea
+الكراسي قاسية على الظهر ما اقدر اقعد,الجو والمكان,seating_comfort,ambience_synthetic,False,الكراسي,g013,5,ambience positive — uncomfortable chairs vs dirty chairs
+الكراسي عليها بقايا طعام من اللي قبلنا,النظافة,,ambience_synthetic,True,الكراسي,g013,5,contrastive hard-negative — uncomfortable chairs vs dirty chairs
+الطاولات صغيرة ما تكفي الطلب,الجو والمكان,seating_comfort,ambience_synthetic,False,الطاولة,g014,5,ambience positive — small tables vs uncleaned tables
+الطاولة وسخه ومالها بصمة تنظيف,النظافة,,ambience_synthetic,True,الطاولة,g014,5,contrastive hard-negative — small tables vs uncleaned tables
+الكنب قاسي وما تشعر بأي راحه,الجو والمكان,seating_comfort,ambience_synthetic,False,الكنب,g015,5,ambience positive — hard sofa vs dirty sofa
+الكنب وسخ عليه بقع وما تنظف,النظافة,,ambience_synthetic,True,الكنب,g015,5,contrastive hard-negative — hard sofa vs dirty sofa
+ما فيه مكان نقعد كل الجلسات محجوزه,الجو والمكان,seating_comfort,ambience_synthetic,False,الجلسه,g016,5,ambience positive — no available seats vs slow service
+الجلسه طويله جدا ما حد جا يخدمنا,خدمة الموظفين,,ambience_synthetic,True,الجلسه,g016,5,contrastive hard-negative — no available seats vs slow service
+الكنب صغير وثلاثه ما يقعدون فيه,الجو والمكان,seating_comfort,ambience_synthetic,False,الجلسه,g017,5,ambience positive — tight sofa vs unwelcoming staff
+الكاشير ما رحب فينا والجلسه طويله,خدمة الموظفين,,ambience_synthetic,True,الجلسه,g017,5,contrastive hard-negative — tight sofa vs unwelcoming staff
+الجلسات الارضيه ما فيها وسائد كافيه,الجو والمكان,seating_comfort,ambience_synthetic,False,الجلسه,g018,5,ambience positive — uncushioned floor seats vs long wait
+الجلسه استمرت ساعتين انتظار,وقت الانتظار,,ambience_synthetic,True,الجلسه,g018,5,contrastive hard-negative — uncushioned floor seats vs long wait
+القعدات ضيقه ولا اقدر امد رجلي,الجو والمكان,seating_comfort,ambience_synthetic,False,قعدوا,g019,5,ambience positive — tight seating vs idle staff
+الموظفين قعدوا يسولفون وما يخدمون,خدمة الموظفين,,ambience_synthetic,True,قعدوا,g019,5,contrastive hard-negative — tight seating vs idle staff
+الكرسي يهتز كل ما اتحرك,الجو والمكان,seating_comfort,ambience_synthetic,False,يهتز,g020,5,ambience positive — wobbly chair vs nervous staff
+الموظف يهتز كل ما تكلمه ما عنده تركيز,خدمة الموظفين,,ambience_synthetic,True,يهتز,g020,5,contrastive hard-negative — wobbly chair vs nervous staff
+الطاوله كبيره بزياده على المجموعه الصغيره,الجو والمكان,seating_comfort,ambience_synthetic,False,الطاوله,g021,5,ambience positive — wrong-size table vs reservation issue
+الطاوله المحجوزه ما تطابق العدد المسجل,خدمة الموظفين,,ambience_synthetic,True,الطاوله,g021,5,contrastive hard-negative — wrong-size table vs reservation issue
+جلسات العوائل قليلة وكلها مشغوله,الجو والمكان,seating_comfort,ambience_synthetic,False,العوائل,g022,5,ambience positive — few family seats vs staff confusion
+الموظفين ما يفهمون نحجز للعوائل,خدمة الموظفين,,ambience_synthetic,True,العوائل,g022,5,contrastive hard-negative — few family seats vs staff confusion
+البارتشن مكسور وما يفصل بينا,الجو والمكان,seating_comfort,ambience_synthetic,False,البارتشن,g023,5,ambience positive — broken partition vs staff accident
+البارتشن المعدني وقع لما لمسه الموظف بالخطأ,خدمة الموظفين,,ambience_synthetic,True,البارتشن,g023,5,contrastive hard-negative — broken partition vs staff accident
+المكان زحمه موت ما لقينا مكان نقعد,الجو والمكان,space_crowding,ambience_synthetic,False,زحمه,g024,5,ambience positive — crowding vs slow-staff-blamed-on-crowd
+الموظفين ما يعرفون يخدمون من الزحمه,خدمة الموظفين,,ambience_synthetic,True,زحمه,g024,5,contrastive hard-negative — crowding vs slow-staff-blamed-on-crowd
+الجلسات متلاصقه فينا ما فيه مساحه,الجو والمكان,space_crowding,ambience_synthetic,False,الجلسات,g025,5,ambience positive — tight seating vs price
+الفاتوره غاليه على الجلسه القصيرة,السعر والقيمة,,ambience_synthetic,True,الجلسات,g025,5,contrastive hard-negative — tight seating vs price
+ضيق وما تقدر تتنفس من الزحمة,الجو والمكان,space_crowding,ambience_synthetic,False,ضيق,g026,5,ambience positive — tight space vs portion-size complaint
+السعر مبالغ فيه على وجبه ضيقه,السعر والقيمة,,ambience_synthetic,True,ضيق,g026,5,contrastive hard-negative — tight space vs portion-size complaint
+المكان مزدحم ما تقدر تمشي بين الطاولات,الجو والمكان,space_crowding,ambience_synthetic,False,مزدحم,g027,5,ambience positive — packed place vs over-stuffed order
+الطلب مزدحم بالاضافات اللي ما طلبتها,دقة الطلب,,ambience_synthetic,True,مزدحم,g027,5,contrastive hard-negative — packed place vs over-stuffed order
+ما فيه مساحه شخصيه كأنك في حافله,الجو والمكان,space_crowding,ambience_synthetic,False,مساحه,g028,5,ambience positive — no personal space vs unclear bill
+الفاتوره ما فيها مساحه لتفصيل الاصناف,السعر والقيمة,,ambience_synthetic,True,مساحه,g028,5,contrastive hard-negative — no personal space vs unclear bill
+كتمه فظيعه من الزحام داخل المطعم,الجو والمكان,space_crowding,ambience_synthetic,False,كتمه,g029,5,ambience positive — stuffy crowd vs unresponsive cashier
+الكاشير حسبها كتمه ما رد علي,خدمة الموظفين,,ambience_synthetic,True,كتمه,g029,5,contrastive hard-negative — stuffy crowd vs unresponsive cashier
+لاصقين فينا وما اقدر اتنفس,الجو والمكان,space_crowding,ambience_synthetic,False,لاصقين,g030,5,ambience positive — crowded patrons vs intrusive staff
+الموظف لاصق فينا ما يفارقنا,خدمة الموظفين,,ambience_synthetic,True,لاصقين,g030,5,contrastive hard-negative — crowded patrons vs intrusive staff
+مصفوطين مع بعض ما تقدر تتحرك,الجو والمكان,space_crowding,ambience_synthetic,False,مصفوطين,g031,5,ambience positive — packed in vs packed delivery bag
+الطلبات مصفوطه فوق بعض في الكيس,التوصيل,,ambience_synthetic,True,مصفوطين,g031,5,contrastive hard-negative — packed in vs packed delivery bag
+ما فيه مجال نمشي حتى لدورة المياه,الجو والمكان,space_crowding,ambience_synthetic,False,مجال,g032,5,ambience positive — no walking room vs no order edits
+ما فيه مجال للتعديل بالطلب بعد ارساله,خدمة الموظفين,,ambience_synthetic,True,مجال,g032,5,contrastive hard-negative — no walking room vs no order edits
+زحمة بزياده وما حسبوا حساب العدد,الجو والمكان,space_crowding,ambience_synthetic,False,حسبوا,g033,5,ambience positive — crowding vs miscounted bill
+الكاشير حسب طلب اللي قبلي معاي بالزحمه,دقة الطلب,,ambience_synthetic,True,حسبوا,g033,5,contrastive hard-negative — crowding vs miscounted bill
+الموسيقى صوتها عالي ما نقدر نسولف,الجو والمكان,noise_music,ambience_synthetic,False,عالي,g034,5,ambience positive — loud music vs loud staff
+الموظف صوته عالي ومزعج وقت الطلب,خدمة الموظفين,,ambience_synthetic,True,عالي,g034,5,contrastive hard-negative — loud music vs loud staff
+الاطفال يصرخون في كل المكان جو ازعاج,الجو والمكان,noise_music,ambience_synthetic,False,ازعاج,g035,5,ambience positive — child noise vs annoying staff
+الموظف ازعجني بالاسئله الكثيرة,خدمة الموظفين,,ambience_synthetic,True,ازعاج,g035,5,contrastive hard-negative — child noise vs annoying staff
+الدي جي يفتح الصوت لين تطق ودانك,الجو والمكان,noise_music,ambience_synthetic,False,عالي,g036,5,ambience positive — DJ noise vs rude loud staff
+النادل صوته عالي وما يحترم,خدمة الموظفين,,ambience_synthetic,True,عالي,g036,5,contrastive hard-negative — DJ noise vs rude loud staff
+الصوت في المطعم مزعج ما نسمع بعض,الجو والمكان,noise_music,ambience_synthetic,False,مزعج,g037,5,ambience positive — loud place vs spam-stuffed order
+الطلب وصل مزعج بالسبام والاضافات الغلط,دقة الطلب,,ambience_synthetic,True,مزعج,g037,5,contrastive hard-negative — loud place vs spam-stuffed order
+الاغاني العربيه عاليه بزياده,الجو والمكان,noise_music,ambience_synthetic,False,الاغاني,g038,5,ambience positive — loud songs vs loud staff over music
+الاغاني الموسيقيه بالخلفيه طبيعيه بس الموظف عالي,خدمة الموظفين,,ambience_synthetic,True,الاغاني,g038,5,contrastive hard-negative — loud songs vs loud staff over music
+صوت المعدات في المطبخ يسمع لين عندنا,الجو والمكان,noise_music,ambience_synthetic,False,يصيحون,g039,5,ambience positive — kitchen equipment noise vs kitchen-staff yelling
+الموظفين في المطبخ يصيحون على بعض,خدمة الموظفين,,ambience_synthetic,True,يصيحون,g039,5,contrastive hard-negative — kitchen equipment noise vs kitchen-staff yelling
+الصراخ من الاطفال خرب الجو علينا,الجو والمكان,noise_music,ambience_synthetic,False,صراخ,g040,5,ambience positive — child screaming vs staff yelling
+الموظف صرخ علي لما طلبت تعديل الطلب,خدمة الموظفين,,ambience_synthetic,True,صراخ,g040,5,contrastive hard-negative — child screaming vs staff yelling
+الصوت العالي خلانا ما نسمع طلباتنا للنادل,الجو والمكان,noise_music,ambience_synthetic,False,نسمع,g041,5,ambience positive — noise made staff inaudible vs deaf staff
+النادل ما يسمع لما نكلمه يقولك ها كل مره,خدمة الموظفين,,ambience_synthetic,True,نسمع,g041,5,contrastive hard-negative — noise made staff inaudible vs deaf staff
+بزارين لاعبين بالكوره داخل المطعم وصوتهم عالي,الجو والمكان,noise_music,ambience_synthetic,False,بزارين,g042,5,ambience positive — noisy kids vs missing kids meal
+البزارين بالطلب احتاجوا ميني برجر مفقود,دقة الطلب,,ambience_synthetic,True,بزارين,g042,5,contrastive hard-negative — noisy kids vs missing kids meal
+الصوت العالي خلى راسي يدور,الجو والمكان,noise_music,ambience_synthetic,False,العالي,g043,5,ambience positive — loud noise dizzying vs high bill dizzying
+الفاتوره العاليه خلت راسي يدور,السعر والقيمة,,ambience_synthetic,True,العالي,g043,5,contrastive hard-negative — loud noise dizzying vs high bill dizzying
+الاضاءه قويه على العين بزياده,الجو والمكان,lighting,ambience_synthetic,False,قوي,g044,5,ambience positive — bright lights vs steep price
+السعر قوي على وجبة بسيطه,السعر والقيمة,,ambience_synthetic,True,قوي,g044,5,contrastive hard-negative — bright lights vs steep price
+المكان مظلم وما اقدر اشوف المنيو,الجو والمكان,lighting,ambience_synthetic,False,قديم,g045,5,ambience positive — dim lights vs outdated menu
+المنيو قديم وفيه اطباق مش موجوده,خدمة الموظفين,,ambience_synthetic,True,قديم,g045,5,contrastive hard-negative — dim lights vs outdated menu
+النور خافت بزياده تحس انك في كهف,الجو والمكان,lighting,ambience_synthetic,False,خافت,g046,5,ambience positive — weak light vs weak-flavored food
+الطلب وصل خافت الطعم وبدون نكهه,جودة الطعام,,ambience_synthetic,True,خافت,g046,5,contrastive hard-negative — weak light vs weak-flavored food
+الكشافات في عيوننا مباشره مزعجه,الجو والمكان,lighting,ambience_synthetic,False,لمعت,g047,5,ambience positive — spotlights in eyes vs surprised cashier
+الكاشير لمعت عيونه لما شاف الفاتوره,خدمة الموظفين,,ambience_synthetic,True,لمعت,g047,5,contrastive hard-negative — spotlights in eyes vs surprised cashier
+اللمبات نص شغاله نص مطفيه,الجو والمكان,lighting,ambience_synthetic,False,اللمبه,g048,5,ambience positive — broken room bulbs vs cake-candle blown out by waiter
+الويتر طفي اللمبه على الكيكه قبل ما يجي,خدمة الموظفين,,ambience_synthetic,True,اللمبه,g048,5,contrastive hard-negative — broken room bulbs vs cake-candle blown out by waiter
+النور قوي مره يحرق العين لما تجلس طويل,الجو والمكان,lighting,ambience_synthetic,False,نور,g049,5,ambience positive — harsh light vs over-fried food
+البرجر طلع نور لون من القلي القوي,جودة الطعام,,ambience_synthetic,True,نور,g049,5,contrastive hard-negative — harsh light vs over-fried food
+ظلام دامس ولا تشوف ايش تاكل,الجو والمكان,lighting,ambience_synthetic,False,ظلام,g050,5,ambience positive — dark room vs dark-colored food
+الطعام ظلام بسبب التتبيل المعتم,جودة الطعام,,ambience_synthetic,True,ظلام,g050,5,contrastive hard-negative — dark room vs dark-colored food
+الاضاءه ملونه وملحوظه فيها صداع,الجو والمكان,lighting,ambience_synthetic,False,ملونه,g051,5,ambience positive — weird-colored lighting vs weird-colored sauce
+الصلصه ملونه بشكل غريب يخوف,جودة الطعام,,ambience_synthetic,True,ملونه,g051,5,contrastive hard-negative — weird-colored lighting vs weird-colored sauce
+الشمعه على الطاوله ضعيفه مكنش نقدر نقرا,الجو والمكان,lighting,ambience_synthetic,False,الشمعه,g052,5,ambience positive — weak candle vs unlit cake-candle
+الشمعه طلعت من الكيكه قبل ما يجي الويتر,خدمة الموظفين,,ambience_synthetic,True,الشمعه,g052,5,contrastive hard-negative — weak candle vs unlit cake-candle
+ريحة الزيت ماسكة في المكان طلعت ريحتي,الجو والمكان,smell,ambience_synthetic,False,زيت,g053,5,ambience positive — env oil smell vs greasy food
+البطاطس مليانه زيت وحامضه,جودة الطعام,,ambience_synthetic,True,زيت,g053,5,contrastive hard-negative — env oil smell vs greasy food
+ريحة الدخان تخنق ما فيه تهوية,الجو والمكان,smell,ambience_synthetic,False,ريحة,g054,5,ambience positive — smoke in air vs food smell
+الاكل ريحته غريبة شككتني فيه,جودة الطعام,,ambience_synthetic,True,ريحة,g054,5,contrastive hard-negative — smoke in air vs food smell
+ريحة المجاري طالعة من الحمام,الجو والمكان,smell,ambience_synthetic,False,ريحة,g055,5,ambience positive — sewage smell vs food smell
+ريحة الزيت في الصلصة بايخه,جودة الطعام,,ambience_synthetic,True,ريحة,g055,5,contrastive hard-negative — sewage smell vs food smell
+الريحة تلصق في الملابس بعد ما اطلع,الجو والمكان,smell,ambience_synthetic,False,ريحة,g056,5,ambience positive — lingering env smell vs food smell
+ريحة اللحمه طلعت غريبة ورديتها,جودة الطعام,,ambience_synthetic,True,ريحة,g056,5,contrastive hard-negative — lingering env smell vs food smell
+ريحة الشيشه من الجلسات الخارجيه تدخل علينا,الجو والمكان,smell,ambience_synthetic,False,ريحة,g057,5,ambience positive — shisha smell vs grilled-meat smell
+ريحة الشاورما اللي طلبتها كانت غريبه,جودة الطعام,,ambience_synthetic,True,ريحة,g057,5,contrastive hard-negative — shisha smell vs grilled-meat smell
+ريحة المعسل تخنقنا والقسم الداخلي ما يفصل,الجو والمكان,smell,ambience_synthetic,False,المعسل,g058,5,ambience positive — shisha smell vs flavored food
+ريحة المعسل في المنيو مغريه بس الطعم سيء,جودة الطعام,,ambience_synthetic,True,المعسل,g058,5,contrastive hard-negative — shisha smell vs flavored food
+ريحة المطبخ تطلع علينا لين الطاوله,الجو والمكان,smell,ambience_synthetic,False,المطبخ,g059,5,ambience positive — kitchen odor leak vs food too kitchen-y
+ريحة المطبخ في الاكل قويه يبي تخفيف,جودة الطعام,,ambience_synthetic,True,المطبخ,g059,5,contrastive hard-negative — kitchen odor leak vs food too kitchen-y
+الريحة العفنه في الزاويه قبيحه,الجو والمكان,smell,ambience_synthetic,False,عفنه,g060,5,ambience positive — moldy corner smell vs spoiled food
+الاكل ريحته عفنه طلب جديد لزم,جودة الطعام,,ambience_synthetic,True,عفنه,g060,5,contrastive hard-negative — moldy corner smell vs spoiled food
+ريحة العرق منتشره في القسم العائلي,الجو والمكان,smell,ambience_synthetic,False,عرق,g061,5,ambience positive — BO smell in place vs off meat
+اللحمه فيها ريحة عرق جايه من سوء التحضير,جودة الطعام,,ambience_synthetic,True,عرق,g061,5,contrastive hard-negative — BO smell in place vs off meat
+طلعت ريحتي مثل المطعم اول ما طلعت,الجو والمكان,smell,ambience_synthetic,False,ريحتي,g062,5,ambience positive — place smell on me vs food smell on hand
+ريحتي طلعت من الطلب لما فتحت الكيس,جودة الطعام,,ambience_synthetic,True,ريحتي,g062,5,contrastive hard-negative — place smell on me vs food smell on hand
+ريحة الزيت القديم تطلع من المقلاه,الجو والمكان,smell,ambience_synthetic,False,زيت,g063,5,ambience positive — old oil smell in place vs old oil in food
+اللحمه فيها ريحة زيت قديم بصراحه,جودة الطعام,,ambience_synthetic,True,زيت,g063,5,contrastive hard-negative — old oil smell in place vs old oil in food
+الديكور قديم والفرش مهلوك يبي تجديد,الجو والمكان,decor_furniture,ambience_synthetic,False,قديم,g064,5,ambience positive — old decor vs old food
+الاكل قديم محسوس عليه ومش طازه,جودة الطعام,,ambience_synthetic,True,قديم,g064,5,contrastive hard-negative — old decor vs old food
+الطاولة تهتز كل ما تحط شي عليها,الجو والمكان,decor_furniture,ambience_synthetic,False,الطاولة,g065,5,ambience positive — wobbly table vs dirty table
+الطاولة وسخه فيها بقع طعام من قبل,النظافة,,ambience_synthetic,True,الطاولة,g065,5,contrastive hard-negative — wobbly table vs dirty table
+الكنب مهلوك والاسفنج طالع,الجو والمكان,decor_furniture,ambience_synthetic,False,الكنب,g066,5,ambience positive — worn sofa vs dirty sofa
+الكنب وسخ عليه بقع وما تنظف,النظافة,,ambience_synthetic,True,الكنب,g066,5,contrastive hard-negative — worn sofa vs dirty sofa
+الجدران فيها بويه متشققه ومتهالكه,الجو والمكان,decor_furniture,ambience_synthetic,False,الجدران,g067,5,ambience positive — cracked walls vs splattered walls
+الجدران فيها بقايا طعام تطير من المطبخ,النظافة,,ambience_synthetic,True,الجدران,g067,5,contrastive hard-negative — cracked walls vs splattered walls
+الديكور ما يناسب فخامة الاسعار,الجو والمكان,decor_furniture,ambience_synthetic,False,الاسعار,g068,5,ambience positive — decor doesn't match price vs price too high for decor
+الاسعار غاليه على ديكور بسيط,السعر والقيمة,,ambience_synthetic,True,الاسعار,g068,5,contrastive hard-negative — decor doesn't match price vs price too high for decor
+الارضيه فيها بلاط مكسور خطر للوقوع,الجو والمكان,decor_furniture,ambience_synthetic,False,الارضيه,g069,5,ambience positive — broken floor vs greasy floor
+الارضيه دبقه من الزيت اللي مراق,النظافة,,ambience_synthetic,True,الارضيه,g069,5,contrastive hard-negative — broken floor vs greasy floor
+السيراميك متشقق ومن زمن لازم يتغير,الجو والمكان,decor_furniture,ambience_synthetic,False,السيراميك,g070,5,ambience positive — old ceramic floor vs unwashed dishes
+السيراميك على الطلب يبي تنظيف,النظافة,,ambience_synthetic,True,السيراميك,g070,5,contrastive hard-negative — old ceramic floor vs unwashed dishes
+الكوشن الموجود على الكراسي مهترئ ووسخ,الجو والمكان,decor_furniture,ambience_synthetic,False,الكوشن,g071,5,ambience positive — worn cushion vs forgotten cushion add-on
+الكوشن الذي طلبته نسوه في الطلب,دقة الطلب,,ambience_synthetic,True,الكوشن,g071,5,contrastive hard-negative — worn cushion vs forgotten cushion add-on
+المخدات على الجلسة فاضيه وبدون حشو,الجو والمكان,decor_furniture,ambience_synthetic,False,المخدات,g072,5,ambience positive — empty cushions vs missing cushion add-on
+المخدات اللي طلبتها كاضافه ما وصلت مع الطلب,دقة الطلب,,ambience_synthetic,True,المخدات,g072,5,contrastive hard-negative — empty cushions vs missing cushion add-on
+الرخام على الطاوله متكسر من الحواف,الجو والمكان,decor_furniture,ambience_synthetic,False,الرخام,g073,5,ambience positive — broken marble counter vs missing decoration
+الرخام مذكور بالمنيو لتزيين الكيك بس مالقيناه,دقة الطلب,,ambience_synthetic,True,الرخام,g073,5,contrastive hard-negative — broken marble counter vs missing decoration
+الفرش قديم ولونه باهت من الاستخدام,الجو والمكان,decor_furniture,ambience_synthetic,False,الفرش,g074,5,ambience positive — faded furniture vs wrong furniture-style food packaging
+الفرش بالطلب طلع غير اللي اخترته,دقة الطلب,,ambience_synthetic,True,الفرش,g074,5,contrastive hard-negative — faded furniture vs wrong furniture-style food packaging
+ما فيه مواقف اضطرينا نمشي من بعيد,الجو والمكان,parking,ambience_synthetic,False,بعيد,g075,5,ambience positive — no parking vs delivery-far
+الطلب تأخر والمندوب تاه,التوصيل,,ambience_synthetic,True,بعيد,g075,5,contrastive hard-negative — no parking vs delivery-far
+المواقف بعيدة جدا والمدخل صعب,الجو والمكان,parking,ambience_synthetic,False,بعيد,g076,5,ambience positive — distant parking vs distant delivery
+المندوب وصل بعيد عن البيت ومانتبه,التوصيل,,ambience_synthetic,True,بعيد,g076,5,contrastive hard-negative — distant parking vs distant delivery
+الباركنج الخاص ممتلئ والشارع ضيق,الجو والمكان,parking,ambience_synthetic,False,بركنج,g077,5,ambience positive — full parking vs missing item discovered at parking
+البركنج فيه طلب ناقص لما طلعنا,دقة الطلب,,ambience_synthetic,True,بركنج,g077,5,contrastive hard-negative — full parking vs missing item discovered at parking
+الموقف الوحيد ضيق ما يسع السياره,الجو والمكان,parking,ambience_synthetic,False,ضيق,g078,5,ambience positive — narrow parking vs tight budget
+الميزانيه ضيقه ما تكفي للوجبه العائليه,السعر والقيمة,,ambience_synthetic,True,ضيق,g078,5,contrastive hard-negative — narrow parking vs tight budget
+المدخل صعب الوصول مع الازدحام,الجو والمكان,parking,ambience_synthetic,False,المدخل,g079,5,ambience positive — physical entrance vs app interface
+المدخل لقائمة الطعام صعب من الموقع الالكتروني,التوصيل,,ambience_synthetic,True,المدخل,g079,5,contrastive hard-negative — physical entrance vs app interface
+الطلعه من المطعم محصوره وضيقه,الجو والمكان,parking,ambience_synthetic,False,الطلعه,g080,5,ambience positive — exit ramp vs menu price spike
+الطلعه من المنيو سعرها مرتفع,السعر والقيمة,,ambience_synthetic,True,الطلعه,g080,5,contrastive hard-negative — exit ramp vs menu price spike
+الموقع صعب الوصول وما فيه باركنج قريب,الجو والمكان,parking,ambience_synthetic,False,الموقع,g081,5,ambience positive — physical location vs app location
+الموقع للطلب الالكتروني فيه مشكله,التوصيل,,ambience_synthetic,True,الموقع,g081,5,contrastive hard-negative — physical location vs app location
+وقفت بعيد مره عشان كل المواقف زحمه,الجو والمكان,parking,ambience_synthetic,False,وقفت,g082,5,ambience positive — parked far vs stood far
+وقفت بعيد عن الكاشير عشان ما يسمعني,خدمة الموظفين,,ambience_synthetic,True,وقفت,g082,5,contrastive hard-negative — parked far vs stood far
+الباركنج مدفوع وما حد قال لنا,الجو والمكان,parking,ambience_synthetic,False,الباركنج,g083,5,ambience positive — paid parking surprise vs parking on bill
+الباركنج المدفوع ما يحسبوه على الفاتوره,السعر والقيمة,,ambience_synthetic,True,الباركنج,g083,5,contrastive hard-negative — paid parking surprise vs parking on bill
+السيفون خربان وما فيه صابون اصلا,الجو والمكان,bathroom_facilities,ambience_synthetic,False,الحمام,g084,5,ambience positive — broken bathroom vs dirty bathroom
+الحمام وصخ ومقرف ما يستحمل,النظافة,,ambience_synthetic,True,الحمام,g084,5,contrastive hard-negative — broken bathroom vs dirty bathroom
+باب الحمام ما يقفل والمغسلة معطلة,الجو والمكان,bathroom_facilities,ambience_synthetic,False,الحمام,g085,5,ambience positive — broken bathroom hardware vs filthy bathroom
+الحمام مليان مجاري وريحه تطلع,النظافة,,ambience_synthetic,True,الحمام,g085,5,contrastive hard-negative — broken bathroom hardware vs filthy bathroom
+ما فيه مناديل في الحمام ولا صابون,الجو والمكان,bathroom_facilities,ambience_synthetic,False,الحمام,g086,5,ambience positive — missing supplies vs floor hygiene
+الارضيه في الحمام مبلولة ووسخه,النظافة,,ambience_synthetic,True,الحمام,g086,5,contrastive hard-negative — missing supplies vs floor hygiene
+المغسلة ما يطلع منها مي,الجو والمكان,bathroom_facilities,ambience_synthetic,False,المغسلة,g087,5,ambience positive — broken tap vs dirty kitchen sink
+المغسلة في المطبخ يصبون فيها كل شي,النظافة,,ambience_synthetic,True,المغسلة,g087,5,contrastive hard-negative — broken tap vs dirty kitchen sink
+الحمام بدون مرايا ولا اضاءه كافيه,الجو والمكان,bathroom_facilities,ambience_synthetic,False,الحمام,g088,5,ambience positive — no mirror in bathroom vs stinking bathroom
+الحمام نتنه ريحه تخنق,النظافة,,ambience_synthetic,True,الحمام,g088,5,contrastive hard-negative — no mirror in bathroom vs stinking bathroom
+جهاز التجفيف معطل بعد غسل اليدين,الجو والمكان,bathroom_facilities,ambience_synthetic,False,التجفيف,g089,5,ambience positive — broken hand-dryer vs undried food packaging
+التجفيف للاكل قبل التغليف ما تم,جودة الطعام,,ambience_synthetic,True,التجفيف,g089,5,contrastive hard-negative — broken hand-dryer vs undried food packaging
+السيفون يطلع كل المي على الارض,الجو والمكان,bathroom_facilities,ambience_synthetic,False,الارض,g090,5,ambience positive — broken flush vs dirty wet floor
+الارض في الحمام مليانه مي ووسخه,النظافة,,ambience_synthetic,True,الارض,g090,5,contrastive hard-negative — broken flush vs dirty wet floor
+دورات المياه الرجاليه مقفله بدون توضيح,الجو والمكان,bathroom_facilities,ambience_synthetic,False,دورات المياه,g091,5,ambience positive — men's room locked vs men's room dirty
+دورات المياه الرجاليه وسخه بشكل مبالغ,النظافة,,ambience_synthetic,True,دورات المياه,g091,5,contrastive hard-negative — men's room locked vs men's room dirty
+المراحيض الجوال معطل بعد كل استخدام,الجو والمكان,bathroom_facilities,ambience_synthetic,False,المراحيض,g092,5,ambience positive — broken urinal vs all toilets dirty
+المراحيض كلها وسخه بشكل لا يصدق,النظافة,,ambience_synthetic,True,المراحيض,g092,5,contrastive hard-negative — broken urinal vs all toilets dirty
+لا يوجد اشاره دخول للحمام للضيوف,الجو والمكان,bathroom_facilities,ambience_synthetic,False,اشاره,g093,5,ambience positive — no bathroom signage vs rude staff signaling
+اشاره الموظفين للزبون قليلة الادب,خدمة الموظفين,,ambience_synthetic,True,اشاره,g093,5,contrastive hard-negative — no bathroom signage vs rude staff signaling
+الجلسة الخارجية مكشوفة على الشارع وجو مزعج,الجو والمكان,outdoor_view,ambience_synthetic,False,برا,g094,5,ambience positive — outdoor seating vs delivery-outside-bag
+الطلب وصل برا الكيس واتلطخ,التوصيل,,ambience_synthetic,True,برا,g094,5,contrastive hard-negative — outdoor seating vs delivery-outside-bag
+التراس ما فيه ظل والشمس قوية,الجو والمكان,outdoor_view,ambience_synthetic,False,الشمس,g095,5,ambience positive — no outdoor shade vs sun-spoiled food
+الشمس على الباب طلعت الايس كريم خربان,جودة الطعام,,ambience_synthetic,True,الشمس,g095,5,contrastive hard-negative — no outdoor shade vs sun-spoiled food
+الجلسة على الواجهه فيها ضوضاء سيارات,الجو والمكان,outdoor_view,ambience_synthetic,False,الواجهه,g096,5,ambience positive — noisy facade vs food cover misleading
+الواجهه في المنيو مغريه بس الطعم مخيب,جودة الطعام,,ambience_synthetic,True,الواجهه,g096,5,contrastive hard-negative — noisy facade vs food cover misleading
+التراس مفتوح وفيه ذباب وحشرات,الجو والمكان,outdoor_view,ambience_synthetic,False,ذباب,g097,5,ambience positive — outdoor flies vs flies in food
+الطلب فيه ذباب اشمأز تماما,النظافة,,ambience_synthetic,True,ذباب,g097,5,contrastive hard-negative — outdoor flies vs flies in food
+الجلسه برا مزعجه من زحمة الشارع,الجو والمكان,outdoor_view,ambience_synthetic,False,برا,g098,5,ambience positive — outdoor noisy vs late seating
+الجلسه برا الموعد ما حد جا,خدمة الموظفين,,ambience_synthetic,True,برا,g098,5,contrastive hard-negative — outdoor noisy vs late seating
+الاطلاله على المدخل قبيحه ومش ممتعه,الجو والمكان,outdoor_view,ambience_synthetic,False,الاطلاله,g099,5,ambience positive — ugly view vs unclear menu
+الاطلاله على المنيو غير واضحه,خدمة الموظفين,,ambience_synthetic,True,الاطلاله,g099,5,contrastive hard-negative — ugly view vs unclear menu
+البلكونه ضيقه ولا تكفي اربعه افراد,الجو والمكان,outdoor_view,ambience_synthetic,False,البلكونه,g100,5,ambience positive — small balcony vs balcony as upsell
+البلكونه التي كانت في الفنادق ابعد,السعر والقيمة,,ambience_synthetic,True,البلكونه,g100,5,contrastive hard-negative — small balcony vs balcony as upsell
+السطح ما فيه تكييف خارجي ولا ميني فان,الجو والمكان,outdoor_view,ambience_synthetic,False,السطح,g101,5,ambience positive — rooftop no AC vs sesame on top
+السطح فوق الطلب وقع منه السمسم,جودة الطعام,,ambience_synthetic,True,السطح,g101,5,contrastive hard-negative — rooftop no AC vs sesame on top
+التراس فيه عمال يدخنون قريب منا,الجو والمكان,outdoor_view,ambience_synthetic,False,التراس,g102,5,ambience positive — smokers on terrace vs terrace not bookable
+التراس بالموقع غير متاح للحجز اونلاين,التوصيل,,ambience_synthetic,True,التراس,g102,5,contrastive hard-negative — smokers on terrace vs terrace not bookable
+جلسة برا ما فيها واي فاي ولا اضائه,الجو والمكان,outdoor_view,ambience_synthetic,False,جلسة برا,g103,5,ambience positive — outdoor no wifi vs delivery-outside packaging
+جلسة برا تطلب باستيكي عشان التوصيل,التوصيل,,ambience_synthetic,True,جلسة برا,g103,5,contrastive hard-negative — outdoor no wifi vs delivery-outside packaging
+ما فيه خصوصية كل الناس تشوفك تاكل,الجو والمكان,privacy,ambience_synthetic,False,خصوصية,g104,5,ambience positive — no privacy in seating vs no customer privacy
+الكاشير ما يحترم خصوصية اللي قبلك,خدمة الموظفين,,ambience_synthetic,True,خصوصية,g104,5,contrastive hard-negative — no privacy in seating vs no customer privacy
+قسم العوائل ضيق ولاصقين فينا,الجو والمكان,privacy,ambience_synthetic,False,لاصقين,g105,5,ambience positive — crowded family section vs hovering staff
+الموظف لاصق فينا ما تحس بالراحه,خدمة الموظفين,,ambience_synthetic,True,لاصقين,g105,5,contrastive hard-negative — crowded family section vs hovering staff
+ما فيه حواجز بين الجلسات وكل الناس تسمعك,الجو والمكان,privacy,ambience_synthetic,False,حواجز,g106,5,ambience positive — no partitions vs no staff barrier
+ما فيه حواجز للموظفين فيدخلون عليك بدون استئذان,خدمة الموظفين,,ambience_synthetic,True,حواجز,g106,5,contrastive hard-negative — no partitions vs no staff barrier
+الجلسه مكشوفه على المطبخ ما فيها سرية,الجو والمكان,privacy,ambience_synthetic,False,مكشوفه,g107,5,ambience positive — exposed to kitchen vs cashier sees order
+الجلسه مكشوفه للمندوب لما طلب الفاتوره,خدمة الموظفين,,ambience_synthetic,True,مكشوفه,g107,5,contrastive hard-negative — exposed to kitchen vs cashier sees order
+جنبنا ناس يتسمعون كل كلمه نقولها,الجو والمكان,privacy,ambience_synthetic,False,جنبنا ناس,g108,5,ambience positive — neighbors eavesdropping vs neighbors got our order
+جنبنا ناس استلموا طلبنا بالغلط,دقة الطلب,,ambience_synthetic,True,جنبنا ناس,g108,5,contrastive hard-negative — neighbors eavesdropping vs neighbors got our order
+الافراد ما يقدرون يجلسون بدون عوائل,الجو والمكان,privacy,ambience_synthetic,False,الافراد,g109,5,ambience positive — singles section issue vs singles can't book online
+الافراد ما يقدرون يحجزون اونلاين,التوصيل,,ambience_synthetic,True,الافراد,g109,5,contrastive hard-negative — singles section issue vs singles can't book online
+القسم العائلي يطل على قسم الافراد,الجو والمكان,privacy,ambience_synthetic,False,القسم العائلي,g110,5,ambience positive — family section exposed vs miscalculated family-section bill
+القسم العائلي حسبوا اسعاره غلط في الفاتوره,السعر والقيمة,,ambience_synthetic,True,القسم العائلي,g110,5,contrastive hard-negative — family section exposed vs miscalculated family-section bill
+جلسات العوائل فاضيه بس ما يخلونا نقعد فيها,الجو والمكان,privacy,ambience_synthetic,False,جلسات العوائل,g111,5,ambience positive — family seats restricted vs family seats pricier
+جلسات العوائل اسعارها اعلى من الافراد,السعر والقيمة,,ambience_synthetic,True,جلسات العوائل,g111,5,contrastive hard-negative — family seats restricted vs family seats pricier
+الستاره بين الجلسات شفافه ما تستر,الجو والمكان,privacy,ambience_synthetic,False,الستاره,g112,5,ambience positive — see-through curtain vs dusty curtain
+الستاره الزخرفيه على الجدار مغبره,النظافة,,ambience_synthetic,True,الستاره,g112,5,contrastive hard-negative — see-through curtain vs dusty curtain
+ما فيه ساتر بين كل عائله وعائله,الجو والمكان,privacy,ambience_synthetic,False,الساتر,g113,5,ambience positive — no family partition vs partition blocks waiter
+الساتر للنادل ضيق ما يقدر يخدم,خدمة الموظفين,,ambience_synthetic,True,الساتر,g113,5,contrastive hard-negative — no family partition vs partition blocks waiter
+المكان كئيب وما يفتح النفس,الجو والمكان,general_place_vibe,ambience_synthetic,False,كئيب,g114,5,ambience positive — depressing place vs cold staff
+الموظف كان بارد في التعامل,خدمة الموظفين,,ambience_synthetic,True,كئيب,g114,5,contrastive hard-negative — depressing place vs cold staff
+الجو ثقيل في المطعم ما يستحمل,الجو والمكان,general_place_vibe,ambience_synthetic,False,ثقيل,g115,5,ambience positive — heavy vibe vs heavy bill
+الفاتوره ثقيله على الجيب,السعر والقيمة,,ambience_synthetic,True,ثقيل,g115,5,contrastive hard-negative — heavy vibe vs heavy bill
+الشكل قديم وكأنه من زمان والحمد لله,الجو والمكان,general_place_vibe,ambience_synthetic,False,قديم,g116,5,ambience positive — old-style place vs old food
+الاكل قديم وما يستاهل ابدا,جودة الطعام,,ambience_synthetic,True,قديم,g116,5,contrastive hard-negative — old-style place vs old food
+الفرع مقفل من الداخل ما يفتح النفس,الجو والمكان,general_place_vibe,ambience_synthetic,False,مقفل,g117,5,ambience positive — stuffy interior vs branch closed
+الفرع مقفل اليوم وما حد رد على التلفون,خدمة الموظفين,,ambience_synthetic,True,مقفل,g117,5,contrastive hard-negative — stuffy interior vs branch closed
+الفايب في المكان غريب ما حسيت بالراحه,الجو والمكان,general_place_vibe,ambience_synthetic,False,الفايب,g118,5,ambience positive — weird vibe vs unconvincing menu
+الفايب في المنيو ما يقنع لاختيار الطلب,خدمة الموظفين,,ambience_synthetic,True,الفايب,g118,5,contrastive hard-negative — weird vibe vs unconvincing menu
+المحل متهالك وداخل من زمن ما رمم,الجو والمكان,general_place_vibe,ambience_synthetic,False,متهالك,g119,5,ambience positive — rundown branch vs other branches better-value
+المحل متهالك في الفروع التانيه افضل,السعر والقيمة,,ambience_synthetic,True,متهالك,g119,5,contrastive hard-negative — rundown branch vs other branches better-value
+اللوكيشن سيء واحساس عام مزعج,الجو والمكان,general_place_vibe,ambience_synthetic,False,اللوكيشن,g120,5,ambience positive — bad-feel location vs wrong map pin
+اللوكيشن في الخريطه غلط وضعنا,التوصيل,,ambience_synthetic,True,اللوكيشن,g120,5,contrastive hard-negative — bad-feel location vs wrong map pin
+الاجواء داخل المطعم باله ومش جذابه,الجو والمكان,general_place_vibe,ambience_synthetic,False,الاجواء,g121,5,ambience positive — stale interior vs unappealing menu vibe
+الاجواء العامه للمنيو ما ترغب الزبون,خدمة الموظفين,,ambience_synthetic,True,الاجواء,g121,5,contrastive hard-negative — stale interior vs unappealing menu vibe
+ما يفتح النفس ابدا الجلوس هنا طويل,الجو والمكان,general_place_vibe,ambience_synthetic,False,يفتح النفس,g122,5,ambience positive — place doesn't lift mood vs food doesn't
+ما يفتح النفس الطعم لما تذوقت اول لقمه,جودة الطعام,,ambience_synthetic,True,يفتح النفس,g122,5,contrastive hard-negative — place doesn't lift mood vs food doesn't
+منفس ما قاله الموقع ولكن داخل المطعم خانق,الجو والمكان,general_place_vibe,ambience_synthetic,False,منفس,g123,5,ambience positive — place not airy vs broken delivery-bag vent
+المنفس في الكيس مكسور والاكل بايخ,التوصيل,,ambience_synthetic,True,منفس,g123,5,contrastive hard-negative — place not airy vs broken delivery-bag vent
+شرح الجو فظيع لا تمشي يوم العطل,الجو والمكان,general_place_vibe,ambience_synthetic,False,شرح,g124,5,ambience positive — place atmosphere bad vs bad menu explanation
+شرح الموظف للمنيو فظيع ما فهمنا شي,خدمة الموظفين,,ambience_synthetic,True,شرح,g124,5,contrastive hard-negative — place atmosphere bad vs bad menu explanation
+المكروف القديم في الجو ما تجاوبنا معه,الجو والمكان,general_place_vibe,ambience_synthetic,False,المكروف,g125,5,ambience positive — stale microwave-feel vs stale microwaved food
+المكروف في الكيك قديم وما متماسك,جودة الطعام,,ambience_synthetic,True,المكروف,g125,5,contrastive hard-negative — stale microwave-feel vs stale microwaved food
