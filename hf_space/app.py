@@ -512,7 +512,7 @@ body.dark #theme-toggle .icon-moon { display: none; }
     font-size: clamp(0.95rem, 1.3vw, 1.05rem);
     color: var(--ink-muted);
     line-height: 1.7;
-    margin: 0 0 36px;
+    margin: 0 0 36px auto;
     max-width: 60ch;
     direction: rtl;
     text-align: right;
