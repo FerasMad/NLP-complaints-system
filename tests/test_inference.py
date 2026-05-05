@@ -35,21 +35,24 @@ def classifier(ensemble_config_path):
 @pytest.mark.parametrize("text,expected", CANARIES)
 def test_canary_predictions(classifier, text, expected):
     """Each canary input must classify to its expected category."""
-    cat, conf, top3 = classifier.predict(text)
-    assert cat == expected, f"text={text!r} expected={expected} got={cat} (conf={conf:.2%}, top3={top3})"
+    result = classifier.predict(text)
+    assert result.category == expected, (
+        f"text={text!r} expected={expected} got={result.category} "
+        f"(conf={result.confidence:.2%}, top_3={result.top_3})"
+    )
 
 
 @pytest.mark.gpu
 @pytest.mark.integration
-def test_predict_returns_8_classes_in_top3(classifier):
+def test_predict_returns_top3_valid_cats(classifier):
     """Top-3 should always have 3 entries with valid category names."""
-    cat, conf, top3 = classifier.predict("الاكل بايخ")
-    assert len(top3) == 3
+    result = classifier.predict("الاكل بايخ")
+    assert len(result.top_3) == 3
     valid_cats = {
         "التوصيل", "السعر والقيمة", "النظافة", "جودة الطعام",
         "خدمة الموظفين", "دقة الطلب", "عامة", "وقت الانتظار",
     }
-    for c, p in top3:
+    for c, p in result.top_3:
         assert c in valid_cats, f"unexpected category {c!r}"
         assert 0.0 <= p <= 1.0, f"invalid probability {p}"
 
@@ -57,9 +60,7 @@ def test_predict_returns_8_classes_in_top3(classifier):
 @pytest.mark.gpu
 @pytest.mark.integration
 def test_predict_too_short(classifier):
-    """Very short input returns empty / category zero confidence."""
-    cat, conf, top3 = classifier.predict("ا")
-    # Behavior: ensemble_inference returns zero-prob array → argmax is index 0
-    # The predict() function doesn't error; just returns whatever has the highest tied prob
-    # We don't assert a specific category, just that it doesn't crash
-    assert isinstance(cat, str)
+    """Very short input abstains via too_short reason; no crash."""
+    result = classifier.predict("ا")
+    assert result.abstain_reason == "too_short"
+    assert result.category is None
