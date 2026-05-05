@@ -13,6 +13,9 @@ tags:
   - saudi
   - dialectal-arabic
   - complaints
+  - restaurant-reviews
+  - aspect-classification
+  - ambience-detection
 metrics:
   - accuracy
   - f1
@@ -50,8 +53,11 @@ widget:
 
 Single-label classification of Arabic restaurant complaints into 8 actionable categories. Specialized for Saudi-Gulf dialect; trained on ~98K reviews from Saudi delivery platforms (HungerStation, Jahez, Mrsool, Talabat) plus production data.
 
+This model card covers the **production 8-class model** (deployed) and the **v5 ambience experiment** (research-stage 9-class model with a re-introduced الجو والمكان class).
+
 Live demo: <https://huggingface.co/spaces/FerasMad/arabic-complaints-classifier>
 Source: <https://github.com/FerasMad/NLP-complaints-system>
+Companion dataset (v5 work): <https://huggingface.co/datasets/FerasMad/arabic-restaurant-ambience>
 
 ## Categories
 
@@ -98,7 +104,7 @@ Triage and routing of Arabic restaurant feedback for Saudi/Gulf operators. Use c
   - Egyptian / MSA: ~50%
   - For non-Gulf dialects, treat predictions as advisory.
 - **Domain bound to restaurants.** The model was trained on restaurant complaints only. Don't apply to other product categories without retraining.
-- **No "ambiance" category.** v3 had a "الجو والمكان" class; v4 dropped it after a manual audit found ~99% of the gold labels were noise. If you need ambiance signals, this isn't the right model.
+- **No ambience category in production model.** v3 had a "الجو والمكان" class; v4 dropped it after a manual audit found ~99% of the gold labels were noise. The production 8-class model does not predict ambience. **A 9-class v5 experiment exists** that re-introduces ambience — see "V5 ambience experiment" section below. The v5 model achieves **89.22% ambience F1** on a hand-crafted adversarial fixture but is research-stage, not deployed.
 - **No abstain mechanism in the raw model.** The deployed Space adds short-input abstain (length < 3 chars) and reframes "عامة" predictions as "no specific aspect detected." If you call the model directly, you won't get those guards.
 - **PII handling is the caller's responsibility.** The model has no built-in PII scrubbing.
 
@@ -147,6 +153,63 @@ The deployed system uses an ensemble of 4 BERT variants (CAMeLBERT-mix × 2 seed
 - Cross-dialect canary set written by hand to probe dialect generalization
 - Behavioral audit: 34 hand-written test cases (single + multi-aspect) covering all 8 categories — this is what the deployed rescue layer optimizes for
 
+## V5 ambience experiment (9-class, research-stage)
+
+After the 8-class production model shipped, the v3-dropped ambience class
+was re-attempted from scratch with new infrastructure: PySarf morphology,
+weak-labeled real data from public HF datasets, MLM continued pre-training
+on 45K Arabic restaurant + hotel reviews, focal loss, and threshold-tuned
+inference. Three models exist (all research-stage, not deployed):
+
+| Model | Adversarial Ambience F1 | Real-world test Ambience F1 | Best for |
+|---|---:|---:|---|
+| Run 4 (`models/single_ambience_v1_pretrained`) | **89.22%** | 69.19% | Adversarial benchmark |
+| Run 5 (`models/single_ambience_v1_pretrained_v2`) | 88.24% | **94.09%** | Real-world deployment |
+| Run 4 + Run 5 ensemble (softmax averaging) | 88.15% | (~80-85% expected) | Best real-world balance |
+
+All three apply a post-hoc decision threshold (`ambience_threshold ∈ [0.005, 0.02]`)
+and an abstain wrapper (length gate + restaurant-domain OOD gate) at inference.
+
+### V5 evaluation methodology
+
+- **Adversarial fixture:** 183 hand-written cases across 13 attack types
+  (clean, boundary, negation, sarcasm, mixed dialect, multi-aspect, short,
+  very_short, long, out_of_domain, typo, emoji, adversarial). Released as
+  part of the [companion dataset](https://huggingface.co/datasets/FerasMad/arabic-restaurant-ambience).
+- **Real-world val/test:** 15% / 15% stratified splits of the combined
+  baseline (95K rows) + 5,000 weak-labeled HARD ambience candidates.
+
+### V5 ambience class metrics (Run 4, threshold 0.01 + abstain)
+
+| Metric | Value |
+|---|---:|
+| Ambience precision | 86.67% |
+| Ambience recall | 91.92% |
+| Ambience F1 | 89.22% |
+| Per-attack-type pass rate (worst) | out_of_domain 50% |
+| Per-attack-type pass rate (best) | sarcasm + emoji + short + very_short = 100% |
+
+### V5 known limitations
+
+- **Multi-aspect cases stuck at 40%** — single-label classification can't
+  decompose "الاكل بارد والمكيف خربان". Multi-label retraining is the
+  only structural fix.
+- **Out-of-domain handling at 50%** — abstain wrapper catches half. A
+  dedicated OOD classifier as a preprocessing gate would close more.
+- **Trained on weak-labeled real data**, not gold-labeled. The 1,256
+  qaym + HARD ambience candidates have ~50-80% precision per sampling.
+  Hand-labeling would push F1 higher.
+
+### Reproducing v5
+
+Full waves 7-10 documented at:
+
+- `docs/V5_TRAINING_RUN_1_RESULTS.md` — initial baseline (78.57% F1)
+- `docs/V5_TRAINING_RUN_2_THRESHOLD_TUNING.md` — threshold to 85.56%
+- `docs/V5_TRAINING_RUN_3_REAL_DATA_AND_ABSTAIN.md` — 24K real candidates harvested
+- `docs/V5_TRAINING_RUN_4_PRETRAINED.md` — MLM + weak labels = 89.22%
+- `docs/V5_TRAINING_RUN_5_HARD_DATA.md` — 5x data, mixed signal
+
 ## Credits
 
 Built by the NLP team at AI Club:
@@ -171,6 +234,8 @@ Special thanks to **Rashidbm** for [PySarf](https://github.com/Rashidbm/pysarf) 
   author = {Madkhali, Feras and the AI Club NLP Team},
   year   = {2026},
   url    = {https://github.com/FerasMad/NLP-complaints-system},
-  note   = {Saudi-Gulf dialect specialization, 8-class single-label}
+  note   = {Saudi-Gulf dialect specialization. 8-class production model
+            + 9-class v5 ambience experiment (89.22% adversarial F1).
+            Companion dataset at huggingface.co/datasets/FerasMad/arabic-restaurant-ambience}
 }
 ```
