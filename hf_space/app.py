@@ -88,15 +88,30 @@ EMPTY_RESULT = """
 """
 
 
+def is_multi_aspect(top: list[tuple[str, float]]) -> bool:
+    """Heuristic: top-1 < 70% AND top-2 > 30% means competing signals."""
+    if len(top) < 2:
+        return False
+    return top[0][1] < 0.70 and top[1][1] > 0.30
+
+
 def render_result(top: list[tuple[str, float]]) -> str:
     if not top:
         return EMPTY_RESULT
+
+    multi = is_multi_aspect(top)
+
     rows = []
     for rank, (cat, score) in enumerate(top):
         en = CATEGORIES_EN.get(cat, "")
         pct = f"{score * 100:.0f}%"
+        # Multi-aspect: rank 1 + 2 both get the primary treatment
+        if multi and rank < 2:
+            row_class = "result-row result-rank-co1"
+        else:
+            row_class = f"result-row result-rank-{rank + 1}"
         rows.append(
-            f'<div class="result-row result-rank-{rank + 1}">'
+            f'<div class="{row_class}">'
             f'  <div class="result-meta">'
             f'    <span class="result-rank">#{rank + 1}</span>'
             f'    <span class="result-en">{en}</span>'
@@ -105,7 +120,20 @@ def render_result(top: list[tuple[str, float]]) -> str:
             f'  <div class="result-pct">{pct}</div>'
             f'</div>'
         )
-    return f'<div class="result-stack">{"".join(rows)}</div>'
+
+    badge = ""
+    if multi:
+        badge = (
+            '<div class="multi-aspect-badge">'
+            '  <span class="multi-aspect-mark">⊕</span>'
+            '  <span class="multi-aspect-text">'
+            '    <strong>تشمل الشكوى أكثر من جانب</strong>'
+            '    <span>multi-aspect complaint, both top categories shown together</span>'
+            '  </span>'
+            '</div>'
+        )
+
+    return f'{badge}<div class="result-stack">{"".join(rows)}</div>'
 
 
 def render_message(headline_ar: str, headline_en: str) -> str:
@@ -667,6 +695,55 @@ body.dark .result-rank-2 { border-color: rgba(138, 148, 104, 0.30); }
 .result-rank-3 .result-cat { color: var(--ink-muted); font-weight: 700; }
 .result-rank-3 .result-pct { color: var(--ink-muted); }
 .result-rank-3 .result-rank { color: var(--ink-muted); }
+
+/* Multi-aspect: rank 1 and 2 share equal visual weight */
+.result-rank-co1 { background: var(--terracotta); color: #F5EFE6; }
+.result-rank-co1 .result-rank,
+.result-rank-co1 .result-cat,
+.result-rank-co1 .result-pct { color: #F5EFE6; }
+.result-rank-co1 .result-en { color: rgba(245, 239, 230, 0.75); }
+.result-rank-co1:nth-of-type(2) { background: var(--terracotta-deep); }
+
+.multi-aspect-badge {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    background: var(--olive-tint);
+    border: 1px solid rgba(95, 104, 69, 0.30);
+    border-radius: 12px;
+    direction: rtl;
+}
+
+body.dark .multi-aspect-badge { border-color: rgba(138, 148, 104, 0.40); }
+
+.multi-aspect-mark {
+    font-size: 1.4rem;
+    color: var(--olive);
+    line-height: 1;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.multi-aspect-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.multi-aspect-text strong {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.multi-aspect-text span {
+    font-size: 0.82rem;
+    color: var(--ink-muted);
+    direction: ltr;
+    text-align: right;
+}
 
 /* Loading pulse during prediction */
 .gradio-container .pending #result_panel { animation: pulse 1.6s ease-in-out infinite; }
