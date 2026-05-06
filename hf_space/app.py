@@ -527,14 +527,31 @@ RESCUE_RULES: list[tuple[str, list[str]]] = [
 ]
 
 
-def apply_rescue(probs, cleaned_text: str, rescue_floor: float = 0.55):
-    """If an unambiguous keyword is present, force its category to top.
+def apply_rescue(
+    probs,
+    cleaned_text: str,
+    rescue_floor: float = 0.55,
+    other_class_dampening: float = 0.30,
+):
+    """If an unambiguous keyword is present, force its category to top
+    AND suppress the other categories so the rail reflects the rescue
+    decision instead of the model's pre-rescue prior.
 
-    Conservative: only rescue when phrase clearly indicates one category.
-    Audit-validated: takes the model from 85% to 100% on a 34-case audit set
-    (see src/audit_predictions.py), trade-off is ~0.9% on held-out test.
+    Why dampening exists: the original asymmetric rescue (boost target only)
+    produced rails like "51% wait time / 49% food quality" on pure
+    wait-time complaints. Root cause: the model has a strong food-quality
+    prior (47% of training data is food complaints), so even after rescue
+    sets the wait floor, the original 0.95 food probability re-normalizes
+    to ~0.49. The rail looked like the model was hedging when it was
+    actually rescue-overridden. Dampening other classes by 70% before
+    re-normalize gives a cleaner ~78%/22% split that matches user intent.
+
+    Conservative: only rescues when phrase clearly indicates one category.
+    Audit-validated: takes the model from 85% to 100% on the behavioral
+    audit set (see src/audit_predictions.py); held-out test cost is ~0.9%.
     """
     out = probs.copy()
+    rescued_idx = None
     for cat, phrases in RESCUE_RULES:
         if cat not in CATEGORY_TO_ID:
             continue
@@ -542,6 +559,16 @@ def apply_rescue(probs, cleaned_text: str, rescue_floor: float = 0.55):
             cat_idx = CATEGORY_TO_ID[cat]
             current_max = float(out.max())
             out[cat_idx] = max(out[cat_idx], current_max + 0.05, rescue_floor)
+            rescued_idx = cat_idx
+            break  # only one rescue fires per row — first match wins
+
+    # When rescue fired, dampen the other classes so the rail reflects
+    # the rescue's confidence instead of the model's original prior.
+    if rescued_idx is not None:
+        for i in range(len(out)):
+            if i != rescued_idx:
+                out[i] *= other_class_dampening
+
     s = out.sum()
     if s > 0:
         out = out / s
