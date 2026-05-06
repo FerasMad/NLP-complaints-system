@@ -453,23 +453,39 @@ def render_result(
 
     multi = is_multi_aspect(top, by_aspect)
 
+    # Visual-only design — no percentages displayed.
+    # Why: post-rescue softmax values don't communicate truthful confidence
+    # (rescue is a deterministic override, the residual prior on dampened
+    # classes is an artifact, not a real model belief). Showing 22% on a
+    # rescue-overridden runner-up implies hedging that isn't there.
+    #
+    # Behavior:
+    #   - Multi-aspect (text mentions ≥2 aspect categories): show top 2 as
+    #     equal-weight badges side-by-side — the user sees both legitimate
+    #     interpretations.
+    #   - Single confident prediction: show ONE clean badge for the rescued
+    #     / top-1 category. No runner-ups.
     rows = []
-    for rank, (cat, score) in enumerate(top):
+    if multi:
+        for rank, (cat, _score) in enumerate(top[:2]):
+            en = CATEGORIES_EN.get(cat, "")
+            rows.append(
+                f'<div class="result-row result-rank-co1">'
+                f'  <div class="result-meta">'
+                f'    <span class="result-en">{en}</span>'
+                f'  </div>'
+                f'  <div class="result-cat">{cat}</div>'
+                f'</div>'
+            )
+    else:
+        cat, _score = top[0]
         en = CATEGORIES_EN.get(cat, "")
-        pct = f"{score * 100:.0f}%"
-        # Multi-aspect: rank 1 + 2 both get the primary treatment
-        if multi and rank < 2:
-            row_class = "result-row result-rank-co1"
-        else:
-            row_class = f"result-row result-rank-{rank + 1}"
         rows.append(
-            f'<div class="{row_class}">'
+            f'<div class="result-row result-rank-1 result-rank-solo">'
             f'  <div class="result-meta">'
-            f'    <span class="result-rank">#{rank + 1}</span>'
             f'    <span class="result-en">{en}</span>'
             f'  </div>'
             f'  <div class="result-cat">{cat}</div>'
-            f'  <div class="result-pct">{pct}</div>'
             f'</div>'
         )
 
