@@ -5,6 +5,7 @@ golden-hour SVG hero, overlapping stats strip, classify, performance charts,
 inline about, and footer. Light + dark themes (toggle top-right). Almarai font.
 """
 import base64
+import html
 import os
 import re
 from pathlib import Path
@@ -245,6 +246,11 @@ def extract_aspects(cleaned_text: str) -> tuple[list[tuple[int, int, str, str]],
         matches: list of (start, end, aspect, matched_phrase) sorted by start
         by_aspect: {aspect_name: [matched_phrases]}
     """
+    # Defensive: clean() is idempotent. Callers SHOULD pass cleaned text,
+    # but if raw text arrives (e.g., a future caller forgets) we still want
+    # alif/taa-marbuta folding to apply so phrase matching works.
+    # (Adversarial Q&A I-8.)
+    cleaned_text = clean(cleaned_text)
     raw_matches: list[tuple[int, int, str, str]] = []
 
     # Pass 1: phrase matching (exact substring with prefix-tolerant boundary)
@@ -297,24 +303,29 @@ def extract_aspects(cleaned_text: str) -> tuple[list[tuple[int, int, str, str]],
 
 
 def annotate_text(text: str, matches: list[tuple[int, int, str, str]]) -> str:
-    """Wrap matched ranges with <mark> spans tagged by aspect."""
+    """Wrap matched ranges with <mark> spans tagged by aspect.
+
+    User text is escaped before HTML interpolation — the inner-text path is
+    fragile-by-construction and Gradio's outer sanitizer does not cover
+    template-string interpolation. (Code audit XSS finding.)
+    """
     if not matches:
-        return text
+        return html.escape(text)
     out = []
     last = 0
     for s, e, aspect, _phrase in matches:
         if s > last:
-            out.append(text[last:s])
+            out.append(html.escape(text[last:s]))
         css = ASPECT_CSS_ID.get(aspect, "other")
         out.append(
             f'<mark class="aspect-mark aspect-{css}" '
-            f'title="{CATEGORIES_EN.get(aspect, aspect)}">'
-            f'{text[s:e]}'
+            f'title="{html.escape(CATEGORIES_EN.get(aspect, aspect))}">'
+            f'{html.escape(text[s:e])}'
             f'</mark>'
         )
         last = e
     if last < len(text):
-        out.append(text[last:])
+        out.append(html.escape(text[last:]))
     return "".join(out)
 
 
@@ -338,7 +349,7 @@ def render_understanding(
             '    <span class="understanding-eyebrow">how I read this</span>'
             '    <strong>كيف فهمت شكواك</strong>'
             '  </div>'
-            f'  <div class="understanding-text">{cleaned_text}</div>'
+            f'  <div class="understanding-text">{html.escape(cleaned_text)}</div>'
             '  <p class="understanding-note">'
             '    لم أجد أي كلمة تشير إلى جانب محدد في النص. '
             '    <em>no aspect-specific words detected.</em>'
@@ -357,12 +368,14 @@ def render_understanding(
         for p in phrases:
             if p not in seen:
                 seen.append(p)
-        sample = "، ".join(seen[:4])
+        # Escape user-derived `seen` phrases; aspect/en come from internal
+        # constants and don't need escaping but we apply for safety.
+        sample = "، ".join(html.escape(s) for s in seen[:4])
         chips.append(
             f'<div class="aspect-chip aspect-{css}">'
             f'  <span class="aspect-chip-label">'
-            f'    <span class="aspect-chip-cat">{aspect}</span>'
-            f'    <span class="aspect-chip-en">{en}</span>'
+            f'    <span class="aspect-chip-cat">{html.escape(aspect)}</span>'
+            f'    <span class="aspect-chip-en">{html.escape(en)}</span>'
             f'  </span>'
             f'  <span class="aspect-chip-evidence">{sample}</span>'
             f'</div>'
@@ -1856,10 +1869,12 @@ footer { display: none !important; }
 ABOUT_HTML = """
 <div class="about-prose">
   <p>
-    نموذج <strong>CAMeLBERT-mix</strong> تدرّب على ٩٨ ألف شكوى عربية حقيقية،
+    نموذج <strong>CAMeLBERT-mix</strong> تدرّب على ٩٥ ألف شكوى عربية حقيقية،
     معظمها من تطبيقات التوصيل السعودية. مخصّص للّهجة السعودية والخليجية.
-    على مجموعة اختبار مستقلّة من ١٣٬٩٨٦ مراجعة، الدقّة <strong>٩٥٫٠٥٪</strong>
-    بفاصل ثقة ٩٥٪ بين ٩٤٫٧٠٪ و ٩٥٫٤١٪. كل الفئات الثماني فوق ٨٠٪ F1.
+    على مجموعة اختبار مستقلّة من ١٣٬٩٨٦ مراجعة، دقّة الـ<em>ensemble</em> الكامل
+    (٤ نماذج) <strong>٩٥٫٠٥٪</strong> بفاصل ثقة ٩٥٪ بين ٩٤٫٧٠٪ و ٩٥٫٤١٪.
+    النموذج المنشور هنا هو أفضل نموذج فردي من هذا الـ<em>ensemble</em>،
+    وكل الفئات الثماني فوق ٨٠٪ F1.
   </p>
 </div>
 """
@@ -1910,8 +1925,8 @@ with gr.Blocks(
             <div class="eyebrow">Arabic Restaurant Complaints Classifier</div>
             <h1>تصنيف شكاوى المطاعم العربية</h1>
             <p class="lede">
-              نموذج عربي تدرّب على ٩٨٬٠٠٠ شكوى حقيقية من تطبيقات التوصيل السعودية،
-              يصنّف أي شكوى إلى واحدة من ٨ فئات بدقّة ٩٥٪.
+              نموذج عربي تدرّب على ٩٥ ألف شكوى حقيقية من تطبيقات التوصيل السعودية،
+              يصنّف أي شكوى إلى واحدة من ٨ فئات.
             </p>
           </div>
         </section>

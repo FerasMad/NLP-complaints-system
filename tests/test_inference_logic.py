@@ -36,10 +36,15 @@ class TestCleanArabic:
         assert "ة" not in clean_arabic("مدينة")
 
     def test_strips_punctuation(self):
+        # Non-Arabic punctuation (!, %, etc.) is stripped. Arabic punctuation
+        # (، . ; etc.) is in the U+0600-U+06FF block and is KEPT — it's part
+        # of normal Arabic text. Matches hf_space/app.py:53 NON_ARABIC regex.
         out = clean_arabic("الاكل!!! بايخ ، ، ،")
         assert "!" not in out
-        assert "،" not in out
         assert "بايخ" in out
+        # Arabic comma intentionally preserved — change this test only if the
+        # cleaning policy itself changes (don't remove the comma in the regex).
+        assert "،" in out
 
     def test_preserves_arabic_indic_digits(self):
         # 0-9 (Latin) and ٠-٩ (Arabic-Indic) both kept

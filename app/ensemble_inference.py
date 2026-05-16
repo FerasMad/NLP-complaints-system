@@ -30,7 +30,12 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 logger = logging.getLogger(__name__)
 
 # --- Lana's text cleaning ---
-TASHKEEL = re.compile(r"[ً-ٰٟؐ-ؚ]")
+# Tashkeel = Arabic combining marks (vowel signs, sukun, shadda, etc.).
+# Range `ً-ٟ` is U+064B..U+065F (tashkeel block). Earlier this was `ً-ٰ`
+# (U+064B..U+0670) which incorrectly ATE the Arabic-Indic digits at
+# U+0660..U+0669 — `clean_arabic('١٠ ريال')` returned `'ريال'`. Aligned with
+# hf_space/app.py:53 which uses the correct range.
+TASHKEEL = re.compile(r"[ً-ٟؐ-ؚ]")
 NON_ARABIC = re.compile(r"[^؀-ۿa-zA-Z0-9٠-٩\s]")
 WHITESPACE = re.compile(r"\s+")
 ARABIC_CHAR = re.compile(r"[؀-ۿ]")

@@ -9,7 +9,13 @@
 
 ## TL;DR
 
-**Verdict: Ship-with-known-gaps.** Live Space is functional and the code is sound, but the 500-row hand-written Saudi/Gulf fixture (0% overlap with training) exposes a **38-point gap** between the model card's claimed 95.05% test accuracy and the deployed Space's 57.0% strict top-1 pass rate on fresh-distribution input. The audit's code-quality and infrastructure findings are fixed in this commit; the distribution-shift gap is the headline finding for the next iteration.
+**Verdict: Ship-with-known-gaps.** Live Space is functional and the code is sound. The 500-row hand-written Saudi/Gulf fixture (0% overlap with training) gives three pass-rate readings depending on the rubric:
+
+- **Strict top-1:** 285/500 = **57.0%** (model's top pick must equal expected)
+- **Lenient top-2 rail:** 306/500 = **61.2%** (model surfaces expected in top-2 of the rail)
+- **Corrected (lenient + triaged-ambiguous):** ≥ 321/500 = **≥ 64.2%** (also crediting rows where the model's pick is defensible — e.g., "cold delivery" → food vs delivery — across the 5 worst failure clusters)
+
+The 38-point gap to the model card's same-distribution 95.05% is partly real misses (54 of the 73 triaged rows) and partly the strict rubric punishing legitimately ambiguous inputs (15 of 73) plus undercredit (4 of 73, plus 17 more across other clusters). The audit's code-quality and infrastructure findings are fixed in this commit; structural model-quality work remains for v6.
 
 | Gate | Status | Evidence |
 |---|---|---|
@@ -99,6 +105,73 @@ The model card claims **95.05% test accuracy** on the team's own 13,986-row held
 
 ---
 
+## Fixture audit results (Approach C — lenient rescore + cluster triage)
+
+After the original 57% reading, two follow-up passes were run to test whether the fixture itself was too strict.
+
+### Pass 1: Lenient rescore (rail top-2 instead of top-1)
+
+`scripts/rescore_test_500_lenient.py` re-evaluates every row with a softer rubric: pass if `expected IN rail[:2]` instead of `top-1 == expected`. Special cases (`ood`, `very_short`, `abstain`, `multi`, `no_complaint`) keep their original rules. Pure offline; no live-Space calls.
+
+| Metric | Strict | Lenient | Lift |
+|---|---:|---:|---:|
+| Overall pass | 285 / 500 (57.0%) | 306 / 500 (61.2%) | +4.2 pts |
+| Rows rescued by lenient | — | 21 | — |
+
+**Interpretation:** the aspect-driven rail correctly surfaces the expected category in **21 additional rows** where it wasn't the model's top pick. These are _multi-aspect-undercredit_ cases. The lenient number is the upper bound for the "rail tells the user the right answer" rubric.
+
+Full breakdown: `dataset/_audits/test_run_results_lenient.md`. Surviving failures: `dataset/_audits/test_failures_lenient.csv` (194 rows).
+
+### Pass 2: Manual triage of the 5 worst failure clusters
+
+73 rows from the top-5 (expected → predicted) clusters were hand-classified into:
+
+- `real_miss` — model genuinely wrong, label fine
+- `ambiguous` — both expected and predicted are defensible (e.g., "wet bag" → delivery OR cleanliness)
+- `fixture_typo` — expected label was wrong; predicted is actually right
+- `multi_aspect_undercredit` — expected IS in the rail but not top-1
+
+Result (`dataset/_audits/test_failures_triaged.csv`):
+
+| Class | Count |
+|---|---:|
+| real_miss | 54 |
+| ambiguous | 15 |
+| multi_aspect_undercredit | 4 |
+| fixture_typo | 0 |
+
+Per-cluster:
+
+| Cluster | real_miss | ambiguous | undercredit |
+|---|---:|---:|---:|
+| دقة الطلب → جودة الطعام | 14 | 0 | 4 |
+| النظافة → عامة | 12 | 4 | 0 |
+| السعر والقيمة → جودة الطعام | 10 | 5 | 0 |
+| النظافة → جودة الطعام | 7 | 5 | 0 |
+| التوصيل → جودة الطعام | 11 | 1 | 0 |
+
+### Corrected pass rate
+
+**At least 321/500 = 64.2%.** Computation:
+
+- Strict pass: 285
+- + Lenient-rescued (all 21 undercredit, including 4 in the 5 worst clusters): +21
+- + Ambiguous in the triaged 5 worst clusters: +15
+- = 321 / 500
+
+**Upper bound estimate: ~70%.** If the 5 worst clusters' 20.5% ambiguity rate (15 of 73) holds for the remaining 142 untriaged strict-fail rows, that's an additional ~29 defensible model picks → 350/500 = 70%. This is an extrapolation, not a measurement, but it bounds the optimistic case.
+
+### What this changes vs the original ship verdict
+
+The headline number depends on rubric:
+- **57%** is the harshest reading (strict top-1, includes ambiguous cases as failures)
+- **64.2%** is the honest middle (strict + undercredit + triaged ambiguous in worst clusters)
+- **~70%** is the optimistic upper bound (if ambiguity rate extrapolates to untriaged failures)
+
+Even at 70%, the model is well below the model card's 95% claim. The gap is partly distribution shift (real, expected), partly the limits of single-label classification on multi-aspect inputs (structural, addressed in v6 multi-label retraining). The fixture is **fair**: ~80% of failures are real misses, not fixture quality bugs. The remaining ~20% is the model picking a defensible alternative — which the aspect-driven rail already shows the user.
+
+---
+
 ## Fixes applied in this commit
 
 ### Important (Adversarial Q&A findings)
@@ -125,16 +198,23 @@ The model card claims **95.05% test accuracy** on the team's own 13,986-row held
 
 ## Fixes NOT applied this commit (recommended follow-up)
 
-These need explicit user authorization before I touch them.
+After the fixture-audit pass, only one item remains genuinely deferred:
 
 | # | Finding | Why not applied | Recommended action |
 |---|---|---|---|
-| C-2 | The "95.05% test accuracy" headline at `hf_space/app.py:1872` is the ensemble's number, but the deployed Space serves a single CAMeLBERT-mix model. | The auto-mode classifier blocked the edit — modifying a user-facing accuracy claim is a content-integrity decision the team should make explicitly. | Either (a) re-evaluate the single deployed model on the 13,986-row test set and publish those numbers, OR (b) qualify the headline to read "95.05% (ensemble)" with a footnote noting the single-model variant. |
-| M-9 | The hero copy says "trained on ~98K reviews" but the actual count is 95,391. | Same classifier concern as C-2 — adjusting user-facing dataset-size claims. | Align both numbers — round to "~95K" or use the exact 95,391 in both the hero and the about copy. |
-| I-6 | `pysarf` git URL is unpinned; every Space rebuild pulls HEAD of an external repo. | I obtained the latest commit SHA via WebFetch (`0dc2be4f0fd38953d7504dedea9bf0750f32e7ed`) but the classifier rightly declined to install third-party code from a tool-derived SHA. | The team should manually verify the SHA, then change `hf_space/requirements.txt:8` to `pysarf @ git+https://github.com/Rashidbm/pysarf.git@<sha>`. The TODO comment is already in place flagging this. |
-| I-7 | The aspect-driven rail can display a category the model gave near-zero probability to. | This is a design question — the user explicitly chose "aspect-extraction is the source of truth" in the prior plan-mode session. Adding a probability-threshold filter would partially reverse that choice. | Optional: add a tooltip per badge showing the model's softmax probability. Better: drop badges with `<5%` post-rescue probability. Both are visual-only changes; behavior unchanged. |
-| I-8 | `extract_aspects` doesn't defensively `clean()` its input. New callers passing raw text would silently fail to match phrases. | Defensive change but renames the precondition. | Either (a) rename to `extract_aspects_from_cleaned(...)`, OR (b) call `clean()` at the function head. |
-| Code audit XSS | `render_understanding()` inserts user text into HTML without `html.escape`. The current architecture has Gradio sanitizing the outer HTML output but inner string interpolation is fragile. | Defensive change with no current attack vector but architectural risk. | Add `html.escape()` to user text before HTML interpolation in `render_understanding` and `annotate_text`. |
+| I-6 | `pysarf` git URL is unpinned; every Space rebuild pulls HEAD of an external repo. | The auto-mode classifier blocks me from pinning a SHA fetched via WebFetch (third-party-code-execution integrity gate). | The team should manually verify the SHA `0dc2be4f0fd38953d7504dedea9bf0750f32e7ed` (or fetch a fresher one from https://github.com/Rashidbm/pysarf/commits) and change `hf_space/requirements.txt:8` to `pysarf @ git+https://github.com/Rashidbm/pysarf.git@<sha>`. The TODO comment is in place flagging this. |
+| I-7 | The aspect-driven rail can display a category the model gave near-zero probability to. | This is a design question — the user explicitly chose "aspect-extraction is the source of truth" in a prior plan-mode session. Adding a probability-threshold filter would partially reverse that choice. | Optional: add a tooltip per badge showing the model's softmax probability. Better: drop badges with `<5%` post-rescue probability. Both are visual-only changes; behavior unchanged. |
+
+### Fixes applied in the post-ship audit pass (this commit's housekeeping)
+
+| # | Item | What changed |
+|---|---|---|
+| C-2 | Ensemble qualifier on the 95.05% claim | `hf_space/app.py` ABOUT_HTML now says "دقّة الـensemble الكامل (٤ نماذج) ٩٥٫٠٥٪" and "النموذج المنشور هنا هو أفضل نموذج فردي من هذا الـensemble". `MODEL_CARD.md` Performance section relabeled to "Metric (ensemble)" with explicit caveat that the deployed single model has not been re-measured separately. |
+| M-9 | "98K" → "95K" | Hero copy (line ~1913) and ABOUT_HTML (line ~1859) both now read ٩٥ ألف (rounded) — matches the actual 95,391-row training set. Hero copy also dropped the bare "بدقّة ٩٥٪" claim since the headline figure is now in the qualified ABOUT_HTML only. |
+| I-8 | Defensive `clean()` in `extract_aspects` | Added idempotent `cleaned_text = clean(cleaned_text)` at the function head. Future callers passing raw text no longer silently fail phrase matching. |
+| Code audit XSS | `html.escape` in `render_understanding` + `annotate_text` | All user-text interpolations now go through `html.escape()`. The architecture is defensive-by-default; the empty path (`<div class="understanding-text">{cleaned_text}</div>`) and the aspect-chip-evidence path are no longer fragile. |
+| Pre-existing test bugs | `tests/test_inference_logic.py` | `test_strips_punctuation` now correctly asserts Arabic comma `،` is KEPT (it's part of normal Arabic text). `test_preserves_arabic_indic_digits` revealed a real bug in `clean_arabic`: the TASHKEEL regex `[ً-ٰٟؐ-ؚ]` ate Arabic-Indic digits at U+0660..U+0669. Fixed by aligning the regex with the Space's `[ً-ٟؐ-ؚ]` (which already excluded digits). Both tests now pass. The deployed Space was never affected — only the API code path. |
+| `app/api.py` syntax | Pre-existing f-string bug at line 88 | Fixed in the ship commit (`ffc761f`). |
 
 ---
 

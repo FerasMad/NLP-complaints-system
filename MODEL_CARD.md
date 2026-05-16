@@ -74,9 +74,9 @@ Companion dataset (v5 work): <https://huggingface.co/datasets/FerasMad/arabic-re
 
 ## Performance
 
-Held-out test set of 13,986 real reviews, never seen in training:
+Held-out test set of 13,986 real reviews, never seen in training. **These numbers are for the full 4-model ensemble.** The deployed Space uses the single best CAMeLBERT-mix model from this ensemble; its standalone accuracy on this test set has not been re-measured separately.
 
-| Metric | Value |
+| Metric (ensemble) | Value |
 |---|---:|
 | Accuracy | 95.05% |
 | Weighted F1 | 95.08% |
@@ -86,6 +86,18 @@ Held-out test set of 13,986 real reviews, never seen in training:
 | ECE (after temperature scaling, T=1.523) | 0.014 |
 
 The keyword-rescue layer in the deployed Space trades 0.93% test accuracy for a 15-point gain on a 34-case behavioral audit (85% → 100%). See the GitHub repo for the rescue logic and audit set.
+
+### Cross-distribution evaluation (post-ship)
+
+A 500-row hand-written Saudi/Gulf fixture (0% overlap with training) was scored against the live Space (commit 6f91ad5):
+
+| Rubric | Pass rate |
+|---|---:|
+| Strict top-1 | 57.0% |
+| Lenient (expected in top-2 rail) | 61.2% |
+| Corrected (lenient + triaged-ambiguous) | ≥ 64.2% |
+
+The fixture and audit reports are at `dataset/_audits/` in the GitHub repo. The 30-point gap to the same-distribution test accuracy is partly real misses (~75% of failures), partly legitimately ambiguous inputs (~20%), and partly multi-aspect-undercredit (~5%). See `dataset/_audits/SHIP_READINESS.md` for the full reading.
 
 ## Intended use
 
