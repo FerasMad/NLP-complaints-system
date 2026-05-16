@@ -36,6 +36,10 @@ tests_tmp*/
 # Keep the senior review and run results docs in docs/ instead.
 models/single_ambience_v1/
 models/ensemble_ambience_v1/
+# v5 pretrained-base checkpoints (~7.5GB) — fetched from HF Hub, never committed.
+models/camelbert_arabic_reviews_pretrained/
+models/single_ambience_v1_pretrained/
+models/single_ambience_v1_pretrained_v2/
 logs/
 reports/
 

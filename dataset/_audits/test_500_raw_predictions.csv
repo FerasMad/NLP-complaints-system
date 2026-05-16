@@ -1,0 +1,501 @@
+﻿id,text,expected_label,difficulty,attack_type,notes,predicted_top,rail_categories,multi_badge_present,abstain_fired,general_fallback_fired,outcome,failure_reason,raw_html_length
+T001,المندوب رمى الكيس عند الباب وطنش,التوصيل,easy,clean,courier dumped bag,التوصيل,التوصيل,False,False,False,pass,,776
+T002,الاوردر تاخر بزياده والاكل وصل سايح,التوصيل,easy,clean,late delivery + soggy food,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='التوصيل' got='جودة الطعام' rail=['جودة الطعام'],790
+T003,جاهز اعطاني وقت ١٥ دقيقه واستمر ٧٠ دقيقه,التوصيل,easy,clean,estimated vs actual,وقت الانتظار,وقت الانتظار,False,False,False,fail,clean: expected='التوصيل' got='وقت الانتظار' rail=['وقت الانتظار'],850
+T004,ما وصل لي اشعار وصول المندوب طلع بدون ما يدق,التوصيل,medium,clean,no arrival notification,التوصيل,التوصيل,False,False,False,pass,,788
+T005,الديليفري ابلغني ان طلبي راح لعنوان غير عنواني,التوصيل,medium,clean,wrong-address delivery,التوصيل,التوصيل,False,False,False,pass,,940
+T006,المندوب طلب مني انه اطلع له من الحوش,التوصيل,medium,clean,courier refusing to come to door,التوصيل,التوصيل,False,False,False,pass,,780
+T007,التطبيق سحب الفلوس وما اكد الطلب,التوصيل,easy,clean,app charged without confirmation,السعر والقيمة,السعر والقيمة,False,False,False,fail,clean: expected='التوصيل' got='السعر والقيمة' rail=['السعر والقيمة'],602
+T008,سحب فلوسي من البطاقه والطلب اتلغى لحاله,التوصيل,medium,clean,auto-cancel after charge,السعر والقيمة,السعر والقيمة,False,False,False,fail,clean: expected='التوصيل' got='السعر والقيمة' rail=['السعر والقيمة'],609
+T009,مندوب هنقرستيشن قعد يدور البيت نص ساعه,التوصيل,easy,clean,courier got lost,وقت الانتظار,وقت الانتظار | التوصيل,True,False,False,fail,"clean: expected='التوصيل' got='وقت الانتظار' rail=['وقت الانتظار', 'التوصيل']",1488
+T010,الديليفري وصل بدون كيس الزبده والمايونيز,التوصيل,medium,clean,missing sides bag on delivery,التوصيل,التوصيل,False,False,False,pass,,786
+T011,التغليف منفتح كله انسكب الصوص في الكيس,التوصيل,easy,clean,spilled in transit,دقة الطلب,دقة الطلب,False,False,False,fail,clean: expected='التوصيل' got='دقة الطلب' rail=['دقة الطلب'],605
+T012,المندوب باي قبل ما يسلمني الطلب,التوصيل,easy,clean,courier left without handover,التوصيل,التوصيل,False,False,False,pass,,775
+T013,الاكل وصلني بعد ساعه ونص وانا ساكن جنب الفرع,التوصيل,easy,clean,very late from nearby branch,جودة الطعام,جودة الطعام | وقت الانتظار,True,False,False,fail,"clean: expected='التوصيل' got='جودة الطعام' rail=['جودة الطعام', 'وقت الانتظار']",1503
+T014,ضايع المندوب في الحي وكل شويه يتصل يسالني,التوصيل,medium,clean,lost driver calling repeatedly,التوصيل,التوصيل,False,False,False,pass,,785
+T015,التطبيق يقول تم التوصيل وما وصلني شي,التوصيل,easy,clean,false-completed delivery,التوصيل,التوصيل,False,False,False,pass,,780
+T016,المندوب اعطى طلبي للجار وراح,التوصيل,medium,clean,wrong recipient,التوصيل,التوصيل,False,False,False,pass,,772
+T017,جا مندوب الكريم وطلب بقشيش بالعافيه,التوصيل,medium,clean,courier demanding tip,التوصيل,التوصيل,False,False,False,pass,,777
+T018,الديلفري قال ما اطلع للدور الثاني انزل خذ,التوصيل,medium,clean,courier refusing stairs,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='التوصيل' got='جودة الطعام' rail=['جودة الطعام'],608
+T019,التطبيق رفض دفعي بالبطاقه وخلاني ادفع كاش,التوصيل,medium,clean,card declined twice,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='التوصيل' got='جودة الطعام' rail=['جودة الطعام'],608
+T020,الكيس وصل ممزق من ركوب الموتر,التوصيل,easy,clean,torn bag,وقت الانتظار,وقت الانتظار,False,False,False,fail,clean: expected='التوصيل' got='وقت الانتظار' rail=['وقت الانتظار'],594
+T021,طلبي تأخر ساعتين بسبب المطر وما عوضوني,التوصيل,medium,clean,weather delay + no comp,وقت الانتظار,وقت الانتظار,False,False,False,fail,clean: expected='التوصيل' got='وقت الانتظار' rail=['وقت الانتظار'],786
+T022,جربت اطلب من مرسول وما لقيت اي مندوب متاح,التوصيل,easy,clean,no couriers available,التوصيل,التوصيل,False,False,False,pass,,783
+T023,التطبيق علق عند تأكيد الدفع وما طلع ايصال,التوصيل,medium,clean,checkout hang,التوصيل,التوصيل,False,False,False,pass,,600
+T024,الكيس مكتوب عليه اسم زبون ثاني,التوصيل,medium,clean,labeled wrong customer,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='التوصيل' got='جودة الطعام' rail=['جودة الطعام'],597
+T025,المندوب جالس في السياره يكلم اهله وانا انتظر تحت,التوصيل,medium,clean,courier idling on call,التوصيل,التوصيل | وقت الانتظار,True,False,False,pass,,1498
+T026,التطبيق يطلب فيزا فقط ما يقبل مدى,التوصيل,easy,clean,payment method restriction,دقة الطلب,دقة الطلب,False,False,False,fail,clean: expected='التوصيل' got='دقة الطلب' rail=['دقة الطلب'],600
+T027,توصيل من جدة الى الرياض اخذ يومين,التوصيل,easy,clean,cross-city excess,التوصيل,التوصيل,False,False,False,pass,,775
+T028,اتصلت بخدمة العملاء قالوا المندوب فقد الاشاره,التوصيل,medium,clean,support blames signal,التوصيل,التوصيل,False,False,False,pass,,789
+T029,الطلب وصل وانا في مشوار راح للبيت فاضي,التوصيل,medium,clean,delivery missed customer,التوصيل,التوصيل,False,False,False,pass,,597
+T030,ما عجبني ان المندوب طلب مني ابوكسه على القطعه,التوصيل,medium,clean,asked for cash for parking,التوصيل,التوصيل,False,False,False,pass,,789
+T031,الطلب اتقسم على مندوبين والاكل وصل قسمين,التوصيل,hard,clean,split delivery,التوصيل,التوصيل | جودة الطعام,True,False,False,pass,,1498
+T032,التطبيق يحدد العنوان غلط على الخريطه,التوصيل,medium,clean,geocoder error,التوصيل,التوصيل,False,False,False,pass,,784
+T033,جاء بدون كيس البلاستيك صب الاكل في الباب,التوصيل,medium,clean,no bag handoff,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='التوصيل' got='جودة الطعام' rail=['جودة الطعام'],794
+T034,الاوبشن في التطبيق يعطي ٣٠ دقيقه وطلع ٩٠,التوصيل,easy,clean,ETA underestimate,وقت الانتظار,وقت الانتظار,False,False,False,fail,clean: expected='التوصيل' got='وقت الانتظار' rail=['وقت الانتظار'],787
+T035,ما رضي يعطيني الطلب الا ادفع كاش بسبب التطبيق,التوصيل,medium,clean,cash-only forced,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='التوصيل' got='جودة الطعام' rail=['جودة الطعام'],612
+T036,سحب المبلغ مرتين والديليفري ما وصل,التوصيل,easy,clean,double-charge no delivery,التوصيل,التوصيل,False,False,False,pass,,781
+T037,المندوب جا بسياره خاصه بدون اي شعار,التوصيل,medium,clean,unmarked vehicle,التوصيل,التوصيل,False,False,False,pass,,779
+T038,التغليف فتحه احد قبل ما يوصلني,التوصيل,hard,clean,tamper-evident concern,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='التوصيل' got='جودة الطعام' rail=['جودة الطعام'],597
+T039,الطلب ضايع لحد الحين والتطبيق يقول جاري التوصيل,التوصيل,easy,clean,stuck in delivery state,التوصيل,التوصيل,False,False,False,pass,,791
+T040,الديلفري حاول يفتح الكيس قدامي عشان يحسبها,التوصيل,hard,clean,courier opening bag,دقة الطلب,دقة الطلب,False,False,False,fail,clean: expected='التوصيل' got='دقة الطلب' rail=['دقة الطلب'],609
+T041,جربت احد توا الديلفري كل مره يجي بارد,التوصيل,medium,clean,consistent cold delivery,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='التوصيل' got='جودة الطعام' rail=['جودة الطعام'],790
+T042,المندوب جايب كيس ثاني غير اللي حسبته انا,التوصيل,hard,clean,wrong order entirely,التوصيل,التوصيل,False,False,False,pass,,784
+T043,الطلب وصل من بعد ما اتصلت ٤ مرات بالدعم,التوصيل,easy,clean,after support escalation,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='التوصيل' got='جودة الطعام' rail=['جودة الطعام'],606
+T044,التطبيق يجبرني اضيف بقشيش قبل ما اكمل الطلب,التوصيل,medium,clean,forced tip,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='التوصيل' got='جودة الطعام' rail=['جودة الطعام'],610
+T045,الديلفري وقف في باب البنايه وما طلع لي,التوصيل,easy,clean,ground-floor handoff demand,عامة,,False,False,True,fail,clean: expected='التوصيل' got='عامة' rail=[],1216
+T046,التتبع متوقف ولا يتحرك من ربع ساعه,التوصيل,medium,clean,frozen tracker,وقت الانتظار,وقت الانتظار,False,False,False,fail,clean: expected='التوصيل' got='وقت الانتظار' rail=['وقت الانتظار'],780
+T047,ساعه وانا انتظر مندوب من فرع قريب من البيت,التوصيل,easy,clean,wait from nearby branch,وقت الانتظار,وقت الانتظار | التوصيل,True,False,False,fail,"clean: expected='التوصيل' got='وقت الانتظار' rail=['وقت الانتظار', 'التوصيل']",1559
+T048,سياسة التطبيق ما ترجع الفلوس الا بعد اسبوع,التوصيل,medium,clean,refund policy delay,السعر والقيمة,السعر والقيمة,False,False,False,fail,clean: expected='التوصيل' got='السعر والقيمة' rail=['السعر والقيمة'],612
+T049,الكيس وصل مبلل ماء كانه طاح في الشارع,التوصيل,medium,clean,wet bag,النظافة,النظافة,False,False,False,fail,clean: expected='التوصيل' got='النظافة' rail=['النظافة'],599
+T050,الديلفري طلب رقمي الشخصي عشان يكلمني بره التطبيق,التوصيل,hard,clean,out-of-app contact request,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='التوصيل' got='جودة الطعام' rail=['جودة الطعام'],615
+T051,الوجبه ب٧٠ ريال وحجمها مايسد جوع طفل,السعر والقيمة,easy,clean,expensive vs portion,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='السعر والقيمة' got='جودة الطعام' rail=['جودة الطعام'],791
+T052,سعر الزياده على الصوص ١٠ ريال شي ما يتصدق,السعر والقيمة,easy,clean,expensive addons,السعر والقيمة,السعر والقيمة,False,False,False,pass,,802
+T053,الفاتوره طلعت ضعفين اللي توقعته,السعر والقيمة,easy,clean,bill doubled,السعر والقيمة,السعر والقيمة,False,False,False,pass,,797
+T054,اضافة الجبنه وحدها ب١٥ ريال,السعر والقيمة,easy,clean,addon surcharge,عامة,,False,False,True,fail,clean: expected='السعر والقيمة' got='عامة' rail=[],1197
+T055,القيمه ما تستاهل المبلغ المدفوع ابدا,السعر والقيمة,easy,clean,value mismatch,السعر والقيمة,السعر والقيمة,False,False,False,pass,,800
+T056,سعر القهوه ب٣٢ ريال وطعمها عادي,السعر والقيمة,easy,clean,overpriced coffee,السعر والقيمة,السعر والقيمة | جودة الطعام,True,False,False,pass,,1506
+T057,حسبوا علي رسوم خدمه بدون ما يخبروني,السعر والقيمة,medium,clean,hidden service charge,دقة الطلب,دقة الطلب,False,False,False,fail,clean: expected='السعر والقيمة' got='دقة الطلب' rail=['دقة الطلب'],602
+T058,الكوبون اللي في التطبيق ما اشتغل ودفعت كامل,السعر والقيمة,medium,clean,broken coupon,دقة الطلب,دقة الطلب,False,False,False,fail,clean: expected='السعر والقيمة' got='دقة الطلب' rail=['دقة الطلب'],610
+T059,مشروب صغير ب١٨ ريال يعني سرقه,السعر والقيمة,easy,clean,drink overpriced,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='السعر والقيمة' got='جودة الطعام' rail=['جودة الطعام'],596
+T060,العرض اللي في الانستقرام مو هو نفسه في الفرع,السعر والقيمة,medium,clean,ad-vs-reality price,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='السعر والقيمة' got='جودة الطعام' rail=['جودة الطعام'],611
+T061,اضافة الايس كريم تنده ب٢٠ ريال,السعر والقيمة,easy,clean,ice cream surcharge,عامة,,False,False,True,fail,clean: expected='السعر والقيمة' got='عامة' rail=[],1200
+T062,سعر التوصيل غير معقول ٢٥ ريال لمسافه ٣ كيلو,السعر والقيمة,medium,clean,delivery fee high,التوصيل,التوصيل | السعر والقيمة,True,False,False,fail,"clean: expected='السعر والقيمة' got='التوصيل' rail=['التوصيل', 'السعر والقيمة']",1507
+T063,دفعت ٢٠٠ على ٣ ساندوتشات وما شبعنا,السعر والقيمة,easy,clean,high total + low value,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='السعر والقيمة' got='جودة الطعام' rail=['جودة الطعام'],601
+T064,الباقي ما اعطوني اياه قالوا ما عندنا فكه,السعر والقيمة,medium,clean,no change given,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='السعر والقيمة' got='جودة الطعام' rail=['جودة الطعام'],607
+T065,اضافة الفلفل ب٥ ريال شي يضحك,السعر والقيمة,easy,clean,absurd small surcharge,عامة,,False,False,True,fail,clean: expected='السعر والقيمة' got='عامة' rail=[],1199
+T066,الفاتوره فيها بنود ما طلبتها,السعر والقيمة,medium,clean,phantom line items,السعر والقيمة,السعر والقيمة,False,False,False,pass,,794
+T067,اللحم وحده ب٨٠ ريال ربع كيلو والباقي بصل,السعر والقيمة,medium,clean,expensive light entrée,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='السعر والقيمة' got='جودة الطعام' rail=['جودة الطعام'],794
+T068,الخصم على التطبيق يطبق بعد الضريبه يعني صفر فايده,السعر والقيمة,hard,clean,discount-after-tax trick,السعر والقيمة,السعر والقيمة,False,False,False,pass,,619
+T069,الاسعار في القائمه غير اللي يحسبوها في الكاشير,السعر والقيمة,medium,clean,menu vs cashier mismatch,السعر والقيمة,السعر والقيمة | خدمة الموظفين,True,False,False,pass,,1539
+T070,سعر السلطه ب٣٥ ريال على نص صحن خس,السعر والقيمة,easy,clean,small salad pricey,السعر والقيمة,السعر والقيمة,False,False,False,pass,,794
+T071,اخر ميسد كم على الاكل ما تستاهل ابدا,السعر والقيمة,easy,clean,general value,عامة,,False,False,True,fail,clean: expected='السعر والقيمة' got='عامة' rail=[],1709
+T072,ضعف السعر بدون اي مبرر مقارنه بالفرع الثاني,السعر والقيمة,medium,clean,branch-vs-branch pricing,السعر والقيمة,السعر والقيمة,False,False,False,pass,,806
+T073,اضافة فطر ٧ ريال على بيتزا اصلا غاليه,السعر والقيمة,easy,clean,stacked surcharges,السعر والقيمة,السعر والقيمة,False,False,False,pass,,800
+T074,وجبة الاطفال ب٥٠ ريال وكل اللي فيها قطعتين,السعر والقيمة,easy,clean,kids meal overpriced,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='السعر والقيمة' got='جودة الطعام' rail=['جودة الطعام'],795
+T075,نفس البرجر في فرع ثاني ب٢٥ هنا ب٤٥,السعر والقيمة,medium,clean,inconsistent pricing,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='السعر والقيمة' got='جودة الطعام' rail=['جودة الطعام'],789
+T076,سعر العصير الطبيعي ب٢٨ يعني انت تستهبل,السعر والقيمة,easy,clean,fresh juice overpriced,السعر والقيمة,السعر والقيمة,False,False,False,pass,,799
+T077,ضريبه القيمه طبقوها على وجبه مخفضه,السعر والقيمة,hard,clean,VAT on discounted price,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='السعر والقيمة' got='جودة الطعام' rail=['جودة الطعام'],787
+T078,دفعت ١٢٠ على فطار سادس وقهوه,السعر والقيمة,easy,clean,expensive simple breakfast,عامة,,False,False,True,fail,clean: expected='السعر والقيمة' got='عامة' rail=[],1203
+T079,اعلانهم يقول ٢ ب ٥٠ وعند الكاشير ما يمشي العرض,السعر والقيمة,medium,clean,promo not honored,خدمة الموظفين,خدمة الموظفين,False,False,False,fail,clean: expected='السعر والقيمة' got='خدمة الموظفين' rail=['خدمة الموظفين'],815
+T080,القيمه الغذائيه قليله مقابل السعر العالي,السعر والقيمة,easy,clean,nutrition vs price,السعر والقيمة,السعر والقيمة,False,False,False,pass,,803
+T081,سعر الحلى ب٤٥ ريال على قطعه ما تتجاوز اللقمتين,السعر والقيمة,easy,clean,dessert size vs price,السعر والقيمة,السعر والقيمة,False,False,False,pass,,807
+T082,تحسبون التوصيل بسعر البنزين بدون ما تقولون,السعر والقيمة,hard,clean,fuel surcharge surprise,التوصيل,التوصيل | السعر والقيمة,True,False,False,fail,"clean: expected='السعر والقيمة' got='التوصيل' rail=['التوصيل', 'السعر والقيمة']",1507
+T083,اضطريت ادفع ضعف السعر عشان الجبن الزياده,السعر والقيمة,easy,clean,extra cheese gouge,السعر والقيمة,السعر والقيمة,False,False,False,pass,,803
+T084,الفاتوره فيها مبلغ بقشيش مضاف بدون اذني,السعر والقيمة,hard,clean,auto-tip without consent,السعر والقيمة,السعر والقيمة,False,False,False,pass,,805
+T085,شفت سعر الصلصه في الكاشير اعلى من المنيو ب٣ ريال,السعر والقيمة,medium,clean,menu typo or scam,السعر والقيمة,السعر والقيمة | خدمة الموظفين,True,False,False,pass,,1537
+T086,اشتركت في عروض البريميوم وما قدمت لي اي تخفيض,السعر والقيمة,medium,clean,premium membership useless,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='السعر والقيمة' got='جودة الطعام' rail=['جودة الطعام'],612
+T087,القهوه التركيه ب٤٠ ريال شي مبالغ فيه,السعر والقيمة,easy,clean,turkish coffee overpriced,السعر والقيمة,السعر والقيمة,False,False,False,pass,,606
+T088,اضافة الصلصه الاضافيه على البيتزا ب٧ ريال,السعر والقيمة,easy,clean,extra sauce price,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='السعر والقيمة' got='جودة الطعام' rail=['جودة الطعام'],797
+T089,الفاتوره مكتوبه بالانجليزي وما اقدر اقراها,السعر والقيمة,medium,clean,bill format,السعر والقيمة,السعر والقيمة,False,False,False,pass,,808
+T090,ميزانيتنا ما تكفي لاسعارهم اللي زادت بثلث,السعر والقيمة,easy,clean,price hike,السعر والقيمة,السعر والقيمة,False,False,False,pass,,807
+T091,نقرشهم بحسبتهم القهوه ب٣٠ والمنيو ب٢٥,السعر والقيمة,medium,clean,explicit overcharge,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='السعر والقيمة' got='جودة الطعام' rail=['جودة الطعام'],604
+T092,سعر اضافه واحده مايونيز ٤ ريال غير منطقي,السعر والقيمة,easy,clean,small absurd surcharge,السعر والقيمة,السعر والقيمة,False,False,False,pass,,801
+T093,اشتريت كوبون من قروبون وما قبل في الفرع,السعر والقيمة,medium,clean,third-party voucher rejected,عامة,,False,False,True,fail,clean: expected='السعر والقيمة' got='عامة' rail=[],1214
+T094,القائمه ما فيها اسعار اصلا حتى توقعوني بمبلغ كبير,السعر والقيمة,medium,clean,no prices on menu,السعر والقيمة,السعر والقيمة,False,False,False,pass,,812
+T095,الجلسه في القسم العائلي تكلف ٢٠٠ ريال اضافيه,السعر والقيمة,hard,clean,family section upcharge,عامة,,False,False,True,fail,clean: expected='السعر والقيمة' got='عامة' rail=[],1397
+T096,الفاتوره بدون تفصيل واطلبت تفاصيل ما اعطوني,السعر والقيمة,medium,clean,no itemized bill,السعر والقيمة,السعر والقيمة,False,False,False,pass,,809
+T097,ضربوني بضريبة بقشيش ٢٠٪ بدون ما اطلب,السعر والقيمة,medium,clean,20% auto-gratuity,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='السعر والقيمة' got='جودة الطعام' rail=['جودة الطعام'],603
+T098,اسعارهم تتغير كل اسبوع بدون اشعار,السعر والقيمة,medium,clean,fluctuating prices,السعر والقيمة,السعر والقيمة,False,False,False,pass,,798
+T099,جربت اطبق كوبون والتطبيق رفع السعر بعدها,السعر والقيمة,hard,clean,coupon raises price,السعر والقيمة,السعر والقيمة,False,False,False,pass,,803
+T100,الميمبرشب اللي اشتركت فيه ما يفعل العروض الموعوده,السعر والقيمة,medium,clean,membership broken promo,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='السعر والقيمة' got='جودة الطعام' rail=['جودة الطعام'],616
+T101,لقيت شعره في وسط الرز,النظافة,easy,clean,hair in food,النظافة,النظافة,False,False,False,pass,,583
+T102,الصحن فيه بقع من اكل سابق,النظافة,easy,clean,dish residue,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='النظافة' got='جودة الطعام' rail=['جودة الطعام'],777
+T103,الكاسه على رفها لها بقع روج لشخص ثاني,النظافة,easy,clean,lipstick on glass,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='النظافة' got='جودة الطعام' rail=['جودة الطعام'],604
+T104,الشوكه فيها قطع طعام من زبون قبلي,النظافة,easy,clean,fork residue,عامة,,False,False,True,fail,clean: expected='النظافة' got='عامة' rail=[],1394
+T105,لاحظت بقعة دم على المنشفه,النظافة,hard,clean,blood on napkin,النظافة,النظافة,False,False,False,pass,,587
+T106,الارضيه دبقه ولزقت احذيتي فيها,النظافة,easy,clean,sticky floor,النظافة,النظافة,False,False,False,pass,,592
+T107,الحمام رائحته كريهه ومافيه صابون,النظافة,easy,clean,bathroom smell + supplies,النظافة,النظافة,False,False,False,pass,,778
+T108,شفت صرصور صغير يمشي على البلاط,النظافة,easy,clean,roach,النظافة,النظافة,False,False,False,pass,,592
+T109,الطاوله ما تنظفت من الزبون اللي قبلنا,النظافة,easy,clean,uncleared table,عامة,,False,False,True,fail,clean: expected='النظافة' got='عامة' rail=[],1210
+T110,الذباب تطير فوق رفوف العرض,النظافة,medium,clean,flies near display,النظافة,النظافة,False,False,False,pass,,772
+T111,لقيت قطعه قمامه صغيره في طبق السلطه,النظافة,medium,clean,trash in salad,عامة,,False,False,True,fail,clean: expected='النظافة' got='عامة' rail=[],1206
+T112,الكنب مليان بقع طعام محنطه,النظافة,easy,clean,stained sofa,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='النظافة' got='جودة الطعام' rail=['جودة الطعام'],779
+T113,الزجاج فيه ابصام يدين ما تنمسح,النظافة,easy,clean,smudged glass,دقة الطلب,دقة الطلب,False,False,False,fail,clean: expected='النظافة' got='دقة الطلب' rail=['دقة الطلب'],597
+T114,سلة المهملات تطفح في زاوية الصاله,النظافة,easy,clean,overflowing trash,عامة,,False,False,True,fail,clean: expected='النظافة' got='عامة' rail=[],1203
+T115,نظافة المطبخ سيئه شفتها لما طلبت اروح للحمام,النظافة,medium,clean,kitchen visible dirty,النظافة,النظافة,False,False,False,pass,,863
+T116,الصابون السائل في الحمام ينتهي ولا يعبى,النظافة,medium,clean,soap dispenser empty,النظافة,النظافة,False,False,False,pass,,785
+T117,شفت قطه ماشيه جوا المطعم تتمسح بالكراسي,النظافة,easy,clean,stray cat indoors,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='النظافة' got='جودة الطعام' rail=['جودة الطعام'],606
+T118,الكاشير يأخذ النقود ويقدم لي الاكل بنفس اليد,النظافة,hard,clean,no glove change,خدمة الموظفين,خدمة الموظفين | جودة الطعام,True,False,False,fail,"clean: expected='النظافة' got='خدمة الموظفين' rail=['خدمة الموظفين', 'جودة الطعام']",1526
+T119,شعرت بحشره صغيره طايره تحوم على راسي,النظافة,easy,clean,flying insect,النظافة,النظافة,False,False,False,pass,,598
+T120,الكوب جا فيه قطعه ليمون من زبون ثاني,النظافة,medium,clean,leftover lemon,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='النظافة' got='جودة الطعام' rail=['جودة الطعام'],603
+T121,الحمام ما فيه مناديل ورق,النظافة,easy,clean,no tissue in bathroom,النظافة,النظافة,False,False,False,pass,,770
+T122,الكاشير يحط الفلوس فوق رف الاكل,النظافة,hard,clean,money on food shelf,خدمة الموظفين,خدمة الموظفين | جودة الطعام,True,False,False,fail,"clean: expected='النظافة' got='خدمة الموظفين' rail=['خدمة الموظفين', 'جودة الطعام']",1513
+T123,لاحظت طبقه دهون على شاشة الكاونتر,النظافة,medium,clean,grease on counter,النظافة,النظافة,False,False,False,pass,,595
+T124,المنشفه المعطره ما تنغيرت من اول صباح,النظافة,medium,clean,unchanged towel,عامة,,False,False,True,fail,clean: expected='النظافة' got='عامة' rail=[],1208
+T125,اعمدة التكييف فيها غبار متراكم,النظافة,easy,clean,dusty AC vents,النظافة,النظافة,False,False,False,pass,,592
+T126,الكاسات تنشف على فوطه وسخه,النظافة,hard,clean,dirty drying towel,النظافة,النظافة,False,False,False,pass,,770
+T127,شفت اكل سايب على الطاوله من البارحه,النظافة,medium,clean,leftover food overnight,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='النظافة' got='جودة الطعام' rail=['جودة الطعام'],787
+T128,الطعمه على الكنب من قبل ساعتين موجوده,النظافة,easy,clean,uncleared crumbs,جودة الطعام,جودة الطعام | وقت الانتظار,True,False,False,fail,"clean: expected='النظافة' got='جودة الطعام' rail=['جودة الطعام', 'وقت الانتظار']",1499
+T129,لقيت اظفر صغير في وسط البرجر,النظافة,hard,clean,nail in burger,عامة,,False,False,True,fail,clean: expected='النظافة' got='عامة' rail=[],1386
+T130,الموظف ينخم في يده ويرجع يخدم,النظافة,hard,clean,staff hygiene,خدمة الموظفين,خدمة الموظفين,False,False,False,fail,clean: expected='النظافة' got='خدمة الموظفين' rail=['خدمة الموظفين'],797
+T131,الكاتشب علبتها لزجه من خارج,النظافة,easy,clean,sticky condiment bottle,عامة,,False,False,True,fail,clean: expected='النظافة' got='عامة' rail=[],1198
+T132,الجداول الزجاج مليانه ابصام لاطفال,النظافة,easy,clean,kid handprints,عامة,,False,False,True,fail,clean: expected='النظافة' got='عامة' rail=[],1204
+T133,شفت فاره صغيره تطل من تحت الثلاجه,النظافة,easy,clean,mouse sighting,عامة,,False,False,True,fail,clean: expected='النظافة' got='عامة' rail=[],1203
+T134,القهوه فيها رواسب غريبه,النظافة,medium,clean,residue in coffee,النظافة,النظافة,False,False,False,pass,,585
+T135,صحون المازه مكسره من الاطراف,النظافة,medium,clean,chipped dishes (hygiene risk),عامة,,False,False,True,fail,clean: expected='النظافة' got='عامة' rail=[],1199
+T136,الفوط الورقيه على الطاوله مبلله من رائحة العفن,النظافة,medium,clean,moldy napkins,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='النظافة' got='جودة الطعام' rail=['جودة الطعام'],613
+T137,الكاشير حط فلوسي في درج وفي نفس الدرج خبز,النظافة,hard,clean,money + food storage,خدمة الموظفين,خدمة الموظفين,False,False,False,fail,clean: expected='النظافة' got='خدمة الموظفين' rail=['خدمة الموظفين'],810
+T138,صحن الاكل ينقط ماء طلع من غسيل ناقص,النظافة,medium,clean,dripping wet dish,جودة الطعام,جودة الطعام | دقة الطلب,True,False,False,fail,"clean: expected='النظافة' got='جودة الطعام' rail=['جودة الطعام', 'دقة الطلب']",1511
+T139,لقيت حجر صغير في كوب الرز,النظافة,medium,clean,stone in rice,عامة,,False,False,True,fail,clean: expected='النظافة' got='عامة' rail=[],1195
+T140,شفت ذبابه ميته في طبق المازات,النظافة,easy,clean,dead fly in mezze,النظافة,النظافة,False,False,False,pass,,774
+T141,الكاشير يتقشر جلد يده وما يلبس قفاز,النظافة,hard,clean,skin condition handling food,خدمة الموظفين,خدمة الموظفين,False,False,False,fail,clean: expected='النظافة' got='خدمة الموظفين' rail=['خدمة الموظفين'],804
+T142,الميز كله مغطى ببقايا توابل من قبل,النظافة,easy,clean,spice residue,عامة,,False,False,True,fail,clean: expected='النظافة' got='عامة' rail=[],1204
+T143,بقايا شعرات حيوان على كرسي القعده,النظافة,medium,clean,pet hair on chair,النظافة,النظافة,False,False,False,pass,,595
+T144,ريحة الزبد المتعفن طالعه من زاوية المطبخ,النظافة,medium,clean,rancid butter smell,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='النظافة' got='جودة الطعام' rail=['جودة الطعام'],607
+T145,الخباز يلمس العجين بكفه بدون قفاز,النظافة,hard,clean,baker no gloves,عامة,,False,False,True,fail,clean: expected='النظافة' got='عامة' rail=[],1203
+T146,الفناجين متكدسه على رف بدون غطاء,النظافة,medium,clean,uncovered cup storage,عامة,,False,False,True,fail,clean: expected='النظافة' got='عامة' rail=[],1203
+T147,شفت لقم اكل تطيح من البفيه وترجع تنحط,النظافة,hard,clean,buffet pick-and-replace,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='النظافة' got='جودة الطعام' rail=['جودة الطعام'],789
+T148,ريحة الحمام وصلت الى صالة الاكل,النظافة,easy,clean,bathroom smell in dining,النظافة,النظافة | جودة الطعام,True,False,False,pass,,1490
+T149,الكنب جلد متشقق وفي شقوقه قطع طعام,النظافة,medium,clean,torn sofa with food in cracks,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='النظافة' got='جودة الطعام' rail=['جودة الطعام'],787
+T150,لاحظت قطع بلاستيك صغيره في طبق الفول,النظافة,hard,clean,plastic shards in food,عامة,,False,False,True,fail,clean: expected='النظافة' got='عامة' rail=[],1208
+T151,الدجاج مالح بحيث ما اقدر اكمل,جودة الطعام,easy,clean,oversalted,جودة الطعام,جودة الطعام,False,False,False,pass,,856
+T152,الرز ناشف وكأنه من ثلاث ايام,جودة الطعام,easy,clean,dry old rice,جودة الطعام,جودة الطعام,False,False,False,pass,,595
+T153,اللحم محروق من برا ونيه من جوا,جودة الطعام,easy,clean,burnt outside raw inside,جودة الطعام,جودة الطعام,False,False,False,pass,,790
+T154,الصلصه طعمها مغير شككتني فيها,جودة الطعام,medium,clean,off-tasting sauce,جودة الطعام,جودة الطعام,False,False,False,pass,,783
+T155,البرجر قطعه اللحم رفيعه مايوكل,جودة الطعام,easy,clean,thin patty,جودة الطعام,جودة الطعام,False,False,False,pass,,858
+T156,القهوه طعمها مر بزياده والمسحوق مكثر,جودة الطعام,easy,clean,bitter overdosed coffee,جودة الطعام,جودة الطعام,False,False,False,pass,,790
+T157,الكنافه باردة وعجينتها يابسه,جودة الطعام,easy,clean,cold dry kunafa,جودة الطعام,جودة الطعام,False,False,False,pass,,782
+T158,الطعام طعمه مكرر وكان لقاء جايز,جودة الطعام,medium,clean,reheated leftover,جودة الطعام,جودة الطعام,False,False,False,pass,,858
+T159,الصلصه الخاصه ما لها اي مذاق,جودة الطعام,easy,clean,bland signature sauce,جودة الطعام,جودة الطعام,False,False,False,pass,,781
+T160,اللحمه فيها عروق ما يتأكل منها,جودة الطعام,easy,clean,tough meat tendons,جودة الطعام,جودة الطعام,False,False,False,pass,,785
+T161,الشاورمه عجينتها مكسره ومحروقه,جودة الطعام,easy,clean,shawarma bread burnt,عامة,,False,False,True,fail,clean: expected='جودة الطعام' got='عامة' rail=[],1395
+T162,الفطار بايخ والبيض مايصير لون اصفر,جودة الطعام,medium,clean,bland eggs,جودة الطعام,جودة الطعام,False,False,False,pass,,787
+T163,الايس كريم ذايب من نص ساعه قبل التقديم,جودة الطعام,easy,clean,melted ice cream,وقت الانتظار,وقت الانتظار,False,False,False,fail,clean: expected='جودة الطعام' got='وقت الانتظار' rail=['وقت الانتظار'],787
+T164,الحساء بارد كأنه طلع من البراد,جودة الطعام,easy,clean,cold soup,جودة الطعام,جودة الطعام,False,False,False,pass,,783
+T165,الكفته جافه وما فيها بصل ولا صلصه,جودة الطعام,easy,clean,dry kebabs,النظافة,النظافة,False,False,False,fail,clean: expected='جودة الطعام' got='النظافة' rail=['النظافة'],595
+T166,الدجاج المشوي طعمه فاتح بدون بهارات,جودة الطعام,easy,clean,underseasoned,جودة الطعام,جودة الطعام,False,False,False,pass,,862
+T167,الخبز ابيض شاحب ما تشوف عليه شي,جودة الطعام,easy,clean,pale bread,جودة الطعام,جودة الطعام,False,False,False,pass,,598
+T168,البطاطس مقرمشه بزياده تكسرت بسنوني,جودة الطعام,easy,clean,overfried fries,جودة الطعام,جودة الطعام,False,False,False,pass,,601
+T169,السلطه الخس فيها لون اصفر ذابل,جودة الطعام,easy,clean,wilted lettuce,عامة,,False,False,True,fail,clean: expected='جودة الطعام' got='عامة' rail=[],1200
+T170,اللازانيا جافه وعدمت الصلصه عليها,جودة الطعام,easy,clean,dry lasagna,جودة الطعام,جودة الطعام,False,False,False,pass,,600
+T171,التمر المحشي ما هو طازج,جودة الطعام,easy,clean,stale stuffed dates,عامة,,False,False,True,fail,clean: expected='جودة الطعام' got='عامة' rail=[],1193
+T172,القشطه فيها طعم حامض غريب,جودة الطعام,medium,clean,sour cream off,جودة الطعام,جودة الطعام,False,False,False,pass,,777
+T173,اللبن الرايب طعمه فاسد,جودة الطعام,easy,clean,spoiled yogurt,جودة الطعام,جودة الطعام,False,False,False,pass,,775
+T174,الحلوى الباردة وكأنها من السنه الفايته,جودة الطعام,hard,clean,very stale dessert,جودة الطعام,جودة الطعام,False,False,False,pass,,794
+T175,الفول طعمه نيه بدون تطييب,جودة الطعام,easy,clean,underseasoned fava,جودة الطعام,جودة الطعام,False,False,False,pass,,778
+T176,الفلافل قاسيه من برا وغصت في حلقي,جودة الطعام,easy,clean,hard falafel,جودة الطعام,جودة الطعام,False,False,False,pass,,600
+T177,المعكرونه مطبوخه بزياده تحولت لعجينه,جودة الطعام,easy,clean,overcooked pasta,جودة الطعام,جودة الطعام,False,False,False,pass,,603
+T178,الجبن طازه بس بدون نكهه ابدا,جودة الطعام,medium,clean,bland fresh cheese,عامة,,False,False,True,fail,clean: expected='جودة الطعام' got='عامة' rail=[],1389
+T179,الكيك جاف بدون اي رطوبه,جودة الطعام,easy,clean,dry cake,النظافة,النظافة,False,False,False,fail,clean: expected='جودة الطعام' got='النظافة' rail=['النظافة'],585
+T180,التمر هندي طعمه مر بشكل غير معتاد,جودة الطعام,medium,clean,bitter tamarind,جودة الطعام,جودة الطعام,False,False,False,pass,,786
+T181,القهوه السعوديه باهته بدون هيل,جودة الطعام,easy,clean,weak saudi coffee,عامة,,False,False,True,fail,clean: expected='جودة الطعام' got='عامة' rail=[],1208
+T182,الشاي الاحمر بطعم البلاستك,جودة الطعام,medium,clean,plastic-tasting tea,جودة الطعام,جودة الطعام,False,False,False,pass,,779
+T183,الشاورما الزيت كثير ينقط منها,جودة الطعام,easy,clean,greasy shawarma,عامة,,False,False,True,fail,clean: expected='جودة الطعام' got='عامة' rail=[],1199
+T184,البطاطا الحلوه قاسيه وما طبخت كويس,جودة الطعام,easy,clean,underdone sweet potato,جودة الطعام,جودة الطعام,False,False,False,pass,,861
+T185,التبوله طعمها فيه بصل بايخ,جودة الطعام,medium,clean,off onion in tabbouleh,جودة الطعام,جودة الطعام,False,False,False,pass,,852
+T186,المطبق الدجاج اللي فيه ميته,جودة الطعام,hard,clean,dead chicken taste,جودة الطعام,جودة الطعام,False,False,False,pass,,782
+T187,الفطيره فيها اثار حرق من الصاج,جودة الطعام,easy,clean,burnt pastry,عامة,,False,False,True,fail,clean: expected='جودة الطعام' got='عامة' rail=[],1200
+T188,الكبسه فيها قرفه بزياده,جودة الطعام,easy,clean,too much cinnamon,جودة الطعام,جودة الطعام,False,False,False,pass,,778
+T189,الكبده مرّه ومحروقه بنفس الوقت,جودة الطعام,easy,clean,burnt bitter liver,جودة الطعام,جودة الطعام,False,False,False,pass,,785
+T190,الزبادي اليوناني سايل غريب,جودة الطعام,medium,clean,thin greek yogurt,جودة الطعام,جودة الطعام,False,False,False,pass,,593
+T191,القمح الكامل خبزه يابسه كانها بسكوت,جودة الطعام,easy,clean,dry whole wheat bread,جودة الطعام,جودة الطعام,False,False,False,pass,,602
+T192,الاكل ما يحمل اي بهار مجرد ماء وملح,جودة الطعام,easy,clean,no seasoning,جودة الطعام,جودة الطعام,False,False,False,pass,,789
+T193,السمك فيه طعم مر يدل على عدم النظافه,جودة الطعام,hard,clean,bitter fish,جودة الطعام,جودة الطعام | النظافة,True,False,False,pass,,1494
+T194,الزيتون فيه طعم مكسره,جودة الطعام,medium,clean,broken-tasting olives,جودة الطعام,جودة الطعام,False,False,False,pass,,773
+T195,الميلك شيك سايح من تاخر التقديم,جودة الطعام,easy,clean,watery milkshake,وقت الانتظار,وقت الانتظار,False,False,False,fail,clean: expected='جودة الطعام' got='وقت الانتظار' rail=['وقت الانتظار'],596
+T196,البيتزا العجينه نيه من النص,جودة الطعام,easy,clean,doughy pizza,جودة الطعام,جودة الطعام,False,False,False,pass,,783
+T197,الحمص فيه طعم تين ما هو مكانه,جودة الطعام,medium,clean,off hummus,جودة الطعام,جودة الطعام,False,False,False,pass,,781
+T198,الزعتر طعمه طيني وكانه طازج خبيث,جودة الطعام,hard,clean,earthy zaatar,جودة الطعام,جودة الطعام,False,False,False,pass,,785
+T199,المهلبيه فيها كتل دقيق ما ذابت,جودة الطعام,easy,clean,lumpy muhalabia,عامة,,False,False,True,fail,clean: expected='جودة الطعام' got='عامة' rail=[],1381
+T200,الفلافل وقت قليتها بداخل القلب لزجه,جودة الطعام,medium,clean,sticky inside falafel,وقت الانتظار,وقت الانتظار,False,False,False,fail,clean: expected='جودة الطعام' got='وقت الانتظار' rail=['وقت الانتظار'],600
+T201,الكاشير اشار لي بيده ان اروح ولم يكلمني,خدمة الموظفين,easy,clean,rude gesture,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,808
+T202,الموظفه ما رحبت فينا وقت ما دخلنا,خدمة الموظفين,easy,clean,no welcome,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,802
+T203,النادل مشغول بالتلفون ولا ينتبه الينا,خدمة الموظفين,easy,clean,staff on phone,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,805
+T204,طلبت الفاتوره وانتظرت اكثر من نص ساعه,خدمة الموظفين,medium,clean,slow bill request,السعر والقيمة,السعر والقيمة | وقت الانتظار,True,False,False,fail,"clean: expected='خدمة الموظفين' got='السعر والقيمة' rail=['السعر والقيمة', 'وقت الانتظار']",1583
+T205,الموظف بصق علي شبه ضحكه ما عجبتني,خدمة الموظفين,hard,clean,rude staff behavior,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,801
+T206,المدير ما رد على شكوتي ووقف بعيد,خدمة الموظفين,medium,clean,manager ignored,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,602
+T207,النادل خلط طلبات الطاولات وكلهم زعلوا,خدمة الموظفين,medium,clean,mixed up tables,خدمة الموظفين,خدمة الموظفين | دقة الطلب,True,False,False,pass,,1526
+T208,الكاشير دق على الزر بعصبيه قدامي,خدمة الموظفين,easy,clean,agitated cashier,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,801
+T209,الموظفه ضحكت في وجهي وقت قلت لها زبون مش راضي,خدمة الموظفين,hard,clean,mocking smile,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,814
+T210,استقبلونا بقعدتهم على الكنب ولم يقوم احد,خدمة الموظفين,easy,clean,"staff seated, no welcome",خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,610
+T211,النادل تجاهل اشارتي ثلاث مرات,خدمة الموظفين,easy,clean,ignored hand signal,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,797
+T212,الموظف صرخ على زميله قدام الزباين,خدمة الموظفين,medium,clean,yelling at colleague,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,801
+T213,استلم الطلب باستخفاف وكأنه يضحك,خدمة الموظفين,medium,clean,disrespectful,دقة الطلب,دقة الطلب,False,False,False,fail,clean: expected='خدمة الموظفين' got='دقة الطلب' rail=['دقة الطلب'],598
+T214,الكاشير ما اعطاني الفاتوره ورفض اعطائي,خدمة الموظفين,medium,clean,refused receipt,السعر والقيمة,السعر والقيمة | خدمة الموظفين,True,False,False,fail,"clean: expected='خدمة الموظفين' got='السعر والقيمة' rail=['السعر والقيمة', 'خدمة الموظفين']",1532
+T215,النادل ما اعطاني المنيو الا بعد ما طلبت ٣ مرات,خدمة الموظفين,easy,clean,delayed menu,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,814
+T216,الموظف رد علي بصوت عالي ومتعجرف,خدمة الموظفين,easy,clean,loud arrogant reply,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,799
+T217,استخدم الموظف الاسئله الشخصيه قدامي,خدمة الموظفين,hard,clean,intrusive questions,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,803
+T218,الكاشير ما رد على سؤالي عن المكونات,خدمة الموظفين,easy,clean,no answer on ingredients,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,804
+T219,النادل اخذ منيو والداتا والذهب عيوني وما رجع,خدمة الموظفين,easy,clean,took menu and disappeared,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,812
+T220,الموظفه بصوت منخفض اهانتني سراً,خدمة الموظفين,hard,clean,covert insult,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,799
+T221,الطباخ طلع من المطبخ يدخن قدام الزباين,خدمة الموظفين,hard,clean,cook smoking openly,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,608
+T222,الكاشير اجبرني ادفع بقشيش وانا ما اريد,خدمة الموظفين,hard,clean,forced tip,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,807
+T223,النادل سبني بدل ما يعتذر عن الخطا,خدمة الموظفين,hard,clean,cursed me out,دقة الطلب,دقة الطلب | خدمة الموظفين,True,False,False,fail,"clean: expected='خدمة الموظفين' got='دقة الطلب' rail=['دقة الطلب', 'خدمة الموظفين']",1522
+T224,ما حد سالنا ادا الاكل عجبنا او لا,خدمة الموظفين,easy,clean,no check-in on food,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='خدمة الموظفين' got='جودة الطعام' rail=['جودة الطعام'],787
+T225,الكاشير ضحك مع زميله وقت ما طلبت,خدمة الموظفين,easy,clean,laughed during order,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,801
+T226,النادل وقف فوق راسي اثناء الاكل,خدمة الموظفين,easy,clean,hovering,جودة الطعام,جودة الطعام | خدمة الموظفين,True,False,False,fail,"clean: expected='خدمة الموظفين' got='جودة الطعام' rail=['جودة الطعام', 'خدمة الموظفين']",1512
+T227,الموظف صد وجهه وقت ما اشتكيت,خدمة الموظفين,medium,clean,turned face on complaint,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,796
+T228,النادل تلقى مكالمه شخصيه واهملنا,خدمة الموظفين,easy,clean,personal call mid-service,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,800
+T229,الكاشير قال خلصت الكاسه ما عندي ماء,خدمة الموظفين,easy,clean,denied service,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,804
+T230,الموظف نهرني عن الجلوس في طاوله محجوزه بدون اعتذار,خدمة الموظفين,medium,clean,harsh reservation enforcement,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,818
+T231,النادل قال ما عنده وقت يشرح المنيو,خدمة الموظفين,medium,clean,refused menu explanation,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,802
+T232,المدير قاطعني وانا اشتكي,خدمة الموظفين,medium,clean,manager interrupted complaint,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='خدمة الموظفين' got='جودة الطعام' rail=['جودة الطعام'],591
+T233,الكاشير اعطاني الباقي وراح يحاسب الثاني,خدمة الموظفين,easy,clean,abrupt change handoff,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,808
+T234,النادل اقصى مزحه غير لايقه قدام عائلتي,خدمة الموظفين,hard,clean,inappropriate joke,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,806
+T235,النادل صب الماء على طاولتي بالخطا وما اعتذر,خدمة الموظفين,easy,clean,spilled water no apology,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,811
+T236,الكاشير اجبرنا نعطيه التقييم قبل ما نخلص,خدمة الموظفين,hard,clean,demanding review,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,809
+T237,الموظف اعطاني الحساب بسرعه وكأنه يطردنا,خدمة الموظفين,medium,clean,rushed bill = pushing out,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,807
+T238,النادل ما يعرف اي شي عن مكونات الاكل,خدمة الموظفين,easy,clean,no menu knowledge,جودة الطعام,جودة الطعام | خدمة الموظفين,True,False,False,fail,"clean: expected='خدمة الموظفين' got='جودة الطعام' rail=['جودة الطعام', 'خدمة الموظفين']",1517
+T239,الموظف لمس وجهي بكفه اثناء صب الماء,خدمة الموظفين,hard,clean,physical contact,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,803
+T240,الكاشير صبني بنظره مستفزه قدام الجميع,خدمة الموظفين,medium,clean,provocative look,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,806
+T241,الموظف لبسه غير لائق ومش نظيف,خدمة الموظفين,medium,clean,unprofessional appearance,خدمة الموظفين,خدمة الموظفين | النظافة,True,False,False,pass,,1500
+T242,النادل سمع اني اشتكيت ورفع طلباتي بعنف,خدمة الموظفين,medium,clean,vengeful service,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,806
+T243,الكاشير اعطاني نظره عابسه طوال الوقت,خدمة الموظفين,easy,clean,scowling cashier,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,805
+T244,الموظف اعطاني صحن اقل من المطلوب وقال خلاص,خدمة الموظفين,medium,clean,shorted portion + dismissive,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,810
+T245,النادل اجبر ابنتي تجلس وقالها اسكتي,خدمة الموظفين,hard,clean,shushing my child,خدمة الموظفين,خدمة الموظفين | وقت الانتظار,True,False,False,pass,,1508
+T246,الكاشير قاتلني على الكوبون بدون اي تعاون,خدمة الموظفين,medium,clean,fought over coupon,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,809
+T247,النادل قال انتم زباين قليلين ما لكم اولوية,خدمة الموظفين,hard,clean,openly prioritizing big orders,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,810
+T248,الكاشير ما اعطاني فرصه اختار وقاطعني,خدمة الموظفين,easy,clean,interrupted order,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,805
+T249,الموظف وقف ينظر التلفون اثناء اخذ طلبي,خدمة الموظفين,easy,clean,phone while taking order,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,806
+T250,النادل ما عرف اللغه الانجليزيه وتجاهل ضيفنا,خدمة الموظفين,medium,clean,no English service,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,811
+T251,طلبت برجر بدون مخلل واجاني مليان مخلل,دقة الطلب,easy,clean,no pickle ignored,دقة الطلب,دقة الطلب,False,False,False,pass,,604
+T252,نسوا حصة البطاطس مع الوجبه,دقة الطلب,easy,clean,missing side,جودة الطعام,جودة الطعام | دقة الطلب,True,False,False,fail,"clean: expected='دقة الطلب' got='جودة الطعام' rail=['جودة الطعام', 'دقة الطلب']",1503
+T253,طلبت قهوه حليب وجاتني سوداء,دقة الطلب,easy,clean,wrong coffee type,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='دقة الطلب' got='جودة الطعام' rail=['جودة الطعام'],594
+T254,ضاع نص الطلب في الكيس,دقة الطلب,easy,clean,half order missing,دقة الطلب,دقة الطلب,False,False,False,pass,,588
+T255,طلبت لحم ضاني وجاء دجاج,دقة الطلب,easy,clean,wrong protein,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='دقة الطلب' got='جودة الطعام' rail=['جودة الطعام'],847
+T256,نسوا اعطاني الصوصات المطلوبه,دقة الطلب,easy,clean,no sauces,دقة الطلب,دقة الطلب,False,False,False,pass,,791
+T257,طلبت بدون جبنه ولقيتها مليانه جبن,دقة الطلب,easy,clean,no cheese ignored,دقة الطلب,دقة الطلب,False,False,False,pass,,600
+T258,الطلب بدون بصل واتى عليه بصل مفروم,دقة الطلب,easy,clean,no onion ignored,دقة الطلب,دقة الطلب,False,False,False,pass,,601
+T259,بدلوا حجم الكوكا من كبير الى صغير,دقة الطلب,medium,clean,wrong size drink,عامة,,False,False,True,fail,clean: expected='دقة الطلب' got='عامة' rail=[],1405
+T260,اضاف الموظف صلصه ما طلبتها,دقة الطلب,easy,clean,extra unwanted sauce,خدمة الموظفين,خدمة الموظفين,False,False,False,fail,clean: expected='دقة الطلب' got='خدمة الموظفين' rail=['خدمة الموظفين'],794
+T261,طلبت بيتزا وسط جاءت صغيره,دقة الطلب,easy,clean,wrong pizza size,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='دقة الطلب' got='جودة الطعام' rail=['جودة الطعام'],592
+T262,بدلوا السلطه بمقبلات ثانيه,دقة الطلب,easy,clean,wrong side substitution,دقة الطلب,دقة الطلب,False,False,False,pass,,790
+T263,نسوا حصة الايس كريم,دقة الطلب,easy,clean,missing dessert,دقة الطلب,دقة الطلب,False,False,False,pass,,782
+T264,طلبت دجاج مشوي وجاء مقلي,دقة الطلب,easy,clean,wrong cooking method,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='دقة الطلب' got='جودة الطعام' rail=['جودة الطعام'],777
+T265,اعطاني سلطة سيزر بدل ما طلبت يونانيه,دقة الطلب,easy,clean,wrong salad,دقة الطلب,دقة الطلب,False,False,False,pass,,798
+T266,الطلب فيه عبوه مياه ناقصه,دقة الطلب,easy,clean,missing water bottle,دقة الطلب,دقة الطلب,False,False,False,pass,,789
+T267,الكاشير سجل الطلب على غير اللي قلته,دقة الطلب,medium,clean,cashier mis-entered,خدمة الموظفين,خدمة الموظفين,False,False,False,fail,clean: expected='دقة الطلب' got='خدمة الموظفين' rail=['خدمة الموظفين'],804
+T268,التطبيق غير الطلب لما اضفت ملاحظه,دقة الطلب,medium,clean,app overrode modifier,دقة الطلب,دقة الطلب,False,False,False,pass,,600
+T269,اضاف لحم اضافي بدون ما اطلب وحسبه علي,دقة الطلب,hard,clean,extra item + charged,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='دقة الطلب' got='جودة الطعام' rail=['جودة الطعام'],789
+T270,الطلب جاء بكامله من فرع غير اللي طلبت منه,دقة الطلب,hard,clean,wrong branch fulfilled,دقة الطلب,دقة الطلب,False,False,False,pass,,608
+T271,الموظف نسي يضيف الحلى المجاني للعرض,دقة الطلب,medium,clean,missed promo item,خدمة الموظفين,خدمة الموظفين,False,False,False,fail,clean: expected='دقة الطلب' got='خدمة الموظفين' rail=['خدمة الموظفين'],803
+T272,نسوا الخبز الاضافي اللي طلبته,دقة الطلب,easy,clean,missing extra bread,دقة الطلب,دقة الطلب,False,False,False,pass,,792
+T273,طلبت اضاف زبده وما لقيتها,دقة الطلب,easy,clean,missing add-on,دقة الطلب,دقة الطلب,False,False,False,pass,,592
+T274,جاء البرجر بدون اللحم بالكامل,دقة الطلب,easy,clean,no meat in burger,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='دقة الطلب' got='جودة الطعام' rail=['جودة الطعام'],857
+T275,جاء الطلب فيه قطعه فلافل واحده مكان خمس,دقة الطلب,easy,clean,wrong quantity,دقة الطلب,دقة الطلب,False,False,False,pass,,606
+T276,اعطاني عصير برتقال بدل عصير ليمون,دقة الطلب,easy,clean,wrong juice flavor,دقة الطلب,دقة الطلب,False,False,False,pass,,795
+T277,طلبت سلطة بدون طماطم واتت مليانه طماطم,دقة الطلب,easy,clean,tomato ignored,دقة الطلب,دقة الطلب,False,False,False,pass,,605
+T278,نسوا اعطاني حصة الشاي الكرك,دقة الطلب,easy,clean,missing karak,دقة الطلب,دقة الطلب,False,False,False,pass,,790
+T279,التطبيق قبل الطلب لكن الفرع ارسل غير المطلوب,دقة الطلب,medium,clean,app vs branch mismatch,دقة الطلب,دقة الطلب,False,False,False,pass,,611
+T280,اعطاني فطر بدل البصل في الفاهيتا,دقة الطلب,easy,clean,fajita topping swap,دقة الطلب,دقة الطلب,False,False,False,pass,,794
+T281,اخطا في عدد الطلبات لما حسب,دقة الطلب,medium,clean,miscount,دقة الطلب,دقة الطلب,False,False,False,pass,,594
+T282,الكاشير اعطاني الاير فرايز بدل القلي العادي,دقة الطلب,easy,clean,wrong fry type,خدمة الموظفين,خدمة الموظفين | دقة الطلب,True,False,False,fail,"clean: expected='دقة الطلب' got='خدمة الموظفين' rail=['خدمة الموظفين', 'دقة الطلب']",1533
+T283,جاءت الوجبه بدون مشروب اساسي,دقة الطلب,easy,clean,missing combo drink,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='دقة الطلب' got='جودة الطعام' rail=['جودة الطعام'],783
+T284,اعطاني بدل من الدجاج لحم لانه قال ما عنده دجاج,دقة الطلب,medium,clean,silent substitution,جودة الطعام,جودة الطعام | دقة الطلب,True,False,False,fail,"clean: expected='دقة الطلب' got='جودة الطعام' rail=['جودة الطعام', 'دقة الطلب']",1665
+T285,طلبت بيتزا بدون مارجريتا فضافها,دقة الطلب,medium,clean,added unwanted item,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='دقة الطلب' got='جودة الطعام' rail=['جودة الطعام'],598
+T286,التطبيق سجل لي طبقين متشابهين,دقة الطلب,easy,clean,duplicate items,دقة الطلب,دقة الطلب,False,False,False,pass,,596
+T287,اعطاني فلافل بدل من شاورما لحم,دقة الطلب,easy,clean,wrong main,جودة الطعام,جودة الطعام | دقة الطلب,True,False,False,fail,"clean: expected='دقة الطلب' got='جودة الطعام' rail=['جودة الطعام', 'دقة الطلب']",1503
+T288,نسي اعطاني صحن البقلاوه الاضافي,دقة الطلب,easy,clean,missing dessert add,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='دقة الطلب' got='جودة الطعام' rail=['جودة الطعام'],598
+T289,طلبت طعام حار ما اعطاني فلفل اطلاقا,دقة الطلب,easy,clean,no spice ignored,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='دقة الطلب' got='جودة الطعام' rail=['جودة الطعام'],788
+T290,اعطاني الزبادي بدل من السلطة الجانبيه,دقة الطلب,easy,clean,wrong side,دقة الطلب,دقة الطلب,False,False,False,pass,,799
+T291,الكاشير سجل عربي بدل اللحم,دقة الطلب,medium,clean,Arabic typo error,جودة الطعام,جودة الطعام | خدمة الموظفين | دقة الطلب,True,False,False,fail,"clean: expected='دقة الطلب' got='جودة الطعام' rail=['جودة الطعام', 'خدمة الموظفين', 'دقة الطلب']",1994
+T292,بدون بصل اخضر بس اتى مليان بصل اخضر,دقة الطلب,easy,clean,green onion ignored,عامة,,False,False,True,fail,clean: expected='دقة الطلب' got='عامة' rail=[],1205
+T293,اعطاني ليمون بدل من البرتقال للشطه,دقة الطلب,medium,clean,wrong citrus,دقة الطلب,دقة الطلب,False,False,False,pass,,796
+T294,اعطاني عصير بطعم الشمام ما طلبت ذا,دقة الطلب,easy,clean,wrong flavor,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='دقة الطلب' got='جودة الطعام' rail=['جودة الطعام'],787
+T295,جاءت الوجبه بدون التتبيله المطلوبه,دقة الطلب,easy,clean,missing marinade,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='دقة الطلب' got='جودة الطعام' rail=['جودة الطعام'],789
+T296,الموظف خلط الحلى بين زبائن,دقة الطلب,medium,clean,dessert swap,خدمة الموظفين,خدمة الموظفين | دقة الطلب,True,False,False,fail,"clean: expected='دقة الطلب' got='خدمة الموظفين' rail=['خدمة الموظفين', 'دقة الطلب']",1515
+T297,الطلب فيه طبق متكرر مرتين,دقة الطلب,easy,clean,duplicate,دقة الطلب,دقة الطلب,False,False,False,pass,,592
+T298,التطبيق غير عدد القطع لما اضفت تعديل,دقة الطلب,medium,clean,app changed quantity,دقة الطلب,دقة الطلب,False,False,False,pass,,603
+T299,اعطاني تشيز كيك بدل من البراوني,دقة الطلب,easy,clean,wrong dessert,دقة الطلب,دقة الطلب,False,False,False,pass,,793
+T300,نسوا حتى يحطون السكر في القهوه,دقة الطلب,easy,clean,no sugar,دقة الطلب,دقة الطلب,False,False,False,pass,,793
+T301,بصراحه ما عجبتني التجربه نهائياً,عامة,easy,clean,general dissatisfaction,عامة,,False,False,True,pass,,1209
+T302,ما اعتقد اني راح ارجع لهالمكان,عامة,easy,clean,won't return,السعر والقيمة,السعر والقيمة,False,False,False,fail,clean: expected='عامة' got='السعر والقيمة' rail=['السعر والقيمة'],600
+T303,مكان ما يستحق الزياره ولا التجربه,عامة,easy,clean,not worth visit,عامة,,False,False,True,pass,,1206
+T304,شي خايس بشكل عام,عامة,easy,clean,general bad,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='عامة' got='جودة الطعام' rail=['جودة الطعام'],583
+T305,تجربه باهته بكل المعنى,عامة,easy,clean,bland experience,عامة,,False,False,True,pass,,1197
+T306,لا انصح احد يخوض التجربه,عامة,easy,clean,do not recommend,عامة,,False,False,True,pass,,1202
+T307,الكل سيء ما اقدر اخص شي,عامة,medium,clean,"everything bad, nothing specific",عامة,,False,False,True,pass,,1198
+T308,ضايع وقتي وفلوسي في هالمكان,عامة,easy,clean,wasted time/money,السعر والقيمة,السعر والقيمة,False,False,False,fail,clean: expected='عامة' got='السعر والقيمة' rail=['السعر والقيمة'],597
+T309,ما توقعت يكون بهذي السوء,عامة,easy,clean,below expectations,عامة,,False,False,True,pass,,1194
+T310,تجربه محبطه ما لها وصف,عامة,easy,clean,depressing experience,عامة,,False,False,True,pass,,1195
+T311,الكل بس على بعضه يضحك,عامة,medium,clean,everything off,عامة,,False,False,True,pass,,1196
+T312,ما عجبني فيه شي حلو ابداً,عامة,easy,clean,nothing good,عامة,,False,False,True,pass,,1379
+T313,راجع لها مره ثانيه لما اكره نفسي,عامة,medium,clean,sarcasm-light,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='عامة' got='جودة الطعام' rail=['جودة الطعام'],599
+T314,ندمت اني جربتهم,عامة,easy,clean,regret trying,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='عامة' got='جودة الطعام' rail=['جودة الطعام'],582
+T315,شي ما يستاهل الذكر,عامة,easy,clean,not worth mentioning,عامة,,False,False,True,pass,,1385
+T316,سيء بكل المقاييس وما اقدر اقول اكثر من ذلك,عامة,easy,clean,general bad,عامة,,False,False,True,pass,,1217
+T317,ما اعتقد اني حابب ارجعه,عامة,easy,clean,general bad,السعر والقيمة,السعر والقيمة,False,False,False,fail,clean: expected='عامة' got='السعر والقيمة' rail=['السعر والقيمة'],593
+T318,التجربه عادي ما تستحق التوصيه,عامة,easy,clean,mediocre,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='عامة' got='جودة الطعام' rail=['جودة الطعام'],596
+T319,مكان لا اعرف وش يعمل صح,عامة,medium,clean,nothing right,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='عامة' got='جودة الطعام' rail=['جودة الطعام'],590
+T320,تجربه ما ترتقي لاسمهم,عامة,easy,clean,below brand reputation,عامة,,False,False,True,pass,,1199
+T321,احط نجمه وحده فقط,عامة,easy,clean,1-star summary,دقة الطلب,دقة الطلب,False,False,False,fail,clean: expected='عامة' got='دقة الطلب' rail=['دقة الطلب'],584
+T322,بصراحه قمه في السوء,عامة,easy,clean,peak bad,عامة,,False,False,True,pass,,1192
+T323,ما ادري ليش الناس تمدحه,عامة,easy,clean,puzzled by reviews,عامة,,False,False,True,pass,,1196
+T324,تجربه ناقصه من كل جانب,عامة,easy,clean,incomplete experience,دقة الطلب,دقة الطلب,False,False,False,fail,clean: expected='عامة' got='دقة الطلب' rail=['دقة الطلب'],786
+T325,لا انصح ابد بهذا المطعم,عامة,easy,clean,do not recommend,عامة,,False,False,True,pass,,1201
+T326,افضل تطلب من اي مطعم ثاني,عامة,easy,clean,alternative recommendation,,,False,True,False,fail,clean: expected='عامة' got='' rail=[],158
+T327,اخر مره اطلب من هالمكان,عامة,easy,clean,last time,عامة,,False,False,True,pass,,1193
+T328,شي صعب اني اوصفه بكلمات,عامة,medium,clean,hard to describe,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='عامة' got='جودة الطعام' rail=['جودة الطعام'],590
+T329,الفرع كله محتاج اعادة هيكله,عامة,easy,clean,branch needs rebuilding,النظافة,النظافة,False,False,False,fail,clean: expected='عامة' got='النظافة' rail=['النظافة'],589
+T330,تجربه فاشله من كل النواحي,عامة,easy,clean,failed experience,عامة,,False,False,True,pass,,1200
+T331,لو في صفر نجوم لاعطيتهم,عامة,easy,clean,zero stars,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='عامة' got='جودة الطعام' rail=['جودة الطعام'],590
+T332,ما عجبني شي من اول لحظه,عامة,easy,clean,bad from start,عامة,,False,False,True,pass,,1202
+T333,جلست خمس دقائق وطلعت ما ترتاح النفس,عامة,easy,clean,left immediately,عامة,,False,False,True,pass,,1394
+T334,شي يحبط النفس من اول دقيقه,عامة,easy,clean,demoralizing,وقت الانتظار,وقت الانتظار,False,False,False,fail,clean: expected='عامة' got='وقت الانتظار' rail=['وقت الانتظار'],773
+T335,سيء من كل وجه,عامة,easy,clean,bad from all angles,عامة,,False,False,True,pass,,1183
+T336,الفرع هذا مش متطور مثل غيره,عامة,easy,clean,branch lagging,عامة,,False,False,True,pass,,1197
+T337,جربتهم اربع مرات وكل مره تجربه سيئه,عامة,medium,clean,consistent badness,عامة,,False,False,True,pass,,1208
+T338,بداية النهايه لهذا المطعم,عامة,easy,clean,beginning of end,عامة,,False,False,True,pass,,1195
+T339,ضيعت ساعتين من عمري,عامة,easy,clean,wasted hours,وقت الانتظار,وقت الانتظار,False,False,False,fail,clean: expected='عامة' got='وقت الانتظار' rail=['وقت الانتظار'],767
+T340,ما اقدر اوصف التعاسه اللي حصلت لي,عامة,easy,clean,indescribable misery,النظافة,النظافة,False,False,False,fail,clean: expected='عامة' got='النظافة' rail=['النظافة'],595
+T341,الفرع يحتاج اعادة هيكله من الصفر,عامة,easy,clean,needs full restructure,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='عامة' got='جودة الطعام' rail=['جودة الطعام'],599
+T342,تجربه ما تتكرر ابداً,عامة,easy,clean,non-repeatable,عامة,,False,False,True,pass,,1187
+T343,ما لقيت اي شي مميز فيه,عامة,easy,clean,nothing special,عامة,,False,False,True,pass,,1192
+T344,الفرع هذا بحالة سيئه عموماً,عامة,easy,clean,branch in bad shape,عامة,,False,False,True,pass,,1196
+T345,اقل تقييم ممكن اعطيه,عامة,easy,clean,lowest possible rating,عامة,,False,False,True,pass,,1195
+T346,التجربه دون المتوقع بكثير,عامة,easy,clean,below expectations,عامة,,False,False,True,pass,,1195
+T347,تجربه ما تعوض ابداً,عامة,easy,clean,irreplaceable bad experience,عامة,,False,False,True,pass,,1188
+T348,ما عندي صبر اكتب تفاصيل سيئه,عامة,easy,clean,won't detail,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='عامة' got='جودة الطعام' rail=['جودة الطعام'],595
+T349,الفرع كله احتاج تجديد,عامة,easy,clean,needs renewal,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='عامة' got='جودة الطعام' rail=['جودة الطعام'],588
+T350,عموما تجربه ما تستاهل الذكر,عامة,easy,clean,not worth mentioning,عامة,,False,False,True,pass,,1391
+T351,قعدنا ساعه قبل ما يجي الطلب,وقت الانتظار,easy,clean,1hr wait,وقت الانتظار,وقت الانتظار,False,False,False,pass,,773
+T352,انتظرنا ٤٠ دقيقه عشان كوب قهوه,وقت الانتظار,easy,clean,40min coffee,وقت الانتظار,وقت الانتظار,False,False,False,pass,,849
+T353,الطلب اتاخر اكثر من المعتاد بكثير,وقت الانتظار,easy,clean,longer than usual,وقت الانتظار,وقت الانتظار,False,False,False,pass,,598
+T354,صرنا نصرخ بصوت عالي ولا حد جا,وقت الانتظار,medium,clean,yelling no response,وقت الانتظار,وقت الانتظار,False,False,False,pass,,594
+T355,ساعتين انتظار وما اعتذر احد,وقت الانتظار,easy,clean,2hr no apology,وقت الانتظار,وقت الانتظار,False,False,False,pass,,775
+T356,الوقت تطول بشكل لا يحتمل,وقت الانتظار,easy,clean,unbearable wait,وقت الانتظار,وقت الانتظار,False,False,False,pass,,589
+T357,اخدنا اكثر من ساعه نص في الكاشير,وقت الانتظار,easy,clean,checkout wait,خدمة الموظفين,خدمة الموظفين | وقت الانتظار,True,False,False,fail,"clean: expected='وقت الانتظار' got='خدمة الموظفين' rail=['خدمة الموظفين', 'وقت الانتظار']",1506
+T358,طلبنا الفاتوره قبل عشرين دقيقه ولم تاتي,وقت الانتظار,easy,clean,bill wait,السعر والقيمة,السعر والقيمة | وقت الانتظار,True,False,False,fail,"clean: expected='وقت الانتظار' got='السعر والقيمة' rail=['السعر والقيمة', 'وقت الانتظار']",1511
+T359,الطلب من المطبخ اخذ ٩٠ دقيقه,وقت الانتظار,easy,clean,kitchen ticket,وقت الانتظار,وقت الانتظار,False,False,False,pass,,775
+T360,سحبنا الطلب من السياره بانتظار طويل,وقت الانتظار,medium,clean,carry-out wait,وقت الانتظار,وقت الانتظار,False,False,False,pass,,781
+T361,الكاشير شغال على ٣ طلبات وحد يفهم,وقت الانتظار,medium,clean,cashier multi-tasking,خدمة الموظفين,خدمة الموظفين,False,False,False,fail,clean: expected='وقت الانتظار' got='خدمة الموظفين' rail=['خدمة الموظفين'],802
+T362,بطء الخدمه بسبب نقص الموظفين,وقت الانتظار,medium,clean,understaffing,خدمة الموظفين,خدمة الموظفين,False,False,False,fail,clean: expected='وقت الانتظار' got='خدمة الموظفين' rail=['خدمة الموظفين'],798
+T363,الطلب اخذ وقت اكثر من اللي قلت لي,وقت الانتظار,easy,clean,longer than quoted,وقت الانتظار,وقت الانتظار,False,False,False,pass,,598
+T364,جلسنا ساعتين بدون ما يلتفت لنا احد,وقت الانتظار,easy,clean,ignored for hours,وقت الانتظار,وقت الانتظار,False,False,False,pass,,852
+T365,الكوكا اخدت ١٥ دقيقه عشان توصل,وقت الانتظار,easy,clean,drink wait,وقت الانتظار,وقت الانتظار,False,False,False,pass,,777
+T366,جلست في الانتظار اطول من اللي اكلت فيه,وقت الانتظار,medium,clean,more waiting than eating,وقت الانتظار,وقت الانتظار | جودة الطعام,True,False,False,pass,,1496
+T367,بانتظار الزيادات اللي طلبتها على البرجر,وقت الانتظار,easy,clean,addon wait,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='وقت الانتظار' got='جودة الطعام' rail=['جودة الطعام'],794
+T368,اخر شي خلصنا الطلب بعد ساعتين,وقت الانتظار,easy,clean,two-hour total,وقت الانتظار,وقت الانتظار,False,False,False,pass,,777
+T369,الكاشير اخدته دفعتي ١٠ دقايق,وقت الانتظار,easy,clean,payment wait,خدمة الموظفين,خدمة الموظفين,False,False,False,fail,clean: expected='وقت الانتظار' got='خدمة الموظفين' rail=['خدمة الموظفين'],797
+T370,جلسة طويله بدون اي شي على الطاوله,وقت الانتظار,easy,clean,long sit with nothing,وقت الانتظار,وقت الانتظار,False,False,False,pass,,849
+T371,النادل جا بعد ٢٥ دقيقه ياخذ الطلب,وقت الانتظار,easy,clean,long order taking,خدمة الموظفين,خدمة الموظفين | وقت الانتظار,True,False,False,fail,"clean: expected='وقت الانتظار' got='خدمة الموظفين' rail=['خدمة الموظفين', 'وقت الانتظار']",1507
+T372,ساعه قبل ما يجي الحلى,وقت الانتظار,easy,clean,dessert wait,وقت الانتظار,وقت الانتظار,False,False,False,pass,,767
+T373,الانتظار في الزحمه كان خرافي,وقت الانتظار,medium,clean,weekend wait,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='وقت الانتظار' got='جودة الطعام' rail=['جودة الطعام'],595
+T374,اخذت الكثير من الوقت قبل اتسلم الفاتوره,وقت الانتظار,easy,clean,bill delay,السعر والقيمة,السعر والقيمة,False,False,False,fail,clean: expected='وقت الانتظار' got='السعر والقيمة' rail=['السعر والقيمة'],805
+T375,الطلب اللي قلت ربع ساعه قال طلع ساعه,وقت الانتظار,easy,clean,underestimated time,وقت الانتظار,وقت الانتظار,False,False,False,pass,,845
+T376,راحت الشهيه قبل ما يجي الاكل,وقت الانتظار,easy,clean,lost appetite,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='وقت الانتظار' got='جودة الطعام' rail=['جودة الطعام'],782
+T377,نص ساعه عشان يحضر السلطه,وقت الانتظار,easy,clean,salad wait,وقت الانتظار,وقت الانتظار,False,False,False,pass,,773
+T378,جلسنا ساعه ٧٥ دقيقه على الباب نستنى دور,وقت الانتظار,medium,clean,lobby queue,وقت الانتظار,وقت الانتظار,False,False,False,pass,,925
+T379,سحبت الطلب وكنت ابي اطلع,وقت الانتظار,easy,clean,left because of wait,السعر والقيمة,السعر والقيمة,False,False,False,fail,clean: expected='وقت الانتظار' got='السعر والقيمة' rail=['السعر والقيمة'],594
+T380,جلست منتظره الكاشير يحاسب ٢٠ دقيقه,وقت الانتظار,easy,clean,register wait,خدمة الموظفين,خدمة الموظفين | وقت الانتظار,True,False,False,fail,"clean: expected='وقت الانتظار' got='خدمة الموظفين' rail=['خدمة الموظفين', 'وقت الانتظار']",1578
+T381,استمرت الاوامر بدون اي توصيل من الطباخ,وقت الانتظار,medium,clean,kitchen backed up,التوصيل,التوصيل,False,False,False,fail,clean: expected='وقت الانتظار' got='التوصيل' rail=['التوصيل'],780
+T382,ساعتين قبل ما اخذ كوب قهوه,وقت الانتظار,easy,clean,extreme coffee wait,وقت الانتظار,وقت الانتظار,False,False,False,pass,,774
+T383,اول جلستنا اخر طلب الحلى اخذ ساعه,وقت الانتظار,easy,clean,dessert ticket,وقت الانتظار,وقت الانتظار,False,False,False,pass,,850
+T384,الموظف قال خمس دقايق صار خمس ساعات,وقت الانتظار,easy,clean,exaggerated wait,خدمة الموظفين,خدمة الموظفين | وقت الانتظار,True,False,False,fail,"clean: expected='وقت الانتظار' got='خدمة الموظفين' rail=['خدمة الموظفين', 'وقت الانتظار']",1508
+T385,جلست منتظره طلبي ولا اي خبر,وقت الانتظار,easy,clean,no update,وقت الانتظار,وقت الانتظار,False,False,False,pass,,773
+T386,لما طلبت اعرف وضع طلبي قال انتظر بدون توضيح,وقت الانتظار,medium,clean,no transparency,وقت الانتظار,وقت الانتظار,False,False,False,pass,,790
+T387,بطء التحضير غير منطقي مقابل عدد الزباين,وقت الانتظار,medium,clean,slow vs demand,وقت الانتظار,وقت الانتظار,False,False,False,pass,,604
+T388,جلسنا في الانتظار اكثر من اللي اكلنا فيه,وقت الانتظار,easy,clean,wait>eat,وقت الانتظار,وقت الانتظار | جودة الطعام,True,False,False,pass,,1500
+T389,الكاشير معطل وايقاف الكل,وقت الانتظار,medium,clean,broken POS = wait,خدمة الموظفين,خدمة الموظفين,False,False,False,fail,clean: expected='وقت الانتظار' got='خدمة الموظفين' rail=['خدمة الموظفين'],793
+T390,سحبت الطلب من الموقع وكان متاخر,وقت الانتظار,easy,clean,self-pickup delayed,السعر والقيمة,السعر والقيمة,False,False,False,fail,clean: expected='وقت الانتظار' got='السعر والقيمة' rail=['السعر والقيمة'],601
+T391,سحبنا بعد ساعه من تاكيد الاوردر,وقت الانتظار,easy,clean,post-confirm wait,وقت الانتظار,وقت الانتظار,False,False,False,pass,,777
+T392,الفاتوره اخذت اطول من تحضير الاكل,وقت الانتظار,medium,clean,bill > prep,السعر والقيمة,السعر والقيمة | جودة الطعام,True,False,False,fail,"clean: expected='وقت الانتظار' got='السعر والقيمة' rail=['السعر والقيمة', 'جودة الطعام']",1512
+T393,اول طلب اخذ ساعه ثاني طلب اخذ ساعتين,وقت الانتظار,easy,clean,compounding wait,وقت الانتظار,وقت الانتظار,False,False,False,pass,,853
+T394,صرت اتصل عليهم عشان اعرف وضعي بالطابور,وقت الانتظار,easy,clean,had to call,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='وقت الانتظار' got='جودة الطعام' rail=['جودة الطعام'],605
+T395,الزحمه يوم الويك اند تخلي الانتظار ٣ ساعات,وقت الانتظار,medium,clean,weekend extreme,وقت الانتظار,وقت الانتظار,False,False,False,pass,,789
+T396,استمتعت بالاكل بعد ما خلصت اعصابي بالانتظار,وقت الانتظار,medium,clean,sarcastic enjoy,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='وقت الانتظار' got='جودة الطعام' rail=['جودة الطعام'],798
+T397,الانتظار للحساب اطول من الانتظار للاكل,وقت الانتظار,medium,clean,bill > food wait,جودة الطعام,جودة الطعام,False,False,False,fail,clean: expected='وقت الانتظار' got='جودة الطعام' rail=['جودة الطعام'],792
+T398,ساعه ونص ولم اتسلم اي شي,وقت الانتظار,easy,clean,1.5hr nothing,وقت الانتظار,وقت الانتظار,False,False,False,pass,,770
+T399,جلست في الموقف انتظر طلبي يجي,وقت الانتظار,easy,clean,parking lot wait,وقت الانتظار,وقت الانتظار,False,False,False,pass,,845
+T400,ساعة كامله انتظار للسلطه الجانبيه,وقت الانتظار,easy,clean,side dish hour,وقت الانتظار,وقت الانتظار,False,False,False,pass,,785
+T401,الاكل بايخ والموظف عبوس وما رد علي,multi,hard,multi_aspect,dominant=جودة الطعام; FOOD+STAFF,جودة الطعام,جودة الطعام | خدمة الموظفين,True,False,False,pass,,1588
+T402,الفاتوره غاليه والمندوب تاخر ساعتين,multi,hard,multi_aspect,dominant=التوصيل; DELIVERY+PRICE (delivery dominant),التوصيل,التوصيل | السعر والقيمة | وقت الانتظار,True,False,False,pass,,2056
+T403,نسوا نص الطلب والكاشير تكلم معي بطريقه سيئه,multi,hard,multi_aspect,dominant=دقة الطلب; ACCURACY+STAFF,خدمة الموظفين,خدمة الموظفين | دقة الطلب,True,False,False,pass,,1535
+T404,الحمام مقرف والاكل مالح بزياده,multi,hard,multi_aspect,dominant=النظافة; HYGIENE+FOOD,النظافة,النظافة | جودة الطعام,True,False,False,pass,,1562
+T405,الانتظار طويل واسعار غير معقوله,multi,hard,multi_aspect,dominant=وقت الانتظار; WAIT+PRICE,السعر والقيمة,السعر والقيمة | وقت الانتظار,True,False,False,pass,,1500
+T406,الموظف بطيء ووجهه عابس والاكل بارد,multi,hard,multi_aspect,dominant=خدمة الموظفين; STAFF+FOOD,جودة الطعام,جودة الطعام | خدمة الموظفين,True,False,False,pass,,1588
+T407,المندوب نسي نص الطلب وضاع الكوبون,multi,hard,multi_aspect,dominant=التوصيل; DELIVERY+ACCURACY,التوصيل,التوصيل,False,False,False,fail,expected >=2 rail categories; got rail=['التوصيل'],777
+T408,الكاشير اخطا في الحسبه والسعر غالي,multi,hard,multi_aspect,dominant=السعر والقيمة; PRICE+STAFF,السعر والقيمة,السعر والقيمة | خدمة الموظفين,True,False,False,pass,,1600
+T409,الاكل وصل بعد ساعتين باردا وضايع نص الطلب,multi,hard,multi_aspect,dominant=التوصيل; DELIVERY+ACCURACY+FOOD,جودة الطعام,جودة الطعام | وقت الانتظار,True,False,False,pass,,1575
+T410,ضاع الصوص في الكيس والمندوب ما رد,multi,hard,multi_aspect,dominant=التوصيل; DELIVERY+ACCURACY,التوصيل,التوصيل,False,False,False,fail,expected >=2 rail categories; got rail=['التوصيل'],778
+T411,جدا غالي ومش بنفس النظافه المتوقعه,multi,hard,multi_aspect,dominant=السعر والقيمة; PRICE+HYGIENE,السعر والقيمة,السعر والقيمة | النظافة,True,False,False,pass,,1502
+T412,الانتظار خرافي والكاشير يصرخ,multi,hard,multi_aspect,dominant=وقت الانتظار; WAIT+STAFF,خدمة الموظفين,خدمة الموظفين,False,False,False,fail,expected >=2 rail categories; got rail=['خدمة الموظفين'],798
+T413,نسوا الايس كريم وحسبوه علي بالفاتوره,multi,hard,multi_aspect,dominant=دقة الطلب; ACCURACY+PRICE,السعر والقيمة,السعر والقيمة | دقة الطلب,True,False,False,pass,,1525
+T414,ريحه كريهه والاكل ما لها طعم,multi,hard,multi_aspect,dominant=النظافة; HYGIENE+FOOD,جودة الطعام,جودة الطعام,False,False,False,fail,expected >=2 rail categories; got rail=['جودة الطعام'],854
+T415,الموظف اهانني والاسعار مرتفعه,multi,hard,multi_aspect,dominant=خدمة الموظفين; STAFF+PRICE,السعر والقيمة,السعر والقيمة | خدمة الموظفين,True,False,False,pass,,1522
+T416,التطبيق ضرب فلوس مرتين والمندوب جا متاخر,multi,hard,multi_aspect,dominant=التوصيل; DELIVERY+PRICE,التوصيل,التوصيل,False,False,False,fail,expected >=2 rail categories; got rail=['التوصيل'],785
+T417,الصحون متسخه والاكل قديم بزياده,multi,hard,multi_aspect,dominant=النظافة; HYGIENE+FOOD,النظافة,النظافة | جودة الطعام,True,False,False,pass,,1490
+T418,الطلب وصل ناقص بعد ساعتين,multi,hard,multi_aspect,dominant=التوصيل; DELIVERY+ACCURACY+WAIT,دقة الطلب,دقة الطلب | وقت الانتظار,True,False,False,pass,,1495
+T419,اخذنا ساعه ونص ولما جا الاكل اتاكلت ميته,multi,hard,multi_aspect,dominant=جودة الطعام; WAIT+FOOD (food dominant),جودة الطعام,جودة الطعام | وقت الانتظار,True,False,False,pass,,1499
+T420,نسوا التتبيله والوقت طال,multi,hard,multi_aspect,dominant=دقة الطلب; ACCURACY+WAIT,دقة الطلب,دقة الطلب,False,False,False,fail,expected >=2 rail categories; got rail=['دقة الطلب'],787
+T421,الكاشير شتمني وحاسبني غلط,multi,hard,multi_aspect,dominant=خدمة الموظفين; STAFF+PRICE,خدمة الموظفين,خدمة الموظفين | دقة الطلب,True,False,False,pass,,1515
+T422,الصحن مقدم بطريقه قذره والطلب ناقص,multi,hard,multi_aspect,dominant=النظافة; HYGIENE+ACCURACY,النظافة,النظافة | دقة الطلب,True,False,False,pass,,1500
+T423,التوصيل اطول من المعتاد والاكل ساح,multi,hard,multi_aspect,dominant=التوصيل; DELIVERY+FOOD,جودة الطعام,جودة الطعام | التوصيل,True,False,False,pass,,1492
+T424,سحب من البطاقه مرتين والطلب وصل غلط,multi,hard,multi_aspect,dominant=السعر والقيمة; PRICE+ACCURACY,دقة الطلب,دقة الطلب,False,False,False,fail,expected >=2 rail categories; got rail=['دقة الطلب'],797
+T425,الموظف ضحك علي وحاسبني زياده,multi,hard,multi_aspect,dominant=خدمة الموظفين; STAFF+PRICE,خدمة الموظفين,خدمة الموظفين,False,False,False,fail,expected >=2 rail categories; got rail=['خدمة الموظفين'],796
+T426,شعره في الاكل والاستجابه بطيئه,multi,hard,multi_aspect,dominant=النظافة; HYGIENE+STAFF,جودة الطعام,جودة الطعام,False,False,False,fail,expected >=2 rail categories; got rail=['جودة الطعام'],784
+T427,اللحم نيه ووصل بعد ساعتين باردا,multi,hard,multi_aspect,dominant=جودة الطعام; FOOD+DELIVERY+WAIT,جودة الطعام,جودة الطعام | وقت الانتظار,True,False,False,pass,,1565
+T428,الكاشير تجاهلني والكوبون ما اشتغل,multi,hard,multi_aspect,dominant=خدمة الموظفين; STAFF+PRICE,خدمة الموظفين,خدمة الموظفين,False,False,False,fail,expected >=2 rail categories; got rail=['خدمة الموظفين'],802
+T429,الانتظار طويل والاكل ضايع نصه,multi,hard,multi_aspect,dominant=وقت الانتظار; WAIT+ACCURACY,جودة الطعام,جودة الطعام | وقت الانتظار,True,False,False,pass,,1489
+T430,ريحه دخان من المطبخ والاكل طعمه فاسد,multi,hard,multi_aspect,dominant=النظافة; HYGIENE+FOOD,جودة الطعام,جودة الطعام,False,False,False,fail,expected >=2 rail categories; got rail=['جودة الطعام'],863
+T431,يا سلام على الانتظار الممتع لمدة ساعتين,وقت الانتظار,hard,sarcasm,sarcasm wait,وقت الانتظار,وقت الانتظار,False,False,False,pass,,787
+T432,ما شاء الله موظف يعرف يضحك في وجهك وانت تشتكي,خدمة الموظفين,hard,sarcasm,sarcasm staff,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,811
+T433,جدا متحمس للفاتوره اللي ضاعفت ميزانيتي,السعر والقيمة,hard,sarcasm,sarcasm price,السعر والقيمة,السعر والقيمة,False,False,False,pass,,804
+T434,احب الذباب اللي يزين الطعام عندهم,النظافة,hard,sarcasm,sarcasm hygiene,,,False,True,False,fail,sarcasm: expected='النظافة' got='',158
+T435,ابدع الطباخ في تحويل اللحم الى فحم,جودة الطعام,hard,sarcasm,sarcasm food burnt,جودة الطعام,جودة الطعام,False,False,False,pass,,788
+T436,شكرا للمندوب اللي ضيع طريقي وضيع الاكل,التوصيل,hard,sarcasm,sarcasm delivery,,,False,True,False,fail,sarcasm: expected='التوصيل' got='',158
+T437,شطاره عاليه في نسيان نص الطلب,دقة الطلب,hard,sarcasm,sarcasm accuracy,دقة الطلب,دقة الطلب,False,False,False,pass,,596
+T438,روعه الانتظار اللي يخليك تتنازل عن الجوع,وقت الانتظار,hard,sarcasm,sarcasm wait,وقت الانتظار,وقت الانتظار,False,False,False,pass,,605
+T439,الاكل مش بايخ هو فقط بلا طعم,جودة الطعام,hard,negation,negation hides bad,جودة الطعام,جودة الطعام,False,False,False,pass,,925
+T440,ليس الاكل لذيذ ولا الخدمه محترمه,عامة,hard,negation,double negation,,,False,True,False,fail,negation: expected='عامة' got='',158
+T441,ما اقول الكاشير مهذب لكنه قح فظ,خدمة الموظفين,hard,negation,negation + insult,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,800
+T442,ما اقول السعر غالي بس ماحد يدفعه راضي,السعر والقيمة,hard,negation,negation hides price complaint,السعر والقيمة,السعر والقيمة,False,False,False,pass,,874
+T443,ما لقيت شي وسخ لكن الصحون فيها بقع,النظافة,hard,negation,negation contradicts hygiene,النظافة,النظافة,False,False,False,pass,,777
+T444,الطلب ما هو غلط هو فقط مش اللي طلبته,دقة الطلب,hard,negation,negation hides accuracy,دقة الطلب,دقة الطلب,False,False,False,pass,,798
+T445,ما تأخر التوصيل كثير ٩٠ دقيقه عاديه,التوصيل,hard,negation,sarcastic 'normal',التوصيل,التوصيل | وقت الانتظار,True,False,False,pass,,1485
+T446,الانتظار ليس طويل هو فقط لا ينتهي,وقت الانتظار,hard,negation,sarcastic wait,وقت الانتظار,وقت الانتظار,False,False,False,pass,,779
+T447,شعرت بسعادة الانتظار لساعتين,وقت الانتظار,hard,sarcasm,sarcasm wait,وقت الانتظار,وقت الانتظار,False,False,False,pass,,776
+T448,ابداع في تقديم الاكل بدرجة غرفة,جودة الطعام,hard,sarcasm,sarcasm food cold,جودة الطعام,جودة الطعام,False,False,False,pass,,785
+T449,الموظف فنان في توزيع التجاهل بالتساوي,خدمة الموظفين,hard,sarcasm,sarcasm staff,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,805
+T450,الكاشير قمة الذكاء في حسبة غلط,السعر والقيمة,hard,sarcasm,sarcasm price,خدمة الموظفين,خدمة الموظفين | دقة الطلب,True,False,False,fail,sarcasm: expected='السعر والقيمة' got='خدمة الموظفين',1520
+T451,ما عجبني شي بصراحه لكن قالوا الكل احبه,عامة,hard,negation,negation general,عامة,,False,False,True,pass,,1214
+T452,الذباب هي اضافه مجانيه ما يجب الشكوى,النظافة,hard,sarcasm,sarcasm hygiene,النظافة,النظافة,False,False,False,pass,,782
+T453,اخر ابداع في خلط الطلبات بين الزبائن,دقة الطلب,hard,sarcasm,sarcasm accuracy,دقة الطلب,دقة الطلب,False,False,False,pass,,798
+T454,ابدع المندوب وضاع لمدة ٤٠ دقيقه,التوصيل,hard,sarcasm,sarcasm delivery,وقت الانتظار,وقت الانتظار | التوصيل,True,False,False,fail,sarcasm: expected='التوصيل' got='وقت الانتظار',1481
+T455,ماحد شفي مثلهم في تطبيق العروض بشكل خاطئ,السعر والقيمة,hard,sarcasm,sarcasm promo,دقة الطلب,دقة الطلب,False,False,False,fail,sarcasm: expected='السعر والقيمة' got='دقة الطلب',607
+T456,ربما الاكل ليس سيئا لكنه على وشك الفساد,جودة الطعام,hard,negation,soft critique food,جودة الطعام,جودة الطعام,False,False,False,pass,,793
+T457,ليست تجربه فاشله هي فقط لا تستحق العوده,عامة,hard,negation,negation general,عامة,,False,False,True,pass,,1217
+T458,الموظف يبتسم بطريقه تخفي اهانه,خدمة الموظفين,hard,negation,implied staff insult,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,798
+T459,ما ادري ادا الاكل بارد عمداً ام صدفه,جودة الطعام,hard,negation,rhetorical food complaint,جودة الطعام,جودة الطعام,False,False,False,pass,,861
+T460,اشكرهم على عدم اعطائي السلطه المطلوبه,دقة الطلب,hard,sarcasm,sarcasm accuracy,جودة الطعام,جودة الطعام,False,False,False,fail,sarcasm: expected='دقة الطلب' got='جودة الطعام',604
+T461,الديليفري took forever ما يستاهل,التوصيل,medium,mixed_dialect,english 'took forever',عامة,,False,False,True,fail,mixed_dialect: expected='التوصيل' got='عامة',1704
+T462,الفاتوره too expensive والاكل قليل,السعر والقيمة,medium,mixed_dialect,english adjective,السعر والقيمة,السعر والقيمة | جودة الطعام,True,False,False,pass,,1514
+T463,Staff ما يعرفون customer service,خدمة الموظفين,medium,mixed_dialect,english service,,,False,True,False,fail,mixed_dialect: expected='خدمة الموظفين' got='',122
+T464,الكاشير اعطاني wrong order بدون اعتذار,دقة الطلب,medium,mixed_dialect,english 'wrong order',خدمة الموظفين,خدمة الموظفين,False,False,False,fail,mixed_dialect: expected='دقة الطلب' got='خدمة الموظفين',807
+T465,الاكل cold لما وصل من المندوب,جودة الطعام,medium,mixed_dialect,english 'cold',التوصيل,التوصيل | جودة الطعام,True,False,False,fail,mixed_dialect: expected='جودة الطعام' got='التوصيل',1486
+T466,Wait time عندهم disaster كامل,وقت الانتظار,medium,mixed_dialect,english wait time,عامة,,False,False,True,fail,mixed_dialect: expected='وقت الانتظار' got='عامة',1202
+T467,Hygiene عندهم zero ما اقدر اوصف,النظافة,medium,mixed_dialect,english hygiene,عامة,,False,False,True,fail,mixed_dialect: expected='النظافة' got='عامة',1206
+T468,Overall bad experience ما انصح فيه,عامة,medium,mixed_dialect,english general,,,False,True,False,fail,mixed_dialect: expected='عامة' got='',122
+T469,Driver ضاع وما رد على calls,التوصيل,medium,mixed_dialect,english driver/calls,دقة الطلب,دقة الطلب,False,False,False,fail,mixed_dialect: expected='التوصيل' got='دقة الطلب',594
+T470,Order was wrong وحسبوا علي extras,دقة الطلب,medium,mixed_dialect,english+arabic order,,,False,True,False,fail,mixed_dialect: expected='دقة الطلب' got='',122
+T471,Service slow والموظف rude بزياده,خدمة الموظفين,medium,mixed_dialect,english slow rude,خدمة الموظفين,خدمة الموظفين,False,False,False,pass,,801
+T472,Price too high لوجبه بسيطه,السعر والقيمة,medium,mixed_dialect,english price,جودة الطعام,جودة الطعام,False,False,False,fail,mixed_dialect: expected='السعر والقيمة' got='جودة الطعام',780
+T473,Bathroom dirty وما فيه toilet paper,النظافة,medium,mixed_dialect,english bathroom,,,False,True,False,fail,mixed_dialect: expected='النظافة' got='',122
+T474,Food taste weird وكأنه فاسد,جودة الطعام,medium,mixed_dialect,english taste,جودة الطعام,جودة الطعام,False,False,False,pass,,594
+T475,Long queue والكاشير one only,وقت الانتظار,medium,mixed_dialect,english queue,,,False,True,False,fail,mixed_dialect: expected='وقت الانتظار' got='',122
+T476,Bad experience مش بأول مره,عامة,medium,mixed_dialect,english experience,عامة,,False,False,True,pass,,1199
+T477,App keeps crashing لما اضيف items,التوصيل,medium,mixed_dialect,english app crashing,,,False,True,False,fail,mixed_dialect: expected='التوصيل' got='',122
+T478,Coupon code not working وما اقدر استخدمه,السعر والقيمة,medium,mixed_dialect,english coupon,دقة الطلب,دقة الطلب,False,False,False,fail,mixed_dialect: expected='السعر والقيمة' got='دقة الطلب',607
+T479,Order missing items وما اشتغل التطبيق,دقة الطلب,medium,mixed_dialect,english missing items,دقة الطلب,دقة الطلب,False,False,False,pass,,604
+T480,My order is incomplete وضاع نص الكيس,دقة الطلب,medium,mixed_dialect,english incomplete,عامة,,False,False,True,fail,mixed_dialect: expected='دقة الطلب' got='عامة',1207
+T481,الجو في الرياض اليوم حار جدا والشمس قويه,no_complaint,hard,ood,weather,عامة,,False,False,True,pass,,1209
+T482,سيارتي البطاريه فاضيه ومحتاج روبيد,no_complaint,hard,ood,car battery,دقة الطلب,دقة الطلب,False,False,False,fail,expected abstain or general fallback; got top='دقة الطلب' rail=['دقة الطلب'],601
+T483,التطبيق البنكي ما يفتح من الصباح,no_complaint,hard,ood,bank app,جودة الطعام,جودة الطعام,False,False,False,fail,expected abstain or general fallback; got top='جودة الطعام' rail=['جودة الطعام'],599
+T484,المستشفى انتظرت ٣ ساعات بدون ما يجيني الدكتور,no_complaint,hard,ood,hospital wait,وقت الانتظار,وقت الانتظار,False,False,False,fail,expected abstain or general fallback; got top='وقت الانتظار' rail=['وقت الانتظار'],863
+T485,شركة الكهرباء قطعت الخدمه بدون اشعار,no_complaint,hard,ood,utility,خدمة الموظفين,خدمة الموظفين,False,False,False,fail,expected abstain or general fallback; got top='خدمة الموظفين' rail=['خدمة الموظفين'],606
+T486,الانترنت بطيء جدا اليوم ما اقدر اشتغل,no_complaint,hard,ood,internet speed,التوصيل,التوصيل,False,False,False,fail,expected abstain or general fallback; got top='التوصيل' rail=['التوصيل'],596
+T487,الطيارة تاخرت ساعتين على الرحله,no_complaint,hard,ood,airline delay,وقت الانتظار,وقت الانتظار,False,False,False,fail,expected abstain or general fallback; got top='وقت الانتظار' rail=['وقت الانتظار'],779
+T488,جوالي اللمسه ما تشتغل من امس,no_complaint,hard,ood,phone touch,جودة الطعام,جودة الطعام,False,False,False,fail,expected abstain or general fallback; got top='جودة الطعام' rail=['جودة الطعام'],595
+T489,الجامعه الدرجات اللي اخذتها ظالمه,no_complaint,hard,ood,university grade,خدمة الموظفين,خدمة الموظفين,False,False,False,fail,expected abstain or general fallback; got top='خدمة الموظفين' rail=['خدمة الموظفين'],603
+T490,الجار حقي صوت موسيقاه عالي طول الليل,no_complaint,hard,ood,neighbor noise,وقت الانتظار,وقت الانتظار,False,False,False,fail,expected abstain or general fallback; got top='وقت الانتظار' rail=['وقت الانتظار'],601
+T491,بايخ,abstain,hard,very_short,1-word,,,False,True,False,pass,,172
+T492,سيء جدا,abstain,hard,very_short,2-word,عامة,,False,False,True,fail,expected abstain; got top='عامة' rail=[],1175
+T493,زفت,abstain,hard,very_short,1-word slang,,,False,True,False,pass,,172
+T494,ما يستاهل,abstain,hard,very_short,fixed expression,عامة,,False,False,True,fail,expected abstain; got top='عامة' rail=[],1376
+T495,للاسف,abstain,hard,very_short,1-word interjection,,,False,True,False,pass,,172
+T496,زرت الفرع الجديد اللي افتتح في شمال الرياض بعد ما شفت اعلاناتهم الكثيره في السوشال ميديا وتوقعت تجربه مميزه بناء على تقييمات الزملاء لكن للاسف الزياره كانت كارثيه من اول دقيقه استقبالنا كان فاتر والمضيفه ما رحبت فينا وبعدين النادل ما جا الا بعد ربع ساعه واخذ الطلب باستخفاف وضحك مع زميله بلا سبب وكلما طلبنا اضافه او تعديل يرد بلا اكتراث ولا اعرف ادا كان ذلك بسبب نقص التدريب او ضعف الاداره,خدمة الموظفين,hard,long,long staff-dominant review,خدمة الموظفين,خدمة الموظفين | وقت الانتظار,True,False,False,pass,,1933
+T497,طلبت من خلال تطبيق التوصيل قبل تقريبا ساعتين وكان من المفترض ان يوصل خلال خمس واربعين دقيقه حسب التقدير الموجود في الطلب لكن الواقع كان مختلف تماما حيث تاخر المندوب اكثر من ساعتين بدون اي تواصل ولا اشعار وحتى لما اتصلت بخدمة العملاء قالوا انه لا توجد معلومات عن طلبي ولا يقدرون يعرفون مكانه الحالي وبعد ساعتين والاكل وصل بارد,التوصيل,hard,long,long delivery-dominant,التوصيل,التوصيل | جودة الطعام | وقت الانتظار,True,False,False,pass,,2598
+T498,هذا الفرع من اسوء التجارب اللي مريت فيها منذ زمن طويل من ناحية النظافه شفت بقايا طعام على الكنب والطاولات ولاحظت ذبابه تطير حول البيتزا الموجوده في رف العرض وحتى الحمام كان قذرا جدا بدون مناديل ورق ولا صابون ووجدت بقعه دم على المنشفه التي اعطاني الكاشير وذلك خطر يهدد صحة الزبائن,النظافة,hard,long,long hygiene-dominant,النظافة,النظافة | جودة الطعام | خدمة الموظفين | وقت الانتظار,True,False,False,pass,,2995
+T499,الفاتوره طلعت اكثر من الضعف عن المتوقع وعندما طلبت تفسير من الكاشير قال ان هذه هي الاسعار بعد التحديث الجديد ولكن لم يخبروني قبل الطلب وحتى الكوبون اللي حصلت عليه من التطبيق لم يطبق على الفاتوره وقالوا ان شروطه لا تنطبق وعندما حاولت ان اوضح لهم انها كانت ضمن العرض الموجود في الاعلان قاطعوني ورفضوا التعديل بدون تفسير منطقي,السعر والقيمة,hard,long,long price-dominant,السعر والقيمة,السعر والقيمة | خدمة الموظفين,True,False,False,pass,,1962
+T500,طلبت وجبه عائليه تتضمن دجاج مشوي مع رز وسلطه ومشروبات وحلى لاربع اشخاص لكن عندما وصل الطلب اكتشفت ان نصف العناصر ناقصه فلا توجد سلطه ولا اضافات الزبده ولا الحلى المجاني المرفق مع العرض كما ان نوع الدجاج كان مقلي بدلا من مشوي والمشروبات كلها بدون ثلج رغم انني طلبتها مثلجه بشكل واضح في الملاحظات,دقة الطلب,hard,long,long accuracy-dominant,جودة الطعام,جودة الطعام | دقة الطلب,True,False,False,fail,long: expected='دقة الطلب' got='جودة الطعام',1994

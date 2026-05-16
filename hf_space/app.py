@@ -83,6 +83,12 @@ print(f"Loading {HF_REPO_ID} ...")
 device = "cuda" if torch.cuda.is_available() else "cpu"
 tokenizer = AutoTokenizer.from_pretrained(HF_REPO_ID)
 model = AutoModelForSequenceClassification.from_pretrained(HF_REPO_ID).to(device).eval()
+# Fail loudly if a wrong-shape model is ever fetched — covers the HF_REPO_ID
+# env-override case + future model-card mismatch. (Adversarial Q&A I-5.)
+assert model.config.num_labels == len(CATEGORIES), (
+    f"loaded model has {model.config.num_labels} labels but Space expects "
+    f"{len(CATEGORIES)} ({CATEGORIES}). Refusing to start."
+)
 print(f"Model loaded on {device}.")
 
 HERE = Path(__file__).parent
@@ -540,8 +546,18 @@ def render_message(headline_ar: str, headline_en: str) -> str:
 CATEGORY_TO_ID = {cat: i for i, cat in ID2LABEL.items()}
 
 # Rescue rules: unambiguous Arabic phrases that must produce the matched
-# category as top-1. Mirrors app/ensemble_inference.py so the Space behaves
-# the same as the API. See src/audit_predictions.py for validation.
+# category as top-1.
+#
+# ORDER IS LOAD-BEARING — first match wins (see `break` in apply_rescue).
+# Most-specific phrases first, with the catch-all `عامة` last.
+#
+# NOTE: this layer has diverged from app/ensemble_inference.py::apply_keyword_priors.
+# The Space adds: (a) the `عامة` rescue category, (b) first-match-only
+# semantics, (c) 0.30x dampening on non-rescued classes. The "Audit-validated
+# 85% → 100%" claim in `apply_rescue` was measured against the API's older
+# rescue, not this one — treat the docstring as historical context, not a
+# current measurement. The 500-row Space test in dataset/_audits/test_run_results.md
+# is the authoritative measurement for this rescue layer.
 RESCUE_RULES: list[tuple[str, list[str]]] = [
     ("النظافة", ["الحمام", "تواليت", "ذباب", "صراصير"]),
     ("وقت الانتظار", [
@@ -587,8 +603,13 @@ def apply_rescue(
     re-normalize gives a cleaner ~78%/22% split that matches user intent.
 
     Conservative: only rescues when phrase clearly indicates one category.
-    Audit-validated: takes the model from 85% to 100% on the behavioral
-    audit set (see src/audit_predictions.py); held-out test cost is ~0.9%.
+
+    Historical context: an early version of this rescue (no dampening, 4
+    categories, iterate-all) was audited via src/audit_predictions.py and
+    moved the API model from 85% to 100% on a 20-row behavioral set. The
+    current Space layer has diverged from that — the canonical measurement
+    for THIS rescue is the 500-row Space test in
+    dataset/_audits/test_run_results.md, not the older 20-row audit.
     """
     out = probs.copy()
     rescued_idx = None
@@ -634,10 +655,22 @@ NEGATIVE_WORDS = frozenset({
     "مالح", "مالحه", "مالحة", "بارد", "بارده", "باردة",
     "تاخر", "تاخرت", "تأخر", "تأخرت", "متأخر", "متاخر",
     "قذر", "قذره", "قذرة", "متسخ", "متسخه", "متسخة", "وسخ", "وسخه", "وسخة",
-    "غير", "ما", "لا", "مو", "مب",  # negation particles — only match as whole words
+    # negation particles — only match as whole words.
+    # Includes ليس/ليست (formal MSA), ابدا/ابداً (emphatic Saudi negator),
+    # and Gulf colloquial مهو/مهي. (Adversarial Q&A I-2.)
+    "غير", "ما", "لا", "مو", "مب", "ليس", "ليست", "ابدا", "ابداً",
+    "مهو", "مهي", "مهوب", "مهوش",
     "مزعج", "مزعجه", "مزعجة", "غالي", "غاليه", "غالية",
     "ضاع", "ضاعت", "محروق", "محروقه", "محروقة", "نسي", "نسوا",
     "مشكله", "مشكلة", "مشاكل", "خربان", "خربانه", "خربانة",
+})
+
+# Contrastive markers — if any appear in the cleaned text, skip the praise
+# screen. Inputs like "ممتاز بس الجو حار" or "الموظف رائع لكن الكاشير غلط"
+# are legitimate complaints framed politely; the bare praise word should not
+# swallow them. (Adversarial Q&A I-3.)
+CONTRASTIVE_MARKERS = frozenset({
+    "بس", "لكن", "لاكن", "مع", "رغم", "بالرغم", "الا", "إلا",
 })
 
 
@@ -646,8 +679,14 @@ def looks_like_praise(cleaned: str) -> bool:
 
     Uses whole-word matching (not substring) so short negation particles like
     'لا' / 'ما' don't false-match inside common words such as 'الاكل'.
+
+    Contrastive markers (بس، لكن، رغم، ...) bypass the praise screen so that
+    "ممتاز بس الجو حار" reaches the model — a mixed-sentiment complaint
+    should not be discarded just because it contains one praise word.
     """
     words = set(cleaned.split())
+    if words & CONTRASTIVE_MARKERS:
+        return False
     has_praise = bool(words & PRAISE_WORDS)
     has_negative = bool(words & NEGATIVE_WORDS)
     return has_praise and not has_negative
@@ -660,6 +699,12 @@ def predict(text: str) -> str:
             "اكتب شكوى أطول من ٣ أحرف",
             "type a longer complaint (at least 3 characters)",
         )
+    # DoS guard — the model truncates at MAX_LENGTH (192) tokens anyway, but
+    # the regex passes in clean() are O(n) over the raw input. A 1MB string
+    # would pin the cpu-basic worker; cap at 4000 chars (~500 Arabic words,
+    # well above any real complaint). (Adversarial Q&A I-10, Code audit #3.)
+    if len(text) > 4000:
+        text = text[:4000]
     if not is_arabic_enough(text):
         return render_message(
             "النص ليس بالعربية",
@@ -1625,10 +1670,13 @@ body.dark .multi-aspect-badge { border-color: rgba(138, 148, 104, 0.40); }
 }
 
 .perf-card-sub {
-    font-size: 0.82rem;
-    color: var(--ink-muted);
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--ink);
+    opacity: 0.88;
     direction: ltr;
 }
+body.dark .perf-card-sub { opacity: 0.92; }
 
 .perf-card-chart {
     width: 100%;
@@ -1646,13 +1694,15 @@ body.dark .chart-light { display: none; }
 body.dark .chart-dark { display: block; }
 
 .perf-card-caption {
-    font-size: 0.92rem;
-    color: var(--ink-muted);
-    line-height: 1.7;
+    font-size: 0.95rem;
+    color: var(--ink);
+    opacity: 0.88;
+    line-height: 1.75;
     margin: 16px 0 0;
     direction: rtl;
     text-align: right;
 }
+body.dark .perf-card-caption { opacity: 0.94; }
 
 /* ---- Inline About section ---- */
 
@@ -1866,18 +1916,6 @@ with gr.Blocks(
           </div>
         </section>
 
-        <div id="headline-wrap">
-          <div id="headline">
-            <div class="headline-stat">
-              <span class="headline-figure">95.05%</span>
-              <span class="headline-unit">test accuracy</span>
-            </div>
-            <p class="headline-note">
-              13,986 held-out real reviews. 8 categories, all above 80% F1.
-              Single best CAMeLBERT-mix from a 4-model ensemble.
-            </p>
-          </div>
-        </div>
         """
     )
 
@@ -1970,10 +2008,6 @@ with gr.Blocks(
           <div class="section-inner">
             <h2 class="section-title">عن النموذج</h2>
             {ABOUT_HTML}
-            <div class="categories-rail">
-              <span class="rail-label">الفئات</span>
-              {CATEGORIES_GRID_HTML}
-            </div>
           </div>
         </section>
         """
@@ -1984,7 +2018,7 @@ with gr.Blocks(
         f"""
         <footer id="footer">
           <div class="footer-inner">
-            <span class="made-by">Made by the NLP team at AI Club</span>
+            <span class="made-by">Made by the NLP team at the AI Club of KSU</span>
             <span class="links">
               <a href="{GITHUB_URL}" target="_blank" rel="noopener">Source on GitHub</a>
               <a href="https://huggingface.co/{HF_REPO_ID}" target="_blank" rel="noopener">Model on HF Hub</a>

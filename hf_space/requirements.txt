@@ -4,4 +4,7 @@ huggingface_hub>=0.24
 sentencepiece>=0.2
 gradio>=5.0,<6
 numpy>=1.24
+# TODO(team): pin to a commit SHA — currently tracks HEAD of an external
+# repo, meaning every Space rebuild is non-reproducible and a force-push
+# upstream could silently change behavior. See dataset/_audits/adversarial_findings.md I-6.
 pysarf @ git+https://github.com/Rashidbm/pysarf.git

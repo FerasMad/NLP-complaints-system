@@ -85,7 +85,8 @@ async def lifespan(app: FastAPI):
     try:
         state["clf"] = EnsembleClassifier(cfg, min_arabic_ratio=MIN_ARABIC_RATIO)
         state["ready"] = True
-        logger.info(f'"loaded {len(state[\"clf\"].models)} models from {cfg}"')
+        n_models = len(state["clf"].models)
+        logger.info(f'"loaded {n_models} models from {cfg}"')
     except Exception as exc:
         state["load_error"] = str(exc)
         logger.error(f'"model load failed: {exc}"')
