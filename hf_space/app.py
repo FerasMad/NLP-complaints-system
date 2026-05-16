@@ -443,45 +443,68 @@ def render_general_fallback(top: list[tuple[str, float]]) -> str:
 def render_result(
     top: list[tuple[str, float]],
     by_aspect: dict[str, list[str]] | None = None,
+    full_probs: dict[str, float] | None = None,
+    rescued_cat: str | None = None,
 ) -> str:
+    """Render the colored category rail.
+
+    Source of truth: `by_aspect` (the dict from extract_aspects), the same
+    source the "كيف فهمت" panel uses — so they're always consistent.
+
+    Algorithm:
+      - If aspect-extraction found >=1 categories: show all of them, sorted
+        by the model's softmax probability (highest = darker, at top).
+        Cap at 4 to prevent very long reviews from cluttering the rail.
+      - If aspect-extraction found 0 categories: fall back to model's top-1
+        (single badge — the historical behavior for vague inputs).
+      - If a rescue fired for a category extract_aspects missed: force-include
+        the rescued category at the top so the rail reflects the actual
+        prediction.
+
+    Visual:
+      - Index 0 (most-confident among displayed): result-rank-top (darker)
+      - Indices 1..N: result-rank-other (standard)
+      - Multi-aspect badge: fired whenever >=2 badges are shown.
+    """
     if not top:
         return EMPTY_RESULT
 
-    # Special handling: when general is top-1, reframe as "no aspect detected"
+    # General fallback unchanged — when "عامة" is the prediction, show the
+    # "شكوى عامة" reframing UI instead of the rail.
     if top[0][0] == "عامة":
         return render_general_fallback(top)
 
-    multi = is_multi_aspect(top, by_aspect)
+    # Build the categories list — aspect-extraction drives the rail.
+    aspect_cats: list[str] = list((by_aspect or {}).keys())
 
-    # Visual-only design — no percentages displayed.
-    # Why: post-rescue softmax values don't communicate truthful confidence
-    # (rescue is a deterministic override, the residual prior on dampened
-    # classes is an artifact, not a real model belief). Showing 22% on a
-    # rescue-overridden runner-up implies hedging that isn't there.
-    #
-    # Behavior:
-    #   - Multi-aspect (text mentions ≥2 aspect categories): show top 2 as
-    #     equal-weight badges side-by-side — the user sees both legitimate
-    #     interpretations.
-    #   - Single confident prediction: show ONE clean badge for the rescued
-    #     / top-1 category. No runner-ups.
+    # Sort by model softmax (descending) — most-confident first.
+    if full_probs is not None and aspect_cats:
+        aspect_cats.sort(key=lambda c: full_probs.get(c, 0.0), reverse=True)
+
+    # Force-include the rescued category at the top so the rail matches the
+    # actual prediction. (Rare: rescue usually overlaps with aspect vocab,
+    # but edge cases exist where keyword rescue fires and extract_aspects
+    # doesn't catch the same signal.)
+    if rescued_cat and rescued_cat != "عامة":
+        if rescued_cat in aspect_cats:
+            aspect_cats.remove(rescued_cat)
+        aspect_cats.insert(0, rescued_cat)
+
+    # Cap at 4 — beyond this the rail loses visual hierarchy.
+    aspect_cats = aspect_cats[:4]
+
+    # Fall back to model's top-1 if no aspects detected (rare — usually
+    # means very short input or unusual phrasing).
+    if not aspect_cats:
+        aspect_cats = [top[0][0]]
+
+    # Render. Index 0 = darker top, the rest = standard.
     rows = []
-    if multi:
-        for rank, (cat, _score) in enumerate(top[:2]):
-            en = CATEGORIES_EN.get(cat, "")
-            rows.append(
-                f'<div class="result-row result-rank-co1">'
-                f'  <div class="result-meta">'
-                f'    <span class="result-en">{en}</span>'
-                f'  </div>'
-                f'  <div class="result-cat">{cat}</div>'
-                f'</div>'
-            )
-    else:
-        cat, _score = top[0]
+    for rank, cat in enumerate(aspect_cats):
         en = CATEGORIES_EN.get(cat, "")
+        css_class = "result-rank-top" if rank == 0 else "result-rank-other"
         rows.append(
-            f'<div class="result-row result-rank-1 result-rank-solo">'
+            f'<div class="result-row {css_class}">'
             f'  <div class="result-meta">'
             f'    <span class="result-en">{en}</span>'
             f'  </div>'
@@ -489,14 +512,15 @@ def render_result(
             f'</div>'
         )
 
+    # Multi-aspect badge whenever the rail shows 2+ categories.
     badge = ""
-    if multi:
+    if len(aspect_cats) >= 2:
         badge = (
             '<div class="multi-aspect-badge">'
             '  <span class="multi-aspect-mark">⊕</span>'
             '  <span class="multi-aspect-text">'
             '    <strong>تشمل الشكوى أكثر من جانب</strong>'
-            '    <span>multi-aspect complaint, both top categories shown together</span>'
+            '    <span>multi-aspect complaint, all detected aspects shown</span>'
             '  </span>'
             '</div>'
         )
@@ -588,7 +612,10 @@ def apply_rescue(
     s = out.sum()
     if s > 0:
         out = out / s
-    return out
+    # Return (normalized probs, rescued category index or None).
+    # render_result uses rescued_idx to force-include the rescued
+    # category in the rail even when extract_aspects missed it.
+    return out, rescued_idx
 
 
 # Praise vs complaint screen — protects against the "ممتاز جدا شكرا" failure
@@ -659,15 +686,22 @@ def predict(text: str) -> str:
 
     enc = tokenizer(cleaned, return_tensors="pt", truncation=True, max_length=MAX_LENGTH).to(device)
     probs = torch.softmax(model(**enc).logits[0], dim=-1).cpu().numpy()
-    probs = apply_rescue(probs, cleaned)
+    probs, rescued_idx = apply_rescue(probs, cleaned)
+    # Full probability map so render_result can sort aspect-extracted
+    # categories by the model's softmax — drives the "darker = top" choice.
+    full_probs = {ID2LABEL[int(i)]: float(probs[i]) for i in range(len(probs))}
     top_idx = probs.argsort()[::-1][:3]
     top = [(ID2LABEL[int(i)], float(probs[i])) for i in top_idx]
+    rescued_cat = ID2LABEL[int(rescued_idx)] if rescued_idx is not None else None
 
     # Compute aspects once and reuse — also feeds the multi-aspect detector
     # so 100%/0% predictions still trigger the multi-aspect badge when two
     # distinct aspect categories are present in the text.
     matches, by_aspect = extract_aspects(cleaned)
-    return render_result(top, by_aspect) + render_understanding(cleaned, matches, by_aspect)
+    return (
+        render_result(top, by_aspect, full_probs=full_probs, rescued_cat=rescued_cat)
+        + render_understanding(cleaned, matches, by_aspect)
+    )
 
 
 EXAMPLES = [
@@ -1453,6 +1487,21 @@ body.dark .aspect-chip.aspect-accuracy .aspect-chip-cat { color: #DC9173; }
 .result-rank-co1 .result-pct { color: #F5EFE6; }
 .result-rank-co1 .result-en { color: rgba(245, 239, 230, 0.75); }
 .result-rank-co1:nth-of-type(2) { background: var(--terracotta-deep); }
+
+/* New aspect-driven rail (aspect-extraction is the source of truth) — */
+/* the "top" badge is darker so the user can see which the model considers */
+/* most prominent. All other badges share the standard terracotta. */
+.result-rank-top { background: var(--terracotta-deep); color: #F5EFE6; }
+.result-rank-top .result-rank,
+.result-rank-top .result-cat,
+.result-rank-top .result-pct { color: #F5EFE6; }
+.result-rank-top .result-en { color: rgba(245, 239, 230, 0.78); }
+
+.result-rank-other { background: var(--terracotta); color: #F5EFE6; }
+.result-rank-other .result-rank,
+.result-rank-other .result-cat,
+.result-rank-other .result-pct { color: #F5EFE6; }
+.result-rank-other .result-en { color: rgba(245, 239, 230, 0.72); }
 
 .multi-aspect-badge {
     display: flex;
